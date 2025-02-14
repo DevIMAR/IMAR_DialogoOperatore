@@ -1,0 +1,135 @@
+﻿@using IMAR_DialogoOperatore.ViewModels
+
+@inject PulsantieraGeneraleViewModel PulsantieraGeneraleViewModel
+
+<DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained"
+		   style="margin-bottom:5px;
+				  --dxbl-toolbar-font-size: 1vh;
+				  --dxbl-toolbar-line-height: 1.1vh;">
+	<Items>
+		<DxToolbarItem style="margin-right:5px;
+							  width:9vw"
+					   Click="@(() => PulsantieraGeneraleViewModel.IngressoUscitaCommand.Execute(null))"
+					   Enabled="@PulsantieraGeneraleViewModel.IngressoUscitaCommand.CanExecute(null)"
+					   Visible="@PulsantieraGeneraleViewModel.IsAssente">
+			<div>
+				<p>(E)</p>
+				<p>Entrata</p>
+			</div>
+		</DxToolbarItem>
+
+		<DxToolbarItem style="margin-right:5px;
+							  width:9vw"
+					   Click="@PulsantieraGeneraleViewModel.IngressoUscitaCommand.Execute"
+					   Enabled="@PulsantieraGeneraleViewModel.IngressoUscitaCommand.CanExecute(null)"
+					   Visible="@(!PulsantieraGeneraleViewModel.IsAssente)">
+			<div>
+				<p>(U)</p>
+				<p>Uscita</p>
+			</div>
+		</DxToolbarItem>
+
+		<DxToolbarItem style="margin-right:5px;
+							  width:9vw"
+					   Click="@PulsantieraGeneraleViewModel.InizioLavoroCommand.Execute"
+					   Enabled="@PulsantieraGeneraleViewModel.InizioLavoroCommand.CanExecute(null)">
+			<div>
+				<p>(F2)</p>
+				<p>Inizio</p>
+				<p>Lavoro</p>
+			</div>
+		</DxToolbarItem>
+
+		<DxToolbarItem style="margin-right:5px;
+							  width:9vw"
+					   Click="@PulsantieraGeneraleViewModel.FineLavoroCommand.Execute"
+					   Enabled="@PulsantieraGeneraleViewModel.FineLavoroCommand.CanExecute(null)">
+			<div>
+				<p>(F3)</p>
+				<p>Fine</p>
+				<p>Lavoro</p>
+			</div>
+		</DxToolbarItem>
+
+		<DxToolbarItem Text="Avanzamento (F4)"
+					   style="margin-right:5px;
+							  width:9vw"
+					   Click="@PulsantieraGeneraleViewModel.AvanzamentoCommand.Execute"
+					   Enabled="@PulsantieraGeneraleViewModel.AvanzamentoCommand.CanExecute(null)">
+			<div>
+				<p>(F4)</p>
+				<p>Avanzamento</p>
+			</div>
+		</DxToolbarItem>
+
+		<DxToolbarItem style="margin-right:5px;
+							  width:9vw"
+					   Click="@PulsantieraGeneraleViewModel.InizioFinePausaCommand.Execute"
+					   Enabled="@PulsantieraGeneraleViewModel.InizioFinePausaCommand.CanExecute(!PulsantieraGeneraleViewModel.IsInPausa)">
+			<div>
+				<p>(F6)</p>
+				<p>Inizio</p>
+				<p>Pausa</p>
+			</div>
+		</DxToolbarItem>
+
+		<DxToolbarItem style="margin-right:5px;
+							  width:9vw"
+					   Click="@PulsantieraGeneraleViewModel.InizioFinePausaCommand.Execute"
+					   Enabled="@PulsantieraGeneraleViewModel.InizioFinePausaCommand.CanExecute(PulsantieraGeneraleViewModel.IsInPausa)">
+			<div>
+				<p>(F7)</p>
+				<p>Fine</p>
+				<p>Pausa</p>
+			</div>
+		</DxToolbarItem>
+
+		<DxToolbarItem style="margin-right:5px;
+							  width:9vw"
+					   Click="@PulsantieraGeneraleViewModel.InizioAttrezzaggioCommand.Execute"
+					   Enabled="@PulsantieraGeneraleViewModel.InizioAttrezzaggioCommand.CanExecute(null)">
+			<div>
+				<p>(F9)</p>
+				<p>Inizio</p>
+				<p>Attrezzaggio</p>
+			</div>
+		</DxToolbarItem>
+
+		<DxToolbarItem style="margin-right:5px;
+							  width:9vw"
+					   Click="@PulsantieraGeneraleViewModel.FineAttrezzaggioCommand.Execute"
+					   Enabled="@PulsantieraGeneraleViewModel.FineAttrezzaggioCommand.CanExecute(null)">
+			<div>
+				<p>(F10)</p>
+				<p>Fine</p>
+				<p>Attrezzaggio</p>
+			</div>
+		</DxToolbarItem>
+
+		<DxToolbarItem Text="Annulla Operazione (Esc)"
+					   style="margin-right:5px;
+							  width:9vw"
+					   Click="@PulsantieraGeneraleViewModel.AnnulaOperazioneCommand.Execute"
+					   Enabled="@PulsantieraGeneraleViewModel.AnnulaOperazioneCommand.CanExecute(null)" >
+			<div>
+				<p>(Esc)</p>
+				<p>Annulla</p>
+				<p>Operazione</p>
+			</div>
+		</DxToolbarItem>
+	</Items>
+</DxToolbar>
+
+@code {
+	protected override Task OnInitializedAsync()
+	{
+		PulsantieraGeneraleViewModel.NotifyStateChanged += PulsantieraGeneraleViewModel_NotifyStateChanged;
+
+		return base.OnInitializedAsync();
+	}
+
+	private async void PulsantieraGeneraleViewModel_NotifyStateChanged()
+	{
+		await InvokeAsync(StateHasChanged);
+	}
+}

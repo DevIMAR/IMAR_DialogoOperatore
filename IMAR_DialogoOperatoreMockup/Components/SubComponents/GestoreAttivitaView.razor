@@ -1,0 +1,51 @@
+﻿@using IMAR_DialogoOperatore.ViewModels
+
+@inject GestoreAttivitaViewModel GestoreAttivitaViewModel
+
+<DxDrawer IsOpen="@IsOpen"
+		  Position="DrawerPosition.Right"
+		  Mode="DrawerMode.Overlap"
+		  PanelWidth="35%"
+		  CloseOnTargetContentClick="false">
+	<HeaderTemplate>
+		<div style="font-size:2.5vh">
+			Operazione: @GestoreAttivitaViewModel.OperazioneInCorso
+		</div>
+	</HeaderTemplate>
+
+	<BodyTemplate>
+		<AttivitaDetails @ref="@AttivitaDetails" />
+	</BodyTemplate>
+
+	<FooterTemplate>
+		<DxButton Text="Conferma"
+				  Enabled="@GestoreAttivitaViewModel.ConfermaCommand.CanExecute(null)"
+				  Click="@GestoreAttivitaViewModel.ConfermaCommand.Execute"
+				  class="d-flex justify-content-center align-items-center"
+				  style="padding-top:3%;
+					     padding-bottom:3%;
+						 font-size:1.668vh;" />
+	</FooterTemplate>
+
+	<TargetContent>
+		<AttivitaGrid />
+	</TargetContent>
+</DxDrawer>
+
+@code {
+	private AttivitaDetails AttivitaDetails;
+
+	public bool IsOpen => GestoreAttivitaViewModel.IsOpen;
+
+	protected override Task OnInitializedAsync()
+	{
+		GestoreAttivitaViewModel.NotifyStateChanged += GestoreAttivitaViewModel_NotifyStateChanged;
+
+		return base.OnInitializedAsync();
+	}
+
+	private async void GestoreAttivitaViewModel_NotifyStateChanged()
+	{
+		await InvokeAsync(StateHasChanged);
+	}
+}

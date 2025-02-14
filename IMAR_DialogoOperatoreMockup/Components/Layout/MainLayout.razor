@@ -1,0 +1,147 @@
+﻿@using IMAR_DialogoOperatore.Application
+@using IMAR_DialogoOperatore.Application.Interfaces.Utilities
+@using IMAR_DialogoOperatore.Components.SubComponents
+@using IMAR_DialogoOperatore.Interfaces.Observers
+@using IMAR_DialogoOperatore.ViewModels
+
+@inherits LayoutComponentBase
+
+@inject IDialogoOperatoreObserver DialogoOperatoreObserver
+@inject DialogoOperatoreViewModel DialogoOperatoreViewModel
+@inject IAutoLogoutUtility AutoLogoutUtility
+
+<div @onkeydown="HandleKeyPress"
+	 tabindex="0"
+	 style="outline:none;
+	  		height:100vh;"
+	 @ref="pageElement"
+	 @onclick="RestartAutoLogoutTimer"
+	 @onmousemove="RestartAutoLogoutTimer"
+	 @onmousedown="RestartAutoLogoutTimer">
+
+	<DxLoadingPanel Visible="@DialogoOperatoreViewModel.IsLoaderVisibile"
+					ApplyBackgroundShading="true">
+		<DxGridLayout>
+			<Rows>
+				<DxGridLayoutRow />
+				<DxGridLayoutRow Height="2vh" />
+				<DxGridLayoutRow Height="auto" />
+			</Rows>
+
+			<Columns>
+				<DxGridLayoutColumn Width="0.5vw" />
+				<DxGridLayoutColumn />
+				<DxGridLayoutColumn Width="0.5vw" />
+			</Columns>
+
+			<Items>
+				<DxGridLayoutItem Row="0" Column="1">
+					<Template>
+						@Body
+					</Template>
+				</DxGridLayoutItem>
+
+				<DxGridLayoutItem Row="2" Column="1">
+					<Template>
+						<PulsantieraGenerale />
+					</Template>
+				</DxGridLayoutItem>
+			</Items>
+		</DxGridLayout>
+	</DxLoadingPanel>
+</div>
+
+@code {
+	private ElementReference pageElement;
+
+	protected override Task OnInitializedAsync()
+	{
+		DialogoOperatoreViewModel.NotifyStateChanged += DialogoOperatoreViewModel_NotifyStateChanged;
+
+		return base.OnInitializedAsync();
+	}
+
+	private async void DialogoOperatoreViewModel_NotifyStateChanged()
+	{
+		await InvokeAsync(StateHasChanged);
+	}
+
+	private void RestartAutoLogoutTimer()
+	{
+		if (isRestartTimerActive())
+			AutoLogoutUtility.RestartTimer();
+	}
+
+	private bool isRestartTimerActive()
+	{
+		return AutoLogoutUtility.IsActive &&
+			   DialogoOperatoreObserver.OperatoreSelezionato != null &&
+			   DialogoOperatoreObserver.OperatoreSelezionato.Stato != Costanti.ASSENTE &&
+			   DialogoOperatoreObserver.OperatoreSelezionato.Stato != Costanti.IN_PAUSA;
+	}
+
+	private void HandleKeyPress(KeyboardEventArgs e)
+	{
+		switch (e.Key)
+		{
+			case "e":
+			case "E":
+				if (DialogoOperatoreViewModel.PulsantieraGeneraleViewModel.IngressoUscitaCommand.CanExecute(null))
+					DialogoOperatoreViewModel.PulsantieraGeneraleViewModel.IngressoUscitaCommand.Execute(null);
+				break;
+
+			case "u":
+			case "U":
+				if (DialogoOperatoreViewModel.PulsantieraGeneraleViewModel.IngressoUscitaCommand.CanExecute(null))
+					DialogoOperatoreViewModel.PulsantieraGeneraleViewModel.IngressoUscitaCommand.Execute(null);
+				break;
+
+			case "F2":
+				if (DialogoOperatoreViewModel.PulsantieraGeneraleViewModel.InizioLavoroCommand.CanExecute(null))
+					DialogoOperatoreViewModel.PulsantieraGeneraleViewModel.InizioLavoroCommand.Execute(null);
+				break;
+
+			case "F3":
+				if (DialogoOperatoreViewModel.PulsantieraGeneraleViewModel.FineLavoroCommand.CanExecute(null))
+					DialogoOperatoreViewModel.PulsantieraGeneraleViewModel.FineLavoroCommand.Execute(null);
+				break;
+
+			case "F4":
+				if (DialogoOperatoreViewModel.PulsantieraGeneraleViewModel.AvanzamentoCommand.CanExecute(null))
+					DialogoOperatoreViewModel.PulsantieraGeneraleViewModel.AvanzamentoCommand.Execute(null);
+				break;
+
+			case "F6":
+				if (DialogoOperatoreViewModel.PulsantieraGeneraleViewModel.InizioFinePausaCommand.CanExecute(!DialogoOperatoreViewModel.PulsantieraGeneraleViewModel.IsInPausa))
+					DialogoOperatoreViewModel.PulsantieraGeneraleViewModel.InizioFinePausaCommand.Execute(null);
+				break;
+
+			case "F7":
+				if (DialogoOperatoreViewModel.PulsantieraGeneraleViewModel.InizioFinePausaCommand.CanExecute(DialogoOperatoreViewModel.PulsantieraGeneraleViewModel.IsInPausa))
+					DialogoOperatoreViewModel.PulsantieraGeneraleViewModel.InizioFinePausaCommand.Execute(null);
+				break;
+
+			case "F9":
+				if (DialogoOperatoreViewModel.PulsantieraGeneraleViewModel.InizioAttrezzaggioCommand.CanExecute(null))
+					DialogoOperatoreViewModel.PulsantieraGeneraleViewModel.InizioAttrezzaggioCommand.Execute(null);
+				break;
+
+			case "F10":
+				if (DialogoOperatoreViewModel.PulsantieraGeneraleViewModel.FineAttrezzaggioCommand.CanExecute(null))
+					DialogoOperatoreViewModel.PulsantieraGeneraleViewModel.FineAttrezzaggioCommand.Execute(null);
+				break;
+
+			case "Escape":
+				if (DialogoOperatoreViewModel.PulsantieraGeneraleViewModel.AnnulaOperazioneCommand.CanExecute(null))
+					DialogoOperatoreViewModel.PulsantieraGeneraleViewModel.AnnulaOperazioneCommand.Execute(null);
+				break;
+		}
+
+		RestartAutoLogoutTimer();
+	}
+
+	public void Dispose()
+	{
+		DialogoOperatoreViewModel.NotifyStateChanged -= DialogoOperatoreViewModel_NotifyStateChanged;
+	}
+}

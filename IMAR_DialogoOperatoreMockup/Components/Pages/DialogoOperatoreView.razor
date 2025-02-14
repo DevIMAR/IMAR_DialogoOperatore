@@ -1,0 +1,56 @@
+﻿@using IMAR_DialogoOperatore.Components.SubComponents
+@using IMAR_DialogoOperatore.Interfaces.Observers
+@using IMAR_DialogoOperatore.ViewModels
+@using IMAR_DialogoOperatore.Components.Popups
+
+@inject GestoreAttivitaViewModel GestoreAttivitaViewModel
+
+<DxGridLayout @onkeypress="@HandleKeyPress">
+	<Rows>
+		<DxGridLayoutRow Height="auto" />
+		<DxGridLayoutRow Height="2vh" />
+		<DxGridLayoutRow />
+	</Rows>
+
+	<Items>
+		<DxGridLayoutItem Row="0" Column="1">
+			<Template>
+				<InfoOperatoreView />
+			</Template>
+		</DxGridLayoutItem>
+
+		<DxGridLayoutItem Row="2" Column="1">
+			<Template>
+				<GestoreAttivitaView @ref="GestoreAttivita" />
+			</Template>
+		</DxGridLayoutItem>
+	</Items>
+</DxGridLayout>
+
+<PopupDiConfermaView />
+
+@code {
+	private GestoreAttivitaView GestoreAttivita;
+
+	protected override Task OnInitializedAsync()
+	{
+		return base.OnInitializedAsync();
+	}
+
+	private void HandleKeyPress(KeyboardEventArgs e)
+	{
+		switch (e.Key)
+		{
+			case "Enter":
+				if (IsConfermabile())
+					GestoreAttivitaViewModel.ConfermaCommand.Execute(null);
+				break;
+		}
+	}
+
+	private bool IsConfermabile()
+	{
+		return GestoreAttivita.IsOpen &&
+			   GestoreAttivitaViewModel.ConfermaCommand.CanExecute(null);
+	}
+}

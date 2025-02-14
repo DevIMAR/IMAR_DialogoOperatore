@@ -1,0 +1,319 @@
+﻿@using IMAR_DialogoOperatore.Interfaces.Observers
+@using IMAR_DialogoOperatore.ViewModels
+
+@inject AttivitaDetailsViewModel AttivitaDetailsViewModel
+@inject IDialogoOperatoreObserver DialogoOperatoreObserver
+
+<DxGridLayout style="font-size:1.668vh">
+	<Rows>
+		<DxGridLayoutRow />
+		<DxGridLayoutRow />
+		<DxGridLayoutRow />
+		<DxGridLayoutRow />
+		<DxGridLayoutRow />
+		<DxGridLayoutRow />
+		<DxGridLayoutRow />
+		<DxGridLayoutRow />
+		<DxGridLayoutRow />
+		<DxGridLayoutRow />
+		<DxGridLayoutRow />
+		<DxGridLayoutRow />
+		<DxGridLayoutRow />
+		<DxGridLayoutRow />
+		<DxGridLayoutRow />
+		<DxGridLayoutRow />
+		<DxGridLayoutRow Height="20%" />
+	</Rows>
+	<Columns>
+		<DxGridLayoutColumn />
+		<DxGridLayoutColumn />
+		<DxGridLayoutColumn />
+		<DxGridLayoutColumn />
+		<DxGridLayoutColumn />
+		<DxGridLayoutColumn />
+		<DxGridLayoutColumn />
+		<DxGridLayoutColumn />
+		<DxGridLayoutColumn />
+		<DxGridLayoutColumn />
+		<DxGridLayoutColumn />
+		<DxGridLayoutColumn />
+	</Columns>
+
+	<Items>
+		<DxGridLayoutItem Row="0"
+						  Column="1" ColumnSpan="5">
+			<Template>
+				<div style="height:100% !important"
+					 class="d-flex justify-content-center align-items-center">
+					<label>BOLLA</label>
+				</div>
+			</Template>
+		</DxGridLayoutItem>
+
+		<DxGridLayoutItem Row="0"
+						  Column="6" ColumnSpan="5">
+			<Template>
+				<div style="height:100% !important"
+					 class="d-flex justify-content-center align-items-center">
+					<label>ODP</label>
+				</div>
+			</Template>
+		</DxGridLayoutItem>
+
+		<DxGridLayoutItem Row="1"
+						  Column="1" ColumnSpan="5">
+			<Template>
+				<DxTextBox @bind-Text="@AttivitaDetailsViewModel.Bolla"
+						   style="margin-bottom:5px;
+								  --dxbl-text-edit-padding-x: 0.35vw;
+								  --dxbl-text-edit-padding-y: 0vh;
+								  --dxbl-text-edit-font-size: 1.668vh;"
+						   @ref="@Bolla" />
+			</Template>
+		</DxGridLayoutItem>
+
+		<DxGridLayoutItem Row="1"
+						  Column="6" ColumnSpan="5">
+			<Template>
+				<DxTextBox @bind-Text="@AttivitaDetailsViewModel.Odp"
+						   style="margin-bottom:5px;
+								  --dxbl-text-edit-padding-x: 0.35vw;
+								  --dxbl-text-edit-padding-y: 0vh;
+								  --dxbl-text-edit-font-size: 1.668vh;" />
+			</Template>
+		</DxGridLayoutItem>
+
+		<DxGridLayoutItem Row="2"
+						  Column="1" ColumnSpan="5">
+			<Template>
+				<div style="height:100% !important"
+					 class="d-flex justify-content-center align-items-center">
+					<label>ARTICOLO</label>
+				</div>
+			</Template>
+		</DxGridLayoutItem>
+
+		<DxGridLayoutItem Row="2"
+						  Column="6" ColumnSpan="5">
+			<Template>
+				<div style="height:100% !important"
+					 class="d-flex justify-content-center align-items-center">
+					<label>FASE</label>
+				</div>
+			</Template>
+		</DxGridLayoutItem>
+
+		<DxGridLayoutItem Row="3"
+						  Column="1" ColumnSpan="5">
+			<Template>
+				<DxTextBox Enabled="false"
+						   Text="@(AttivitaDetailsViewModel.Articolo)"
+						   style="margin-bottom:5px;
+								  --dxbl-text-edit-padding-x: 0.35vw;
+								  --dxbl-text-edit-padding-y: 0vh;
+								  --dxbl-text-edit-font-size: 1.668vh;" />
+			</Template>
+		</DxGridLayoutItem>
+
+		<DxGridLayoutItem Row="3"
+						  Column="6" ColumnSpan="5">
+			<Template>
+				<DxComboBox Data="@AttivitaDetailsViewModel.FasiPerAttivita"
+							@bind-Value="@(AttivitaDetailsViewModel.FaseSelezionata)"
+							style="margin-bottom:5px;
+									     --dxbl-text-edit-padding-x: 0.35vw;
+									     --dxbl-text-edit-padding-y: 0vh;
+									     --dxbl-text-edit-font-size: 1.668vh;
+									     --dxbl-text-edit-btn-padding-x: 0.35vw;
+									     --dxbl-text-edit-btn-padding-y: 0vh;"
+							@ref="@Fasi"
+							@onkeydown="HandleKeyPress" />
+			</Template>
+		</DxGridLayoutItem>
+
+		<DxGridLayoutItem Row="4"
+						  Column="1" ColumnSpan="10">
+			<Template>
+				<div style="height:100% !important"
+					 class="d-flex justify-content-center align-items-center">
+					<label>DESCRIZIONE ARTICOLO</label>
+				</div>
+			</Template>
+		</DxGridLayoutItem>
+
+		<DxGridLayoutItem Row="5"
+						  Column="1" ColumnSpan="10">
+			<Template>
+				<DxTextBox Text="@(AttivitaDetailsViewModel.DescrizioneArticolo)"
+						   Enabled="false"
+						   style="margin-bottom:5px;
+								  --dxbl-text-edit-padding-x: 0.35vw;
+								  --dxbl-text-edit-padding-y: 0vh;
+								  --dxbl-text-edit-font-size: 1.668vh;" />
+			</Template>
+		</DxGridLayoutItem>
+
+		<DxGridLayoutItem Row="6"
+						  Column="1" ColumnSpan="10">
+			<Template>
+				<div style="height:100% !important"
+					 class="d-flex justify-content-center align-items-center">
+					<label>DESCRIZIONE FASE</label>
+				</div>
+			</Template>
+		</DxGridLayoutItem>
+
+		<DxGridLayoutItem Row="7"
+						  Column="1" ColumnSpan="10">
+			<Template>
+				<DxTextBox Text="@(AttivitaDetailsViewModel.DescrizioneFase)"
+						   Enabled="false"
+						   style="margin-bottom:5px;
+								  --dxbl-text-edit-padding-x: 0.35vw;
+								  --dxbl-text-edit-padding-y: 0vh;
+								  --dxbl-text-edit-font-size: 1.668vh;" />
+			</Template>
+		</DxGridLayoutItem>
+
+		<DxGridLayoutItem Row="8" RowSpan="3"
+						  Column="1" ColumnSpan="2">
+			<Template>
+				<DxProgressBar Type="ProgressBarType.Circular"
+							   MaxValue="@AttivitaDetailsViewModel.QuantitaOrdine"
+							   Value="@AttivitaDetailsViewModel.QuantitaProdottaPrecedentemente"
+							   Size="12vh"
+							   Thickness="10px"
+							   Label="@AttivitaDetailsViewModel.CompletamentoFase"
+							   LabelPosition="ProgressBarLabelPosition.Top"
+							   ShowLabel="true"
+							   style="--dxbl-progress-bar-label-font-size: 1.668vh;">
+				</DxProgressBar>
+			</Template>
+		</DxGridLayoutItem>
+
+		<DxGridLayoutItem Row="8"
+						  Column="4" ColumnSpan="5">
+			<Template>
+				<div>
+					<label>Qt. RESIDUA: @AttivitaDetailsViewModel.QuantitaResidua</label>
+				</div>
+			</Template>
+		</DxGridLayoutItem>
+
+		<DxGridLayoutItem Row="9"
+						  Column="4" ColumnSpan="5">
+			<Template>
+				<div>
+					<label>Qt. SCARTATA TOTALE: @AttivitaDetailsViewModel.QuantitaScartataTotale</label>
+				</div>
+			</Template>
+		</DxGridLayoutItem>
+
+		<DxGridLayoutItem Row="10"
+						  Column="4" ColumnSpan="5">
+			<Template>
+				<div>
+					<label>@AttivitaDetailsViewModel.StatoAttivita</label>
+				</div>
+			</Template>
+		</DxGridLayoutItem>
+
+		<DxGridLayoutItem Row="11" RowSpan="3"
+						  Column="1" ColumnSpan="10"
+						  Visible="@AttivitaDetailsViewModel.IsAvanzamento">
+			<Template>
+				<AvanzamentoAttivitaView />
+			</Template>
+		</DxGridLayoutItem>
+
+		<DxGridLayoutItem Row="14"
+						  Column="1" ColumnSpan="10"
+						  Visible="@AttivitaDetailsViewModel.IsFineLavoro">
+			<Template>
+				<div style="height:100% !important"
+					 class="d-flex justify-content-center align-items-center">
+					<label>ATTIVA RIAPERTURA AUTOMATICA</label>
+				</div>
+			</Template>
+		</DxGridLayoutItem>
+
+		<DxGridLayoutItem Row="15"
+						  Column="1" ColumnSpan="10"
+						  Visible="@AttivitaDetailsViewModel.IsFineLavoro">
+			<Template>
+				<DxCheckBox CheckType="CheckType.Switch"
+							@bind-Checked="@AttivitaDetailsViewModel.IsRiaperturaAttiva"
+							LabelPosition="LabelPosition.Left"
+							Alignment="CheckBoxContentAlignment.Center"
+							SizeMode="SizeMode.Large"
+							style="font-size:1.668vh;" />
+			</Template>
+		</DxGridLayoutItem>
+	</Items>
+</DxGridLayout>
+
+@code {
+	private DxComboBox<string, string> Fasi;
+
+	public DxTextBox Bolla { get; set; }
+
+	protected override Task OnInitializedAsync()
+	{
+		AttivitaDetailsViewModel.NotifyStateChanged += AttivitaDetailsViewModel_NotifyStateChanged;
+
+		return base.OnInitializedAsync();
+	}
+
+	protected override Task OnAfterRenderAsync(bool firstRender)
+	{
+		SetFocus();
+
+		return base.OnAfterRenderAsync(firstRender);
+	}
+
+	private async void AttivitaDetailsViewModel_NotifyStateChanged()
+	{
+		await InvokeAsync(StateHasChanged);
+	}
+
+	private void SetFocus()
+	{
+		try
+		{
+			if (!DialogoOperatoreObserver.IsDettaglioAttivitaOpen)
+				return;
+
+			if (Fasi.Data.Count() == 0)
+			{
+				Thread.Sleep(50);
+				Bolla.FocusAsync();
+			}
+			else
+				Fasi.FocusAsync();
+		}
+		catch
+		{
+
+		}
+	}
+
+	private void HandleKeyPress(KeyboardEventArgs e)
+	{
+		List<string> listaFasi = AttivitaDetailsViewModel.FasiPerAttivita.ToList();
+		if (listaFasi.Count <= 1)
+			return;
+
+		int index = listaFasi.IndexOf(AttivitaDetailsViewModel.FaseSelezionata);
+
+		switch (e.Key)
+		{
+			case "ArrowUp":
+				AttivitaDetailsViewModel.FaseSelezionata = index < listaFasi.Count - 1 ? listaFasi[index + 1] : listaFasi[index];
+				break;
+
+			case "ArrowDown":
+				AttivitaDetailsViewModel.FaseSelezionata = index > 0 ? listaFasi[index - 1] : listaFasi[index];
+				break;
+		}
+	}
+}
