@@ -1,0 +1,158 @@
+﻿{
+   "CodeGenerationMode": 4,
+   "ContextClassName": "synergyJMES",
+   "ContextNamespace": null,
+   "FilterSchemas": false,
+   "IncludeConnectionString": false,
+   "ModelNamespace": null,
+   "OutputContextPath": null,
+   "OutputPath": "Models",
+   "PreserveCasingWithRegex": true,
+   "ProjectRootNamespace": "IMAR_DialogoOperatore.Domain",
+   "Schemas": null,
+   "SelectedHandlebarsLanguage": 2,
+   "SelectedToBeGenerated": 2,
+   "T4TemplatePath": null,
+   "Tables": [
+      {
+         "Name": "[dbo].[AngBdg]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[AngDay]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[AngGrp]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[AngGrpLng]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[AngMesBrk]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[AngMesBrkLng]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[AngMesDecTyp]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[AngMesDecTypLng]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[AngMesEvtOpeSts]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[AngMesEvtOpeStsLng]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[AngMesSsp]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[AngMesSspLng]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[AngMesSts]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[AngMesStsLng]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[AngRes]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[MesBckEvt]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[MesBckEvtDet]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[MesBckEvtMacDet]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[MesBckEvtOpe]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[MesDiaDefMac]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[MesDiaOpe]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[MesDiaOpeDet]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[MesEvt]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[MesEvtDet]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[MesEvtMacDet]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[MesEvtOpe]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[TblMesClkRes]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[TblResBrk]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[TblResClk]",
+         "ObjectType": 0
+      }
+   ],
+   "UiHint": null,
+   "UncountableWords": null,
+   "UseAsyncStoredProcedureCalls": true,
+   "UseBoolPropertiesWithoutDefaultSql": false,
+   "UseDatabaseNames": true,
+   "UseDateOnlyTimeOnly": true,
+   "UseDbContextSplitting": false,
+   "UseDecimalDataAnnotationForSprocResult": true,
+   "UseFluentApiOnly": true,
+   "UseHandleBars": false,
+   "UseHierarchyId": false,
+   "UseInflector": false,
+   "UseLegacyPluralizer": false,
+   "UseManyToManyEntity": false,
+   "UseNoDefaultConstructor": false,
+   "UseNoNavigations": false,
+   "UseNoObjectFilter": false,
+   "UseNodaTime": false,
+   "UseNullableReferences": false,
+   "UsePrefixNavigationNaming": false,
+   "UseSchemaFolders": false,
+   "UseSchemaNamespaces": false,
+   "UseSpatial": false,
+   "UseT4": false
+}
