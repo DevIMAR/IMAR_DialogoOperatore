@@ -1,0 +1,44 @@
+﻿@using IMAR_DialogoOperatore.ViewModels
+
+@inject DocumentaleViewModel DocumentaleViewModel;
+
+@{
+    switch (ProprietaDaCercare.ToLower())
+    {
+        case "odp":
+            LinkDocumentale = DocumentaleViewModel.MorpheusApiService.GetDocumentaleDaOdp(Codice);
+            break;
+        case "articolo":
+            LinkDocumentale = DocumentaleViewModel.MorpheusApiService.GetDocumentaleDaArticolo(Codice);
+            break;
+        default:
+            break;
+    }
+
+    if (ShowIcon)
+    {
+        <a href="@LinkDocumentale" target="_blank">
+            <DxButton RenderStyle="ButtonRenderStyle.None" Text="@Codice" Title="@("Disegno " + Codice)"
+                CssClass="icon search" />
+        </a>
+    }
+    else
+    {
+        <a href="@LinkDocumentale" target="_blank">
+            <span style="text-decoration:underline;">@Codice</span>
+        </a>
+    }
+}
+
+@code {
+    [Parameter] 
+    public string Codice { get; set; } = "";
+
+    [Parameter] 
+    public bool ShowIcon { get; set; } = true;
+
+    [Parameter]
+    public string ProprietaDaCercare { get; set; } = "odp";
+
+    string? LinkDocumentale { get; set; }
+}

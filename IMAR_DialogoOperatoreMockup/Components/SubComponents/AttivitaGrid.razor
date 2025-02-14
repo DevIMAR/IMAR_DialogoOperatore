@@ -1,0 +1,122 @@
+﻿@using IMAR_DialogoOperatore.Interfaces.Observers
+@using IMAR_DialogoOperatore.ViewModels
+
+@inject AttivitaGridViewModel AttivitaGridViewModel
+
+<div @onkeypress="@HandleKeyPress">
+	<DxGrid @bind-Data="@AttivitaGridViewModel.Attivita"
+			AllowSort="false"
+			FocusedRowEnabled="true"
+			AllowSelectRowByClick="true"
+			SelectionMode="GridSelectionMode.Single"
+			@bind-SelectedDataItem="@AttivitaGridViewModel.AttivitaSelezionata"
+			PageSize="25"
+			style="--dxbl-grid-font-size:1.668vh;"
+			@ref="Grid">
+		<Columns>
+			<DxGridDataColumn FieldName="@(nameof(AttivitaViewModel.Causale))"
+							  Caption=" "
+							  TextAlignment="GridTextAlignment.Center"
+							  Width="3%">
+			</DxGridDataColumn>
+
+			<DxGridDataColumn FieldName="@(nameof(AttivitaViewModel.Odp))"
+							  Caption="Odp"
+							  TextAlignment="GridTextAlignment.Left"
+							  Width="7%"
+							  Name="odp"
+							  SortIndex="1">
+				<CellDisplayTemplate>
+					@{
+						AttivitaViewModel itemRow = (AttivitaViewModel)context.DataItem;
+
+						if (itemRow.Odp != null && !itemRow.Odp.Equals(string.Empty))
+						{
+							<DocumentaleView ProprietaDaCercare="odp" Codice="@itemRow.Odp" ShowIcon="false" />
+						}
+					}
+				</CellDisplayTemplate>
+			</DxGridDataColumn>
+
+			<DxGridDataColumn FieldName="@(nameof(AttivitaViewModel.Articolo))"
+							  Caption="Articolo"
+							  TextAlignment="GridTextAlignment.Left"
+							  Width="13%">
+				<CellDisplayTemplate>
+					@{
+						AttivitaViewModel itemRow = (AttivitaViewModel)context.DataItem;
+
+						if (itemRow.Articolo != null && !itemRow.Articolo.Equals(string.Empty))
+						{
+							<DocumentaleView ProprietaDaCercare="articolo" Codice="@itemRow.Articolo" ShowIcon="false" />
+						}
+					}
+				</CellDisplayTemplate>
+			</DxGridDataColumn>
+
+			<DxGridDataColumn FieldName="@(nameof(AttivitaViewModel.DescrizioneArticolo))"
+							  Caption="Desc. Articolo"
+							  TextAlignment="GridTextAlignment.Left"
+							  Width="36%">
+			</DxGridDataColumn>
+
+			<DxGridDataColumn FieldName="@(nameof(AttivitaViewModel.Fase))"
+							  Caption="Fase"
+							  TextAlignment="GridTextAlignment.Left"
+							  Width="5%"
+							  SortIndex="2">
+			</DxGridDataColumn>
+
+			<DxGridDataColumn FieldName="@(nameof(AttivitaViewModel.DescrizioneFase))"
+							  Caption="Desc. Fase"
+							  TextAlignment="GridTextAlignment.Left"
+							  Width="36%">
+			</DxGridDataColumn>
+		</Columns>
+	</DxGrid>
+</div>
+
+@code {
+	private DxGrid Grid;
+
+	protected override Task OnInitializedAsync()
+	{
+		AttivitaGridViewModel.NotifyStateChanged += AttivitaGridViewModel_NotifyStateChanged;
+
+		return base.OnInitializedAsync();
+	}
+
+	private async void AttivitaGridViewModel_NotifyStateChanged()
+	{
+		if (AttivitaGridViewModel.Attivita != null && Enumerable.Count(AttivitaGridViewModel.Attivita) > 0)
+			Grid.SetFocusedRowIndex(0);
+
+		await InvokeAsync(StateHasChanged);
+	}
+
+	private void HandleKeyPress(KeyboardEventArgs e)
+	{
+		if (AttivitaGridViewModel.Attivita != null)
+			return;
+
+		int actualIndex = Grid.GetFocusedRowIndex();
+		int newIndex = 0;
+
+		switch (e.Key)
+		{
+			case "Enter":
+				Grid.SelectedDataItem = Grid.GetFocusedDataItem();
+				break;
+
+			case "ArrowUp":
+				newIndex = actualIndex < Enumerable.Count(AttivitaGridViewModel.Attivita) - 1 ? actualIndex++ : actualIndex;
+				Grid.SetFocusedRowIndex(newIndex);
+				break;
+
+			case "ArrowDown":
+				newIndex = actualIndex > 0 ? actualIndex-- : actualIndex;
+				Grid.SetFocusedRowIndex(newIndex);
+				break;
+		}
+	}
+}
