@@ -1,12 +1,12 @@
 ﻿using IMAR_DialogoOperatore.Application;
-using IMAR_DialogoOperatore.Application.Interfaces.ViewModels;
 using IMAR_DialogoOperatore.Commands;
 using IMAR_DialogoOperatore.Interfaces.Observers;
+using IMAR_DialogoOperatore.Interfaces.ViewModels;
 using System.Windows.Input;
 
 namespace IMAR_DialogoOperatore.ViewModels
 {
-	public class GestoreAttivitaViewModel : ViewModelBase
+    public class GestoreAttivitaViewModel : ViewModelBase
 	{
 		private readonly IDialogoOperatoreObserver _dialogoOperatoreStore;
 		private readonly ICercaAttivitaObserver _cercaAttivitaStore;

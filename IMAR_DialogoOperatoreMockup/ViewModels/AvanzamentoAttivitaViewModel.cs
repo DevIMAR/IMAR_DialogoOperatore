@@ -1,6 +1,6 @@
 ﻿using IMAR_DialogoOperatore.Application;
-using IMAR_DialogoOperatore.Application.Interfaces.ViewModels;
 using IMAR_DialogoOperatore.Interfaces.Observers;
+using IMAR_DialogoOperatore.Interfaces.ViewModels;
 
 namespace IMAR_DialogoOperatore.ViewModels
 {
@@ -9,36 +9,36 @@ namespace IMAR_DialogoOperatore.ViewModels
 		private readonly IAvanzamentoObserver _avanzamentoObserver;
 		private readonly IDialogoOperatoreObserver _dialogoOperatoreObserver;
 
-		private string _quantitaProdotta;
-		private string _quantitaScartata;
+		private int? _quantitaProdotta;
+		private int? _quantitaScartata;
 		private bool _isFaseCompletabile;
 
 		public object? AttivitaSelezionata => _dialogoOperatoreObserver.AttivitaSelezionata;
 
-		public string QuantitaProdotta 
+		public int? QuantitaProdotta 
 		{ 
 			get {  return _quantitaProdotta; }
 			set
 			{
 				_quantitaProdotta = value;
 
-				if (Int32.TryParse(_quantitaProdotta, out int quantitaProdotta) && AttivitaSelezionata != null)
+				if (Int32.TryParse(_quantitaProdotta.ToString(), out int quantitaProdotta) && AttivitaSelezionata != null)
 				{
-					IsFaseCompletabile = Int32.Parse(_quantitaProdotta) >= ((IAttivitaViewModel)AttivitaSelezionata).QuantitaResidua;
+					IsFaseCompletabile = Int32.Parse(_quantitaProdotta.ToString()) >= ((IAttivitaViewModel)AttivitaSelezionata).QuantitaResidua;
 					_avanzamentoObserver.QuantitaProdotta = quantitaProdotta;
 				}
 
 				OnNotifyStateChanged();
 			}
 		}
-        public string QuantitaScartata
+        public int? QuantitaScartata
 		{ 
 			get {  return _quantitaScartata; }
 			set
 			{
 				_quantitaScartata = value;
 
-				if (Int32.TryParse(_quantitaScartata, out int quantitaScartata) && AttivitaSelezionata != null)
+				if (Int32.TryParse(_quantitaScartata.ToString(), out int quantitaScartata) && AttivitaSelezionata != null)
 					_avanzamentoObserver.QuantitaScartata = quantitaScartata;
 
 				OnNotifyStateChanged();
@@ -63,21 +63,29 @@ namespace IMAR_DialogoOperatore.ViewModels
 			_dialogoOperatoreObserver = dialogoOperatoreObserver;
 			_avanzamentoObserver = avanzamentoObserver;
 
-			QuantitaProdotta = "0";
-			QuantitaScartata = "0";
+			QuantitaProdotta = 0;
+			QuantitaScartata = 0;
 
 			_dialogoOperatoreObserver.OnAttivitaSelezionataChanged += AttivitaStore_OnAttivitaSelezionataChanged;
+            _dialogoOperatoreObserver.OnIsDettaglioAttivitaOpenChanged += DialogoOperatoreObserver_OnIsDettaglioAttivitaOpenChanged;
+
 			_avanzamentoObserver.OnQuantitaProdottaChanged += AvanzamentoStore_OnQuantitaChanged;
 			_avanzamentoObserver.OnQuantitaScartataChanged += AvanzamentoStore_OnQuantitaChanged;
 		}
 
-		private void AvanzamentoStore_OnQuantitaChanged()
-		{
-			if (QuantitaProdotta != _avanzamentoObserver.QuantitaProdotta.ToString())
-				QuantitaProdotta = _avanzamentoObserver.QuantitaProdotta.ToString();
+        private void DialogoOperatoreObserver_OnIsDettaglioAttivitaOpenChanged()
+        {
+            QuantitaProdotta = 0;
+            QuantitaScartata = 0;
+        }
 
-			if (QuantitaScartata != _avanzamentoObserver.QuantitaScartata.ToString())
-				QuantitaScartata = _avanzamentoObserver.QuantitaScartata.ToString();
+        private void AvanzamentoStore_OnQuantitaChanged()
+		{
+			if (QuantitaProdotta != _avanzamentoObserver.QuantitaProdotta)
+				QuantitaProdotta = _avanzamentoObserver.QuantitaProdotta;
+
+			if (QuantitaScartata != _avanzamentoObserver.QuantitaScartata)
+				QuantitaScartata = _avanzamentoObserver.QuantitaScartata;
 		}
 
 		private void AttivitaStore_OnAttivitaSelezionataChanged()

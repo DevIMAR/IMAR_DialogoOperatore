@@ -5,7 +5,7 @@
 
 @inject GestoreAttivitaViewModel GestoreAttivitaViewModel
 
-<DxGridLayout @onkeypress="@HandleKeyPress">
+<DxGridLayout>
 	<Rows>
 		<DxGridLayoutRow Height="auto" />
 		<DxGridLayoutRow Height="2vh" />
@@ -35,22 +35,5 @@
 	protected override Task OnInitializedAsync()
 	{
 		return base.OnInitializedAsync();
-	}
-
-	private void HandleKeyPress(KeyboardEventArgs e)
-	{
-		switch (e.Key)
-		{
-			case "Enter":
-				if (IsConfermabile())
-					GestoreAttivitaViewModel.ConfermaCommand.Execute(null);
-				break;
-		}
-	}
-
-	private bool IsConfermabile()
-	{
-		return GestoreAttivita.IsOpen &&
-			   GestoreAttivitaViewModel.ConfermaCommand.CanExecute(null);
 	}
 }

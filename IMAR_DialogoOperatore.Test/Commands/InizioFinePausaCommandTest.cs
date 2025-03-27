@@ -1,16 +1,16 @@
 ﻿using IMAR_DialogoOperatore.Application;
-using IMAR_DialogoOperatore.Application.Interfaces.ViewModels;
 using IMAR_DialogoOperatore.Commands;
 using IMAR_DialogoOperatore.Domain.Models;
 using IMAR_DialogoOperatore.Interfaces.Helpers;
 using IMAR_DialogoOperatore.Interfaces.Observers;
+using IMAR_DialogoOperatore.Interfaces.ViewModels;
 using IMAR_DialogoOperatore.Observers;
 using NSubstitute;
 using System.Collections.ObjectModel;
 
 namespace IMAR_DialogoOperatore.Test.Commands
 {
-	public class InizioFinePausaCommandTest
+    public class InizioFinePausaCommandTest
 	{
 		private IDialogoOperatoreObserver _dialogoOperatoreStore;
 		private IInterruzioneAttivitaHelper _interruzioneLavoroUtility;
@@ -32,7 +32,7 @@ namespace IMAR_DialogoOperatore.Test.Commands
 		public void CanExecute_ReturnsTrue_WhenOperatoreIsValidAndNotInAssente()
 		{
 			//Arrange
-			_dialogoOperatoreStore.AreTastiBloccati = false;
+			_dialogoOperatoreStore.IsUscita = false;
 			_dialogoOperatoreStore.OperatoreSelezionato.Stato = Costanti.PRESENTE;
 
 			//Act
@@ -59,7 +59,7 @@ namespace IMAR_DialogoOperatore.Test.Commands
 		public void CanExecute_ReturnsFalse_WhenAreTastiBloccatiIsTrue()
 		{
 			//Arrange
-			_dialogoOperatoreStore.AreTastiBloccati = true;
+			_dialogoOperatoreStore.IsUscita = true;
 
 			//Act
 			var result = _command.CanExecute(true);

@@ -17,7 +17,7 @@ namespace IMAR_DialogoOperatore.Test.Commands
 			_dialogoOperatoreStore = Substitute.For<DialogoOperatoreObserver>();
 			Operatore operatoreMock = Substitute.For<Operatore>();
 			_dialogoOperatoreStore.OperazioneInCorso = Costanti.NESSUNA;
-			_dialogoOperatoreStore.AreTastiBloccati = false;
+			_dialogoOperatoreStore.IsUscita = false;
 
 			_dialogoOperatoreStore.OperatoreSelezionato = new OperatoreViewModel(operatoreMock);
 
@@ -69,7 +69,7 @@ namespace IMAR_DialogoOperatore.Test.Commands
 		public void CanExecute_ReturnsFalse_WhenTastiBloccati()
 		{
 			//Arrange
-			_dialogoOperatoreStore.AreTastiBloccati = true;
+			_dialogoOperatoreStore.IsUscita = true;
 
 			//Act
 			bool result = _command.CanExecute(null);

@@ -34,7 +34,6 @@
 								@bind-Value="@InfoOperatoreViewModel.Badge"
 								Enabled="@InfoOperatoreViewModel.IsBadgeEditable"
 								ShowSpinButtons="false"
-								
 								@ref="@Badge" />
 				</div>
 			</Template>
@@ -67,7 +66,6 @@
 	protected override Task OnInitializedAsync()
 	{
 		InfoOperatoreViewModel.NotifyStateChanged += InfoOperatoreViewModel_NotifyStateChanged;
-		DialogoOperatoreObserver.OnAttivitaSelezionataChanged += DialogoOperatoreObserver_OnIsDettaglioAttivitaOpenChanged;
 
 		return base.OnInitializedAsync();
 	}
@@ -86,16 +84,11 @@
 		await InvokeAsync(StateHasChanged);
 	}
 
-	private void DialogoOperatoreObserver_OnIsDettaglioAttivitaOpenChanged()
-	{
-		SetFocus();
-	}
-
 	private void SetFocus()
 	{
 		try
 		{
-			if (DialogoOperatoreObserver.IsDettaglioAttivitaOpen == false)
+			if (Badge.Enabled)
 			{
 				Thread.Sleep(50);
 				Badge.FocusAsync();

@@ -1,9 +1,9 @@
-﻿using IMAR_DialogoOperatore.Application.Interfaces.ViewModels;
-using IMAR_DialogoOperatore.Domain.Models;
+﻿using IMAR_DialogoOperatore.Domain.Models;
+using IMAR_DialogoOperatore.Interfaces.ViewModels;
 
 namespace IMAR_DialogoOperatore.ViewModels
 {
-	public class AttivitaViewModel : ViewModelBase, IAttivitaViewModel
+    public class AttivitaViewModel : ViewModelBase, IAttivitaViewModel
 	{
 		private readonly Attivita? _attivita;
 

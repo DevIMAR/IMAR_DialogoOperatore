@@ -157,7 +157,8 @@ namespace IMAR_DialogoOperatore.Infrastructure.JMes
                     {
                         qck = true,
                         clkBdgCod = badge,
-                        notCod = bolla
+                        notCod = bolla,
+                        clkMacUid = 476
                     }
                 }
             };
@@ -205,6 +206,54 @@ namespace IMAR_DialogoOperatore.Infrastructure.JMes
                         producedQuantity = quantitaProdotta,
                         rejectedQuantity = quantitaScartata,
                         defDecAdv = attivita.SaldoAcconto == Costanti.ACCONTO
+                    }
+                }
+            };
+
+            var urlStartWork = SERVER + WIZARD_WORK_PATH + wizardPath;
+            var result = _jmesClient.PostAsync(urlStartWork, _jsonUtility.BuildJsonContent(entity)).GetAwaiter().GetResult();
+            return result;
+        }
+
+        public HttpResponseMessage MesWorkSuspension(string badge, Attivita attivita, int quantitaProdotta, int quantitaScartata)
+        {
+            string wizardPath = "?wzdCod=MesWorkSuspension";
+
+            var entity = new
+            {
+                entity = new
+                {
+                    paramsIO = new
+                    {
+                        qck = true,
+                        clkBdgCod = badge,
+                        clkDiaOpeUid = attivita.CodiceJMes,
+                        sspUid = 1,
+                        producedQuantity = quantitaProdotta,
+                        rejectedQuantity = quantitaScartata,
+                        defDecAdv = attivita.SaldoAcconto == Costanti.ACCONTO
+                    }
+                }
+            };
+
+            var urlStartWork = SERVER + WIZARD_WORK_PATH + wizardPath;
+            var result = _jmesClient.PostAsync(urlStartWork, _jsonUtility.BuildJsonContent(entity)).GetAwaiter().GetResult();
+            return result;
+        }
+
+        public HttpResponseMessage MesWorkResume(string badge, Attivita attivita)
+        {
+            string wizardPath = "?wzdCod=MesWorkResume";
+
+            var entity = new
+            {
+                entity = new
+                {
+                    paramsIO = new
+                    {
+                        qck = true,
+                        clkBdgCod = badge,
+                        clkDiaOpeUid = attivita.CodiceJMes,
                     }
                 }
             };
@@ -295,6 +344,51 @@ namespace IMAR_DialogoOperatore.Infrastructure.JMes
                         qck = true,
                         clkBdgCod = badge,
                         clkDiaOpeUid = idJmesAttrezzaggio
+                    }
+                }
+            };
+
+            var urlStartWork = SERVER + WIZARD_WORK_PATH + wizardPath;
+            var result = _jmesClient.PostAsync(urlStartWork, _jsonUtility.BuildJsonContent(entity)).GetAwaiter().GetResult();
+            return result;
+        }
+
+        public HttpResponseMessage MesEquipSuspension(string badge, double? idJmesAttrezzaggio)
+        {
+            string wizardPath = "?wzdCod=MesEquipSuspension";
+
+            var entity = new
+            {
+                entity = new
+                {
+                    paramsIO = new
+                    {
+                        qck = true,
+                        clkBdgCod = badge,
+                        clkDiaOpeUid = idJmesAttrezzaggio,
+                        sspUid = 1,
+                    }
+                }
+            };
+
+            var urlStartWork = SERVER + WIZARD_WORK_PATH + wizardPath;
+            var result = _jmesClient.PostAsync(urlStartWork, _jsonUtility.BuildJsonContent(entity)).GetAwaiter().GetResult();
+            return result;
+        }
+
+        public HttpResponseMessage MesEquipResume(string badge, Attivita attivita)
+        {
+            string wizardPath = "?wzdCod=MesEquipResume";
+
+            var entity = new
+            {
+                entity = new
+                {
+                    paramsIO = new
+                    {
+                        qck = true,
+                        clkBdgCod = badge,
+                        clkDiaOpeUid = attivita.CodiceJMes,
                     }
                 }
             };

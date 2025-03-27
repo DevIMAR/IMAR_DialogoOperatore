@@ -12,11 +12,15 @@ namespace IMAR_DialogoOperatore.Application.Interfaces.Clients
 		HttpResponseMessage MesWorkStart(string badge, string bolla);
 		HttpResponseMessage MesWorkStartIndiretta(string badge, string codiceAttivitaIndiretta);
         HttpResponseMessage MesWorkEnd(string badge, Attivita attivita, int quantitaProdotta, int quantitaScartata);
+		HttpResponseMessage MesWorkSuspension(string badge, Attivita attivita, int quantitaProdotta, int quantitaScartata);
+		HttpResponseMessage MesWorkResume(string badge, Attivita attivita);
         HttpResponseMessage MesSuspensionStart(string badge, int codiceJmesMacchina);
 		HttpResponseMessage MesSuspensionEnd(string badge, int codiceJmesMacchina);
         HttpResponseMessage MesEquipStart(string badge, string bolla, int codiceMacchinaGalileo);
 		HttpResponseMessage MesEquipEnd(string badge, double? idJmesAttrezzaggio);
-		HttpResponseMessage MesBreakStart(string badge);
+		HttpResponseMessage MesEquipSuspension(string badge, double? idJmesAttrezzaggio);
+
+        HttpResponseMessage MesBreakStart(string badge);
 		HttpResponseMessage MesBreakEnd(string badge);
 		HttpResponseMessage MesAutoClock(string badge, bool isIngresso);
     }

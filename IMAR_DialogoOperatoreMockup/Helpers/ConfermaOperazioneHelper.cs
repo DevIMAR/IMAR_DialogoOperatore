@@ -59,8 +59,11 @@ namespace IMAR_DialogoOperatore.Helpers
 					break;
 
 				case Costanti.FINE_LAVORO:
-				case Costanti.FINE_ATTREZZAGGIO:
                     result = RimuoviAttivitaDaOperatore();
+					break;
+
+				case Costanti.FINE_ATTREZZAGGIO:
+					result = GestisciFineAttrezzaggio();
 					break;
 
 				default:
@@ -73,7 +76,19 @@ namespace IMAR_DialogoOperatore.Helpers
             return result;
         }
 
-		private string? RimuoviAttivitaDaOperatore()
+        private string? GestisciFineAttrezzaggio()
+        {
+			string? result = null;
+
+			if (_dialogoOperatoreObserver.IsAperturaLavoroAutomaticaAttiva)
+				result = AggiungiAttivitaAdOperatore(false);
+			else
+				result = RimuoviAttivitaDaOperatore();
+
+			return result;
+        }
+
+        private string? RimuoviAttivitaDaOperatore()
 		{
             string? result = _operatoriService.RimuoviAttivitaDaOperatore(
                 _operatoreMapper.OperatoreViewModelToOperatore(_dialogoOperatoreObserver.OperatoreSelezionato),

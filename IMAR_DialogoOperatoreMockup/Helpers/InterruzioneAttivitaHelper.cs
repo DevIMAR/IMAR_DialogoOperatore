@@ -1,11 +1,11 @@
 ﻿using IMAR_DialogoOperatore.Application;
-using IMAR_DialogoOperatore.Application.Interfaces.ViewModels;
 using IMAR_DialogoOperatore.Interfaces.Helpers;
 using IMAR_DialogoOperatore.Interfaces.Observers;
+using IMAR_DialogoOperatore.Interfaces.ViewModels;
 
 namespace IMAR_DialogoOperatore.Helpers
 {
-	public class InterruzioneAttivitaHelper : IInterruzioneAttivitaHelper
+    public class InterruzioneAttivitaHelper : IInterruzioneAttivitaHelper
 	{
 		private readonly IDialogoOperatoreObserver _dialogoOperatoreObserver;
 

@@ -1,12 +1,12 @@
 ﻿using IMAR_DialogoOperatore.Application;
 using IMAR_DialogoOperatore.Application.Interfaces.Services.Activities;
-using IMAR_DialogoOperatore.Application.Interfaces.ViewModels;
 using IMAR_DialogoOperatore.Domain.Models;
 using IMAR_DialogoOperatore.Helpers;
 using IMAR_DialogoOperatore.Infrastructure.Services;
 using IMAR_DialogoOperatore.Interfaces.Helpers;
 using IMAR_DialogoOperatore.Interfaces.Mappers;
 using IMAR_DialogoOperatore.Interfaces.Observers;
+using IMAR_DialogoOperatore.Interfaces.ViewModels;
 using IMAR_DialogoOperatore.Mappers;
 using IMAR_DialogoOperatore.ViewModels;
 using NSubstitute;

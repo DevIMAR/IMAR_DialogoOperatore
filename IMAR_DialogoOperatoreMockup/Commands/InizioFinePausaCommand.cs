@@ -1,11 +1,10 @@
-﻿using Azure;
-using IMAR_DialogoOperatore.Application;
+﻿using IMAR_DialogoOperatore.Application;
 using IMAR_DialogoOperatore.Application.Interfaces.Clients;
 using IMAR_DialogoOperatore.Application.Interfaces.Services.Activities;
 using IMAR_DialogoOperatore.Application.Interfaces.Utilities;
-using IMAR_DialogoOperatore.Application.Interfaces.ViewModels;
 using IMAR_DialogoOperatore.Interfaces.Helpers;
 using IMAR_DialogoOperatore.Interfaces.Observers;
+using IMAR_DialogoOperatore.Interfaces.ViewModels;
 using IMAR_DialogoOperatore.ViewModels;
 
 namespace IMAR_DialogoOperatore.Commands
@@ -14,7 +13,7 @@ namespace IMAR_DialogoOperatore.Commands
     {
         private readonly InfoOperatoreViewModel _infoOperatoreViewModel;
         private readonly IDialogoOperatoreObserver _dialogoOperatoreObserver;
-        private readonly IInterruzioneAttivitaHelper _interruzioneLavoroUtility;
+        private readonly IInterruzioneAttivitaHelper _interruzioneAttivitaHelper;
         private readonly IJmesApiClient _jmesApiClient;
         private readonly IOperatoriService _operatoriService;
         private readonly IAutoLogoutUtility _autoLogoutUtility;
@@ -30,7 +29,7 @@ namespace IMAR_DialogoOperatore.Commands
         {
             _infoOperatoreViewModel = infoOperatoreViewModel;
             _dialogoOperatoreObserver = dialogoOperatoreObserver;
-            _interruzioneLavoroUtility = interruzioneLavoroUtility;
+            _interruzioneAttivitaHelper = interruzioneLavoroUtility;
             _jmesApiClient = jmesApiClient;
             _operatoriService = operatoriService;
             _autoLogoutUtility = autoLogoutUtility;
@@ -41,7 +40,7 @@ namespace IMAR_DialogoOperatore.Commands
         private void AutoLogoutUtility_OnLogoutTriggered()
         {
             _infoOperatoreViewModel.Badge = null;
-            _dialogoOperatoreObserver.AreTastiBloccati = false;
+            _dialogoOperatoreObserver.IsUscita = false;
         }
 
         public override bool CanExecute(object? parameter)
@@ -52,7 +51,8 @@ namespace IMAR_DialogoOperatore.Commands
             bool isInPausa = (bool)parameter;
 
             return _dialogoOperatoreObserver.OperatoreSelezionato != null
-                    && !_dialogoOperatoreObserver.AreTastiBloccati
+                    && !_dialogoOperatoreObserver.IsDettaglioAttivitaOpen
+                    && !_dialogoOperatoreObserver.IsUscita
                     && _dialogoOperatoreObserver.OperatoreSelezionato.Stato != Costanti.ASSENTE
                     && isInPausa
                     && base.CanExecute(parameter);
@@ -61,13 +61,9 @@ namespace IMAR_DialogoOperatore.Commands
         public override async void Execute(object? parameter)
         {
             if (_dialogoOperatoreObserver.OperatoreSelezionato.Stato == Costanti.IN_PAUSA)
-            {
                 await FinePausa();
-            }
             else
-            {
                 await InizioPausa();
-            }
         }
 
         private async Task FinePausa()
@@ -84,13 +80,13 @@ namespace IMAR_DialogoOperatore.Commands
 
         private async Task InizioPausa()
         {
-            _dialogoOperatoreObserver.AreTastiBloccati = true;
+            _dialogoOperatoreObserver.IsUscita = true;
 
             await AvanzaAttivitaOperatore(_dialogoOperatoreObserver.OperatoreSelezionato);
 
             if (_dialogoOperatoreObserver.IsOperazioneAnnullata)
             {
-                _dialogoOperatoreObserver.AreTastiBloccati = false;
+                _dialogoOperatoreObserver.IsUscita = false;
                 return;
             }
 
@@ -102,7 +98,7 @@ namespace IMAR_DialogoOperatore.Commands
             _dialogoOperatoreObserver.OperatoreSelezionato = new OperatoreViewModel(_operatoriService.OttieniOperatore(_dialogoOperatoreObserver.OperatoreSelezionato.Badge));
             _dialogoOperatoreObserver.OperatoreSelezionato.Stato = Costanti.IN_PAUSA;
 
-            _autoLogoutUtility.StartLogoutTimer(5);
+            _autoLogoutUtility.StartLogoutTimer(3);
         }
 
         private async Task AvanzaAttivitaOperatore(IOperatoreViewModel operatore)
@@ -116,7 +112,7 @@ namespace IMAR_DialogoOperatore.Commands
                 if (attivita.Causale == Costanti.IN_ATTREZZAGGIO)
                     continue;
 
-                await _interruzioneLavoroUtility.GestisciInterruzioneAttivita(attivita, false);
+                await _interruzioneAttivitaHelper.GestisciInterruzioneAttivita(attivita, false);
 
                 if (_dialogoOperatoreObserver.IsOperazioneAnnullata)
                     break;

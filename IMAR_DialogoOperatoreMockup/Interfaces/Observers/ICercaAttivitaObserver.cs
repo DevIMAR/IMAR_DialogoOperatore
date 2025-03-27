@@ -1,8 +1,8 @@
-﻿using IMAR_DialogoOperatore.Application.Interfaces.ViewModels;
+﻿using IMAR_DialogoOperatore.Interfaces.ViewModels;
 
 namespace IMAR_DialogoOperatore.Interfaces.Observers
 {
-	public interface ICercaAttivitaObserver
+    public interface ICercaAttivitaObserver
 	{
 		IEnumerable<IAttivitaViewModel> AttivitaTrovate { get; set; }
 		string FaseCercata { get; set; }

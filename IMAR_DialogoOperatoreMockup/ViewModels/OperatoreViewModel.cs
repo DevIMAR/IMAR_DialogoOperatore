@@ -1,11 +1,11 @@
 ﻿using IMAR_DialogoOperatore.Application;
-using IMAR_DialogoOperatore.Application.Interfaces.ViewModels;
 using IMAR_DialogoOperatore.Domain.Models;
+using IMAR_DialogoOperatore.Interfaces.ViewModels;
 using System.Collections.ObjectModel;
 
 namespace IMAR_DialogoOperatore.ViewModels
 {
-	public class OperatoreViewModel : ViewModelBase, IOperatoreViewModel
+    public class OperatoreViewModel : ViewModelBase, IOperatoreViewModel
 	{
 		private readonly Operatore? _operatore;
 

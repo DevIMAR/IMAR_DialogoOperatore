@@ -1,10 +1,10 @@
-﻿using IMAR_DialogoOperatore.Application.Interfaces.ViewModels;
-using IMAR_DialogoOperatore.Interfaces.Mappers;
+﻿using IMAR_DialogoOperatore.Interfaces.Mappers;
 using IMAR_DialogoOperatore.Interfaces.Observers;
+using IMAR_DialogoOperatore.Interfaces.ViewModels;
 
 namespace IMAR_DialogoOperatore.ViewModels
 {
-	public class AttivitaGridViewModel : ViewModelBase
+    public class AttivitaGridViewModel : ViewModelBase
 	{
 		private readonly IDialogoOperatoreObserver _dialogoOperatoreStore;
 		private readonly IAttivitaMapper _attivitaMapper;

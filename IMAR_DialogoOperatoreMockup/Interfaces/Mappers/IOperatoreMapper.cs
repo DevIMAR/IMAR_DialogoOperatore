@@ -1,5 +1,5 @@
-﻿using IMAR_DialogoOperatore.Application.Interfaces.ViewModels;
-using IMAR_DialogoOperatore.Domain.Models;
+﻿using IMAR_DialogoOperatore.Domain.Models;
+using IMAR_DialogoOperatore.Interfaces.ViewModels;
 
 namespace IMAR_DialogoOperatore.Interfaces.Mappers
 {

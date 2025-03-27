@@ -1,4 +1,5 @@
-﻿@using IMAR_DialogoOperatore.ViewModels
+﻿@using DevExpress.Blazor.Internal
+@using IMAR_DialogoOperatore.ViewModels
 
 @inject AvanzamentoAttivitaViewModel AvanzamentoAttivitaViewModel
 
@@ -55,22 +56,32 @@
 		<DxGridLayoutItem Row="2"
 						  Column="0" ColumnSpan="2">
 			<Template>
-				<DxTextBox @bind-Text="@(AvanzamentoAttivitaViewModel.QuantitaProdotta)"
-						   style="margin-bottom:5px;
+				<DxSpinEdit @bind-Value="@(AvanzamentoAttivitaViewModel.QuantitaProdotta)"
+							ShowSpinButtons="false"
+							AllowMouseWheel="false"
+							style="margin-bottom:5px;
 								  --dxbl-text-edit-padding-x: 0.35vw;
 								  --dxbl-text-edit-padding-y: 0vh;
-								  --dxbl-text-edit-font-size: 1.668vh;" />
+								  --dxbl-text-edit-font-size: 1.668vh;"
+							@ref="Prodotta"
+							@onkeydown="HandleProdottaKeyPress"
+							@onclick="@(() => Click.InvokeAsync())" />
 			</Template>
 		</DxGridLayoutItem>
 
 		<DxGridLayoutItem Row="2"
 						  Column="3" ColumnSpan="2">
 			<Template>
-				<DxTextBox @bind-Text="@(AvanzamentoAttivitaViewModel.QuantitaScartata)"
-						   style="margin-bottom:5px;
+				<DxSpinEdit @bind-Value="@(AvanzamentoAttivitaViewModel.QuantitaScartata)"
+							ShowSpinButtons="false"
+							AllowMouseWheel="false"
+							style="margin-bottom:5px;
 								  --dxbl-text-edit-padding-x: 0.35vw;
 								  --dxbl-text-edit-padding-y: 0vh;
-								  --dxbl-text-edit-font-size: 1.668vh;" />
+								  --dxbl-text-edit-font-size: 1.668vh;"
+							@ref="Scartata"
+							@onkeydown="HandleScartataKeyPress"
+							@onclick="@(() => Click.InvokeAsync())" />
 			</Template>
 		</DxGridLayoutItem>
 
@@ -80,13 +91,24 @@
 				<DxCheckBox CheckType="CheckType.Switch"
 							@bind-Checked="@AvanzamentoAttivitaViewModel.IsFaseCompletabile"
 							Alignment="CheckBoxContentAlignment.Center"
-							SizeMode="SizeMode.Large" />
+							SizeMode="SizeMode.Large"
+							@ref="Saldo"
+							@onkeydown="HandleSaldoKeyPress"
+							@onclick="@(() => Click.InvokeAsync())" />
 			</Template>
 		</DxGridLayoutItem>
 	</Items>
 </DxGridLayout>
 
 @code {
+	[Parameter] public EventCallback DatiAvanzamentoInseriti { get; set; }
+	[Parameter] public EventCallback Click { get; set; }
+
+	public DxSpinEdit<int?> Prodotta { get; set; }
+
+	private DxSpinEdit<int?> Scartata;
+	private DxCheckBox<bool> Saldo;
+
 	protected override Task OnInitializedAsync()
 	{
 		AvanzamentoAttivitaViewModel.NotifyStateChanged += AvanzamentoAttivitaViewModel_NotifyStateChanged;
@@ -97,5 +119,54 @@
 	private async void AvanzamentoAttivitaViewModel_NotifyStateChanged()
 	{
 		await InvokeAsync(StateHasChanged);
+	}
+
+	private async void SetFocus(IFocusableEditor element)
+	{
+		try
+		{
+			await Task.Delay(10);
+			await element.FocusAsync();
+		}
+		catch
+		{
+
+		}
+	}
+
+	private void HandleProdottaKeyPress(KeyboardEventArgs e)
+	{
+		switch (e.Key)
+		{
+			case "Enter":
+				SetFocus(Scartata);
+				break;
+		}
+	}
+
+	private void HandleScartataKeyPress(KeyboardEventArgs e)
+	{
+		switch (e.Key)
+		{
+			case "Enter":
+				SetFocus(Saldo);
+				break;
+		}
+	}
+
+	private async void HandleSaldoKeyPress(KeyboardEventArgs e)
+	{
+		switch (e.Key)
+		{
+			case "Enter":
+				await DatiAvanzamentoInseriti.InvokeAsync();
+				break;
+			case "ArrowRight":
+				AvanzamentoAttivitaViewModel.IsFaseCompletabile = true;
+				break;
+			case "ArrowLeft":
+				AvanzamentoAttivitaViewModel.IsFaseCompletabile = false;
+				break;
+		}
 	}
 }

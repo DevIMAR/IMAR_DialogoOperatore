@@ -1,20 +1,21 @@
-﻿using IMAR_DialogoOperatore.Application.Interfaces.ViewModels;
-using IMAR_DialogoOperatore.Interfaces.Observers;
+﻿using IMAR_DialogoOperatore.Interfaces.Observers;
+using IMAR_DialogoOperatore.Interfaces.ViewModels;
 
 namespace IMAR_DialogoOperatore.Observers
 {
-	public class DialogoOperatoreObserver : ObserverBase, IDialogoOperatoreObserver
+    public class DialogoOperatoreObserver : ObserverBase, IDialogoOperatoreObserver
 	{
 		private IEnumerable<IAttivitaViewModel>? _listaAttivita;
 		private IAttivitaViewModel? _attivitaSelezionata;
 		private IOperatoreViewModel? _operatoreSelezionato;
 		private string? _operazioneInCorso;
-		private bool _areTastiBloccati;
+		private bool _isUscita;
 		private bool _isLoaderVisibile;
 		private bool _isDettaglioAttivitaOpen;
 		private bool _isOperazioneAnnullata;
 		private bool _isRiaperturaAttiva;
 		private bool _isOperazioneGestita;
+		private bool _isAperturaLavoroAutomaticaAttiva;
 
 		public IEnumerable<IAttivitaViewModel>? ListaAttivita
 		{
@@ -53,13 +54,13 @@ namespace IMAR_DialogoOperatore.Observers
 				CallAction(OnOperazioneInCorsoChanged);
 			}
 		}
-		public bool AreTastiBloccati
+		public bool IsUscita
 		{
-			get { return _areTastiBloccati; }
+			get { return _isUscita; }
 			set
 			{
-				_areTastiBloccati = value;
-				CallAction(OnAreTastiBloccatiChanged);
+                _isUscita = value;
+				CallAction(OnIsUscitaChanged);
 			}
         }
         public bool IsLoaderVisibile 
@@ -76,6 +77,9 @@ namespace IMAR_DialogoOperatore.Observers
 			get { return _isDettaglioAttivitaOpen; }
 			set
 			{
+				if (_isDettaglioAttivitaOpen == value)
+					return;
+
 				_isDettaglioAttivitaOpen = value;
 				CallAction(OnIsDettaglioAttivitaOpenChanged);
 			}
@@ -108,15 +112,26 @@ namespace IMAR_DialogoOperatore.Observers
             }
 		}
 
+        public bool IsAperturaLavoroAutomaticaAttiva 
+		{ 
+			get { return _isAperturaLavoroAutomaticaAttiva; }
+			set
+			{
+                _isAperturaLavoroAutomaticaAttiva = value;
+				CallAction(OnIsAperturaLavoroAutomaticaAttivaChanged);
+            }
+		}
+
         public event Action? OnListaAttivitaChanged;
 		public event Action? OnAttivitaSelezionataChanged;
 		public event Action? OnOperatoreSelezionatoChanged;
 		public event Action? OnOperazioneInCorsoChanged;
-		public event Action? OnAreTastiBloccatiChanged;
+		public event Action? OnIsUscitaChanged;
         public event Action? OnIsLoaderVisibileChanged;
 		public event Action? OnIsDettaglioAttivitaOpenChanged;
 		public event Action? OnIsOperazioneAnnullataChanged;
         public event Action? OnIsRiaperturaAttivaChanged;
         public event Action? OnIsOperazioneGestitaChanged;
+        public event Action? OnIsAperturaLavoroAutomaticaAttivaChanged;
     }
 }

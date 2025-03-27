@@ -1,10 +1,10 @@
-﻿using IMAR_DialogoOperatore.Application.Interfaces.ViewModels;
+﻿using IMAR_DialogoOperatore.Interfaces.ViewModels;
 
 namespace IMAR_DialogoOperatore.Interfaces.Observers
 {
-	public interface IDialogoOperatoreObserver
+    public interface IDialogoOperatoreObserver
 	{
-		bool AreTastiBloccati { get; set; }
+		bool IsUscita { get; set; }
 		bool IsLoaderVisibile { get; set; }
 		IAttivitaViewModel? AttivitaSelezionata { get; set; }
 		bool IsDettaglioAttivitaOpen { get; set; }
@@ -13,9 +13,10 @@ namespace IMAR_DialogoOperatore.Interfaces.Observers
 		IOperatoreViewModel? OperatoreSelezionato { get; set; }
 		string? OperazioneInCorso { get; set; }
 		bool IsRiaperturaAttiva { get; set; }
+		bool IsAperturaLavoroAutomaticaAttiva { get; set; }
 		bool IsOperazioneGestita { get; set; }
 
-		event Action? OnAreTastiBloccatiChanged;
+		event Action? OnIsUscitaChanged;
 		event Action? OnIsLoaderVisibileChanged;
 		event Action? OnAttivitaSelezionataChanged;
 		event Action? OnIsDettaglioAttivitaOpenChanged;
@@ -24,6 +25,7 @@ namespace IMAR_DialogoOperatore.Interfaces.Observers
 		event Action? OnOperatoreSelezionatoChanged;
 		event Action? OnOperazioneInCorsoChanged;
 		event Action? OnIsRiaperturaAttivaChanged;
+		event Action? OnIsAperturaLavoroAutomaticaAttivaChanged;
 		event Action? OnIsOperazioneGestitaChanged;
 	}
 }

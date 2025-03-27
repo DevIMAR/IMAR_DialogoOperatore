@@ -1,9 +1,9 @@
-﻿using IMAR_DialogoOperatore.Application.Interfaces.ViewModels;
-using IMAR_DialogoOperatore.Interfaces.Observers;
+﻿using IMAR_DialogoOperatore.Interfaces.Observers;
+using IMAR_DialogoOperatore.Interfaces.ViewModels;
 
 namespace IMAR_DialogoOperatore.Observers
 {
-	public class CercaAttivitaObserver : ObserverBase, ICercaAttivitaObserver
+    public class CercaAttivitaObserver : ObserverBase, ICercaAttivitaObserver
 	{
 		private IEnumerable<IAttivitaViewModel> _attivitaTrovate;
 		private bool _isBottoneCercaPremuto;

@@ -1,19 +1,18 @@
 ﻿using IMAR_DialogoOperatore.Application;
 using IMAR_DialogoOperatore.Application.Interfaces.Clients;
 using IMAR_DialogoOperatore.Application.Interfaces.Utilities;
-using IMAR_DialogoOperatore.Application.Interfaces.ViewModels;
 using IMAR_DialogoOperatore.Interfaces.Helpers;
 using IMAR_DialogoOperatore.Interfaces.Observers;
-using IMAR_DialogoOperatore.Observers;
+using IMAR_DialogoOperatore.Interfaces.ViewModels;
 using IMAR_DialogoOperatore.ViewModels;
 
 namespace IMAR_DialogoOperatore.Commands
 {
-	public class IngressoUscitaCommand : CommandBase
+    public class IngressoUscitaCommand : CommandBase
     {
         private readonly InfoOperatoreViewModel _infoOperatoreViewModel;
         private readonly IDialogoOperatoreObserver _dialogoOperatoreObserver;
-        private readonly IInterruzioneAttivitaHelper _interruzioneLavoroHelper;
+        private readonly IInterruzioneAttivitaHelper _interruzioneAttivitaHelper;
 		private readonly IJmesApiClient _jmesApiClient;
         private readonly IAutoLogoutUtility _autoLogoutUtility;
 
@@ -26,7 +25,7 @@ namespace IMAR_DialogoOperatore.Commands
         {
 			_infoOperatoreViewModel = infoOperatoreViewModel;
             _dialogoOperatoreObserver = dialogoOperatoreObserver;
-			_interruzioneLavoroHelper = interruzioneLavoroHelper;
+			_interruzioneAttivitaHelper = interruzioneLavoroHelper;
 			_jmesApiClient = jmesApiClient;
             _autoLogoutUtility = autoLogoutUtility;
 
@@ -36,63 +35,79 @@ namespace IMAR_DialogoOperatore.Commands
         private void AutoLogoutUtility_OnLogoutTriggered()
         {
             _infoOperatoreViewModel.Badge = null;
-            _dialogoOperatoreObserver.AreTastiBloccati = false;
+            _dialogoOperatoreObserver.IsUscita = false;
         }
 
         public override bool CanExecute(object? parameter)
 		{
 			return _dialogoOperatoreObserver.OperatoreSelezionato != null
 					&& _dialogoOperatoreObserver.OperatoreSelezionato.Badge != null
-                    && !_dialogoOperatoreObserver.AreTastiBloccati
+                    && !_dialogoOperatoreObserver.IsDettaglioAttivitaOpen
+                    && !_dialogoOperatoreObserver.IsUscita
 					&& _dialogoOperatoreObserver.OperatoreSelezionato.Stato != Costanti.IN_PAUSA;
 		}
 
 		public override async void Execute(object? parameter)
         {
             if (_dialogoOperatoreObserver.OperatoreSelezionato.Stato == Costanti.ASSENTE)
+                await EffettuaIngressoOperatore();
+            else
+                await EffettuaUscitaOperatore();
+        }
+
+        private async Task EffettuaIngressoOperatore()
+        {
+            _dialogoOperatoreObserver.IsLoaderVisibile = true;
+            await Task.Delay(1);
+
+            _jmesApiClient.MesAutoClock(_dialogoOperatoreObserver.OperatoreSelezionato.Badge.ToString(), true);
+
+
+
+            _dialogoOperatoreObserver.IsLoaderVisibile = false;
+
+            _dialogoOperatoreObserver.OperatoreSelezionato.Stato = Costanti.PRESENTE;
+        }
+
+        private async Task EffettuaUscitaOperatore()
+        {
+            _dialogoOperatoreObserver.IsUscita = true;
+
+            await ChiudiAttivitaOperatore();
+
+            if (_dialogoOperatoreObserver.IsOperazioneAnnullata)
             {
-                _dialogoOperatoreObserver.IsLoaderVisibile = true;
-                await Task.Delay(1);
-                _jmesApiClient.MesAutoClock(_dialogoOperatoreObserver.OperatoreSelezionato.Badge.ToString(), true);
-                _dialogoOperatoreObserver.IsLoaderVisibile = false;
-
-                _dialogoOperatoreObserver.OperatoreSelezionato.Stato = Costanti.PRESENTE;
+                _dialogoOperatoreObserver.IsUscita = false;
+                return;
             }
-			else
-			{
-				_dialogoOperatoreObserver.AreTastiBloccati = true;
 
-                await ChiudiAttivitaOperatore();
+            _dialogoOperatoreObserver.IsLoaderVisibile = true;
+            await Task.Delay(1);
 
-                if (_dialogoOperatoreObserver.IsOperazioneAnnullata)
-                {
-					_dialogoOperatoreObserver.AreTastiBloccati = false;
-					return;
-				}
+            _jmesApiClient.MesAutoClock(_dialogoOperatoreObserver.OperatoreSelezionato.Badge.ToString(), false);
 
-                _dialogoOperatoreObserver.IsLoaderVisibile = true;
-                await Task.Delay(1);
-                _jmesApiClient.MesAutoClock(_dialogoOperatoreObserver.OperatoreSelezionato.Badge.ToString(), false);
-                _dialogoOperatoreObserver.IsLoaderVisibile = false;
+            _dialogoOperatoreObserver.IsLoaderVisibile = false;
 
-                _dialogoOperatoreObserver.OperatoreSelezionato.Stato = Costanti.ASSENTE;
+            _dialogoOperatoreObserver.OperatoreSelezionato.Stato = Costanti.ASSENTE;
 
-                _autoLogoutUtility.StartLogoutTimer(5);
-            }
-		}
+            _autoLogoutUtility.StartLogoutTimer(3);
+        }
 
         private async Task ChiudiAttivitaOperatore()
         {
             try
             {
                 IAttivitaViewModel attivita;
+                IOperatoreViewModel operatore = _dialogoOperatoreObserver.OperatoreSelezionato;
 
-                while (_dialogoOperatoreObserver.OperatoreSelezionato.AttivitaAperte.Any())
+                for (int i = 0; i < operatore.AttivitaAperte.Count; i++)
                 {
-                    attivita = new AttivitaViewModel(_dialogoOperatoreObserver.OperatoreSelezionato.AttivitaAperte[0]);
+                    attivita = new AttivitaViewModel(operatore.AttivitaAperte[i]);
 
-                    await _interruzioneLavoroHelper.GestisciInterruzioneAttivita(attivita, true);
-                    await Task.Delay(1);
+                    if (attivita.Causale == Costanti.LAVORO_SOSPESO || attivita.Causale == Costanti.ATTREZZAGGIO_SOSPESO)
+                        continue;
+
+                    await _interruzioneAttivitaHelper.GestisciInterruzioneAttivita(attivita, true);
 
                     if (_dialogoOperatoreObserver.IsOperazioneAnnullata)
                         break;

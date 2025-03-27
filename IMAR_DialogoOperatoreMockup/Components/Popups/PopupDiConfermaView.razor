@@ -3,8 +3,7 @@
 @inject PopupDiConfermaViewModel PopupDiConfermaViewModel
 
 <DxPopup @bind-Visible="@PopupDiConfermaViewModel.IsVisible"
-ShowFooter="true"
-@onkeypress="@HandleKeyPress">
+		 ShowFooter="true">
 	<BodyContentTemplate>
 		<div style="white-space:pre-line;
 				    font-size:1.668vh;">
@@ -14,18 +13,18 @@ ShowFooter="true"
 
 	<FooterContentTemplate>
 		<DxButton Text="Annulla"
-		Click="@AnnullaHandler"
-		RenderStyle="ButtonRenderStyle.Secondary"
-		class="d-flex justify-content-center align-items-center"
-		style="padding-top:5%;
+				  Click="@AnnullaHandler"
+				  RenderStyle="ButtonRenderStyle.Secondary"
+				  class="d-flex justify-content-center align-items-center"
+				  style="padding-top:5%;
 						 padding-bottom:5%;
 						 font-size:1.668vh;" />
 
 		<DxButton Text="Conferma"
-		Click="@ConfermaHandler"
-		RenderStyle="ButtonRenderStyle.Primary"
-		class="d-flex justify-content-center align-items-center"
-		style="padding-top:5%;
+				  Click="@ConfermaHandler"
+				  RenderStyle="ButtonRenderStyle.Primary"
+				  class="d-flex justify-content-center align-items-center"
+				  style="padding-top:5%;
 					     padding-bottom:5%;
 						 font-size:1.668vh;" />
 	</FooterContentTemplate>
@@ -52,20 +51,5 @@ ShowFooter="true"
 	void ConfermaHandler()
 	{
 		PopupDiConfermaViewModel.RispostaPopupDiConfermaCommand.Execute(true);
-	}
-
-	private void HandleKeyPress(KeyboardEventArgs e)
-	{
-		switch (e.Key)
-		{
-			case "Enter":
-				PopupDiConfermaViewModel.RispostaPopupDiConfermaCommand.Execute(true);
-				break;
-
-			case "Esc": 
-				PopupDiConfermaViewModel.RispostaPopupDiConfermaCommand.Execute(false);
-				break;
-
-		}
 	}
 }

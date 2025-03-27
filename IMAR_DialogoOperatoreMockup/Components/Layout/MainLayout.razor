@@ -101,7 +101,8 @@
 					DialogoOperatoreViewModel.PulsantieraGeneraleViewModel.InizioLavoroCommand.Execute(null);
 				break;
 
-			case "F3":
+			case "z":
+			case "Z":
 				if (DialogoOperatoreViewModel.PulsantieraGeneraleViewModel.FineLavoroCommand.CanExecute(null))
 					DialogoOperatoreViewModel.PulsantieraGeneraleViewModel.FineLavoroCommand.Execute(null);
 				break;
@@ -116,17 +117,20 @@
 					DialogoOperatoreViewModel.PulsantieraGeneraleViewModel.InizioFinePausaCommand.Execute(null);
 				break;
 
-			case "F7":
+			case "c":
+			case "C":
 				if (DialogoOperatoreViewModel.PulsantieraGeneraleViewModel.InizioFinePausaCommand.CanExecute(DialogoOperatoreViewModel.PulsantieraGeneraleViewModel.IsInPausa))
 					DialogoOperatoreViewModel.PulsantieraGeneraleViewModel.InizioFinePausaCommand.Execute(null);
 				break;
 
-			case "F9":
+			case "b":
+			case "B":
 				if (DialogoOperatoreViewModel.PulsantieraGeneraleViewModel.InizioAttrezzaggioCommand.CanExecute(null))
 					DialogoOperatoreViewModel.PulsantieraGeneraleViewModel.InizioAttrezzaggioCommand.Execute(null);
 				break;
 
-			case "F10":
+			case "m":
+			case "M":
 				if (DialogoOperatoreViewModel.PulsantieraGeneraleViewModel.FineAttrezzaggioCommand.CanExecute(null))
 					DialogoOperatoreViewModel.PulsantieraGeneraleViewModel.FineAttrezzaggioCommand.Execute(null);
 				break;

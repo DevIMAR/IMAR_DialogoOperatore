@@ -1,8 +1,11 @@
-﻿@using IMAR_DialogoOperatore.Interfaces.Observers
+﻿@using DevExpress.Blazor.Internal
+@using IMAR_DialogoOperatore.Interfaces.Observers
 @using IMAR_DialogoOperatore.ViewModels
+@using System.Text
 
 @inject AttivitaDetailsViewModel AttivitaDetailsViewModel
 @inject IDialogoOperatoreObserver DialogoOperatoreObserver
+@inject IJSRuntime JSRuntime
 
 <DxGridLayout style="font-size:1.668vh">
 	<Rows>
@@ -22,7 +25,7 @@
 		<DxGridLayoutRow />
 		<DxGridLayoutRow />
 		<DxGridLayoutRow />
-		<DxGridLayoutRow Height="20%" />
+		<DxGridLayoutRow Height="15%" />
 	</Rows>
 	<Columns>
 		<DxGridLayoutColumn />
@@ -63,23 +66,32 @@
 		<DxGridLayoutItem Row="1"
 						  Column="1" ColumnSpan="5">
 			<Template>
-				<DxTextBox @bind-Text="@AttivitaDetailsViewModel.Bolla"
-						   style="margin-bottom:5px;
+				<DxSpinEdit @bind-Value="@(AttivitaDetailsViewModel.Bolla)"
+							BindValueMode="BindValueMode.OnInput"
+							ShowSpinButtons=false
+							AllowMouseWheel="false"
+							style="margin-bottom:5px;
 								  --dxbl-text-edit-padding-x: 0.35vw;
 								  --dxbl-text-edit-padding-y: 0vh;
 								  --dxbl-text-edit-font-size: 1.668vh;"
-						   @ref="@Bolla" />
+							@ref="@BollaRef"
+							@onkeydown="HandleBollaKeyPress"
+							@onclick="@(() => BollaHasFocus = true)" />
 			</Template>
 		</DxGridLayoutItem>
 
 		<DxGridLayoutItem Row="1"
 						  Column="6" ColumnSpan="5">
 			<Template>
-				<DxTextBox @bind-Text="@AttivitaDetailsViewModel.Odp"
+				<DxTextBox @bind-Text="@(AttivitaDetailsViewModel.Odp)"
+						   BindValueMode="BindValueMode.OnInput"
 						   style="margin-bottom:5px;
 								  --dxbl-text-edit-padding-x: 0.35vw;
 								  --dxbl-text-edit-padding-y: 0vh;
-								  --dxbl-text-edit-font-size: 1.668vh;" />
+								  --dxbl-text-edit-font-size: 1.668vh;"
+						   @ref="@OdpRef"
+						   @onkeydown="HandleOdpKeyPress"
+						   @onclick="@(() => BollaHasFocus = false)" />
 			</Template>
 		</DxGridLayoutItem>
 
@@ -120,14 +132,16 @@
 			<Template>
 				<DxComboBox Data="@AttivitaDetailsViewModel.FasiPerAttivita"
 							@bind-Value="@(AttivitaDetailsViewModel.FaseSelezionata)"
+							Enabled="@(AttivitaDetailsViewModel.FasiPerAttivita != null && AttivitaDetailsViewModel.FasiPerAttivita.Count() != 0)"
 							style="margin-bottom:5px;
 									     --dxbl-text-edit-padding-x: 0.35vw;
 									     --dxbl-text-edit-padding-y: 0vh;
 									     --dxbl-text-edit-font-size: 1.668vh;
 									     --dxbl-text-edit-btn-padding-x: 0.35vw;
 									     --dxbl-text-edit-btn-padding-y: 0vh;"
-							@ref="@Fasi"
-							@onkeydown="HandleKeyPress" />
+							@ref="@FasiRef"
+							@onkeydown="HandleFaseKeyPress"
+							@onclick="@(() => BollaHasFocus = false)" />
 			</Template>
 		</DxGridLayoutItem>
 
@@ -222,13 +236,42 @@
 						  Column="1" ColumnSpan="10"
 						  Visible="@AttivitaDetailsViewModel.IsAvanzamento">
 			<Template>
-				<AvanzamentoAttivitaView />
+				<AvanzamentoAttivitaView DatiAvanzamentoInseriti="@DatiAvanzamentoInseriti"
+										 Click="@(() => BollaHasFocus = false)"
+										 @ref="@Avanzamento" />
 			</Template>
 		</DxGridLayoutItem>
 
 		<DxGridLayoutItem Row="14"
 						  Column="1" ColumnSpan="10"
-						  Visible="@AttivitaDetailsViewModel.IsFineLavoro">
+						  Visible="@AttivitaDetailsViewModel.IsFineAttrezzaggio">
+			<Template>
+				<div style="height:100% !important"
+					 class="d-flex justify-content-center align-items-center">
+					<label>APERTURA LAVORO AUTOMATICA</label>
+				</div>
+			</Template>
+		</DxGridLayoutItem>
+
+		<DxGridLayoutItem Row="15"
+						  Column="1" ColumnSpan="10"
+						  Visible="@AttivitaDetailsViewModel.IsFineAttrezzaggio">
+			<Template>
+				<DxCheckBox CheckType="CheckType.Switch"
+							@bind-Checked="@AttivitaDetailsViewModel.IsAperturaLavoroAutomaticaAttiva"
+							LabelPosition="LabelPosition.Left"
+							Alignment="CheckBoxContentAlignment.Center"
+							SizeMode="SizeMode.Large"
+							style="font-size:1.668vh;"
+							@ref="@InizioLavoro"
+							@onkeydown="HandleInizioLavoroKeyPress"
+							@onclick="@(() => BollaHasFocus = false)" />
+			</Template>
+		</DxGridLayoutItem>
+
+		<DxGridLayoutItem Row="14"
+						  Column="1" ColumnSpan="10"
+						  Visible="@AttivitaDetailsViewModel.IsFineAttivitaInUscita">
 			<Template>
 				<div style="height:100% !important"
 					 class="d-flex justify-content-center align-items-center">
@@ -239,36 +282,48 @@
 
 		<DxGridLayoutItem Row="15"
 						  Column="1" ColumnSpan="10"
-						  Visible="@AttivitaDetailsViewModel.IsFineLavoro">
+						  Visible="@AttivitaDetailsViewModel.IsFineAttivitaInUscita">
 			<Template>
 				<DxCheckBox CheckType="CheckType.Switch"
 							@bind-Checked="@AttivitaDetailsViewModel.IsRiaperturaAttiva"
 							LabelPosition="LabelPosition.Left"
 							Alignment="CheckBoxContentAlignment.Center"
 							SizeMode="SizeMode.Large"
-							style="font-size:1.668vh;" />
+							style="font-size:1.668vh;"
+							@ref="@Riapertura"
+							@onkeydown="HandleRiaperturaKeyPress"
+							@onclick="@(() => BollaHasFocus = false)" />
 			</Template>
 		</DxGridLayoutItem>
 	</Items>
 </DxGridLayout>
 
 @code {
-	private DxComboBox<string, string> Fasi;
+	[Parameter] public EventCallback WorkDoneCallback { get; set; }
 
-	public DxTextBox Bolla { get; set; }
+	private DxSpinEdit<uint?> BollaRef;
+	private DxTextBox OdpRef;
+	private DxComboBox<string, string> FasiRef;
+	private AvanzamentoAttivitaView Avanzamento;
+	private DxCheckBox<bool> Riapertura;
+	private DxCheckBox<bool> InizioLavoro;
+
+	public bool BollaHasFocus { get; set; }
 
 	protected override Task OnInitializedAsync()
 	{
 		AttivitaDetailsViewModel.NotifyStateChanged += AttivitaDetailsViewModel_NotifyStateChanged;
+		DialogoOperatoreObserver.OnIsDettaglioAttivitaOpenChanged += DialogoOperatoreObserver_OnIsDettaglioAttivitaOpenChanged;
 
 		return base.OnInitializedAsync();
 	}
 
-	protected override Task OnAfterRenderAsync(bool firstRender)
+	protected override async Task OnAfterRenderAsync(bool firstRender)
 	{
-		SetFocus();
+		if (BollaHasFocus)
+			SetFocus(BollaRef);
 
-		return base.OnAfterRenderAsync(firstRender);
+		await base.OnAfterRenderAsync(firstRender);
 	}
 
 	private async void AttivitaDetailsViewModel_NotifyStateChanged()
@@ -276,20 +331,23 @@
 		await InvokeAsync(StateHasChanged);
 	}
 
-	private void SetFocus()
+	private void DialogoOperatoreObserver_OnIsDettaglioAttivitaOpenChanged()
+	{
+		if (DialogoOperatoreObserver.IsDettaglioAttivitaOpen)
+			return;
+
+		BollaHasFocus = true;
+	}
+
+	private async void SetFocus(IFocusableEditor element)
 	{
 		try
 		{
 			if (!DialogoOperatoreObserver.IsDettaglioAttivitaOpen)
 				return;
 
-			if (Fasi.Data.Count() == 0)
-			{
-				Thread.Sleep(50);
-				Bolla.FocusAsync();
-			}
-			else
-				Fasi.FocusAsync();
+			await Task.Delay(20);
+			await element.FocusAsync();
 		}
 		catch
 		{
@@ -297,22 +355,128 @@
 		}
 	}
 
-	private void HandleKeyPress(KeyboardEventArgs e)
+	private async void HandleBollaKeyPress(KeyboardEventArgs e)
+	{
+		switch (e.Key)
+		{
+			case "Enter":
+				AttivitaDetailsViewModel.Odp = string.Empty;
+
+				if (BollaRef.Value != null)
+					AttivitaDetailsViewModel.CercaAttivitaHelper.CercaAttivitaDaBolla(BollaRef.Value.ToString());
+
+				await SetFocusToFasi();
+				break;
+
+			case "Tab":
+				BollaHasFocus = false;
+				SetFocus(OdpRef);
+				break;
+		}
+	}
+
+	private async void HandleOdpKeyPress(KeyboardEventArgs e)
+	{
+		switch (e.Key)
+		{
+			case "Enter":
+				AttivitaDetailsViewModel.Bolla = null;
+
+				if (OdpRef.Text != string.Empty)
+					AttivitaDetailsViewModel.CercaAttivitaHelper.CercaAttivitaDaOdp(OdpRef.Text);
+
+				await SetFocusToFasi();
+				break;
+
+			case "Tab":
+				BollaHasFocus = true;
+				SetFocus(BollaRef);
+				break;
+		}
+	}
+
+	private async Task SetFocusToFasi()
+	{
+		await Task.Delay(10);
+
+		if (FasiRef.Data.Count() != 0)
+		{
+			BollaHasFocus = false;
+			SetFocus(FasiRef);
+		}
+	}
+
+	private async void HandleFaseKeyPress(KeyboardEventArgs e)
 	{
 		List<string> listaFasi = AttivitaDetailsViewModel.FasiPerAttivita.ToList();
-		if (listaFasi.Count <= 1)
-			return;
 
 		int index = listaFasi.IndexOf(AttivitaDetailsViewModel.FaseSelezionata);
 
 		switch (e.Key)
 		{
 			case "ArrowUp":
+				if (listaFasi.Count <= 1)
+					return;
 				AttivitaDetailsViewModel.FaseSelezionata = index < listaFasi.Count - 1 ? listaFasi[index + 1] : listaFasi[index];
+				SetFocus(FasiRef);
 				break;
 
 			case "ArrowDown":
+				if (listaFasi.Count <= 1)
+					return;
 				AttivitaDetailsViewModel.FaseSelezionata = index > 0 ? listaFasi[index - 1] : listaFasi[index];
+				SetFocus(FasiRef);
+				break;
+
+			case "Enter":
+				if (AttivitaDetailsViewModel.IsAvanzamento)
+					SetFocus(Avanzamento.Prodotta);
+				else if (AttivitaDetailsViewModel.IsFineAttrezzaggio)
+					SetFocus(InizioLavoro);
+				else if (AttivitaDetailsViewModel.IsFineAttivitaInUscita)
+					SetFocus(Riapertura);
+				else
+					await WorkDoneCallback.InvokeAsync();
+				break;
+		}
+	}
+
+	private async void DatiAvanzamentoInseriti()
+	{
+		if (AttivitaDetailsViewModel.IsFineAttivitaInUscita)
+			SetFocus(Riapertura);
+		else
+			await WorkDoneCallback.InvokeAsync();
+	}
+
+	private async void HandleInizioLavoroKeyPress(KeyboardEventArgs e)
+	{
+		switch (e.Key)
+		{
+			case "Enter":
+				await WorkDoneCallback.InvokeAsync();
+				break;
+			case "ArrowRight":
+				AttivitaDetailsViewModel.IsAperturaLavoroAutomaticaAttiva = true;
+				break;
+			case "ArrowLeft":
+				AttivitaDetailsViewModel.IsAperturaLavoroAutomaticaAttiva = false;
+				break;
+		}
+	}
+
+	private async void HandleRiaperturaKeyPress(KeyboardEventArgs e)
+	{
+		switch (e.Key)
+		{
+			case "Enter":
+				await WorkDoneCallback.InvokeAsync();
+				break;
+			case "ArrowRight":
+				AttivitaDetailsViewModel.IsRiaperturaAttiva = true;
+				break;
+			case "ArrowLeft":
+				AttivitaDetailsViewModel.IsRiaperturaAttiva = false;
 				break;
 		}
 	}

@@ -80,17 +80,28 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
 
             string? errore = null;
 
-            if (isAttrezzaggio == true)
-                errore = _jmesApiClient.RegistrazioneOperazioneSuDb(() => _jmesApiClient.MesEquipEnd(operatore.Badge, (double)attivitaDaRimuovere.CodiceJMes));
-            else
+            if (isSospeso)
 			{
-				if (isSospeso)
-                    errore = _jmesApiClient.RegistrazioneOperazioneSuDb(() => _jmesApiClient.MesSuspensionStart(operatore.Badge, attivitaDaRimuovere.Macchina.CodiceJMes));
+                errore = _jmesApiClient.RegistrazioneOperazioneSuDb(() => _jmesApiClient.MesSuspensionStart(operatore.Badge, attivitaDaRimuovere.Macchina.CodiceJMes));
+				return errore;
+			}
+
+            if (isAttrezzaggio == true)
+            {
+                if (isSospeso)
+                    errore = _jmesApiClient.RegistrazioneOperazioneSuDb(() => _jmesApiClient.MesEquipSuspension(operatore.Badge, (double)attivitaDaRimuovere.CodiceJMes));
                 else
-                    errore = _jmesApiClient.RegistrazioneOperazioneSuDb(() =>_jmesApiClient.MesWorkEnd(operatore.Badge, attivitaDaRimuovere, (int)quantitaProdotta, (int)quantitaScartata));
+                    errore = _jmesApiClient.RegistrazioneOperazioneSuDb(() => _jmesApiClient.MesEquipEnd(operatore.Badge, (double)attivitaDaRimuovere.CodiceJMes));
+            }
+            else
+            {
+                if (isSospeso)
+                    errore = _jmesApiClient.RegistrazioneOperazioneSuDb(() => _jmesApiClient.MesWorkSuspension(operatore.Badge, attivitaDaRimuovere, (int)quantitaProdotta, (int)quantitaScartata));
+                else
+                    errore = _jmesApiClient.RegistrazioneOperazioneSuDb(() => _jmesApiClient.MesWorkEnd(operatore.Badge, attivitaDaRimuovere, (int)quantitaProdotta, (int)quantitaScartata));
             }
 
-			return errore;
+            return errore;
         }
 
 		public string? AggiungiAttivitaAdOperatore(bool isAttrezzaggio, Operatore operatore, Attivita attivitaDaAggiungere)

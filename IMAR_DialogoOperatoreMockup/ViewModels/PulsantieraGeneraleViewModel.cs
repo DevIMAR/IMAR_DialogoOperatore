@@ -1,16 +1,17 @@
 ﻿using IMAR_DialogoOperatore.Application;
-using IMAR_DialogoOperatore.Application.Interfaces.ViewModels;
 using IMAR_DialogoOperatore.Commands;
 using IMAR_DialogoOperatore.Interfaces.Observers;
+using IMAR_DialogoOperatore.Interfaces.ViewModels;
+using IMAR_DialogoOperatore.Observers;
 using System.Windows.Input;
 
 namespace IMAR_DialogoOperatore.ViewModels
 {
-	public class PulsantieraGeneraleViewModel : ViewModelBase
+    public class PulsantieraGeneraleViewModel : ViewModelBase
 	{
-		private IDialogoOperatoreObserver _dialogoOperatoreStore;
+		private IDialogoOperatoreObserver _dialogoOperatoreObserver;
 		private IOperatoreViewModel? _operatoreSelezionato;
-		public IAttivitaViewModel? AttivitaSelezionata => _dialogoOperatoreStore.AttivitaSelezionata;
+		public IAttivitaViewModel? AttivitaSelezionata => _dialogoOperatoreObserver.AttivitaSelezionata;
 		public bool IsAssente => OperatoreSelezionato != null ? OperatoreSelezionato.Stato == Costanti.ASSENTE : true;
 		public bool IsInPausa => OperatoreSelezionato != null ? OperatoreSelezionato.Stato == Costanti.IN_PAUSA : false;
 
@@ -36,8 +37,8 @@ namespace IMAR_DialogoOperatore.ViewModels
 			}
 		}
 
-		public PulsantieraGeneraleViewModel(
-			IDialogoOperatoreObserver dialogoOperatoreStore,
+        public PulsantieraGeneraleViewModel(
+			IDialogoOperatoreObserver dialogoOperatoreObserver,
 			IngressoUscitaCommand ingressoUscitaCommand,
 			InizioFinePausaCommand inizioFinePausaCommand,
 			InizioLavoroCommand inizioLavoroCommand,
@@ -47,7 +48,7 @@ namespace IMAR_DialogoOperatore.ViewModels
 			FineLavoroCommand fineLavoroCommand,
 			AnnullaOperazioneCommand annullaOperazioneCommand)
         {
-			_dialogoOperatoreStore = dialogoOperatoreStore;
+			_dialogoOperatoreObserver = dialogoOperatoreObserver;
 
             IngressoUscitaCommand = ingressoUscitaCommand;
 			InizioFinePausaCommand = inizioFinePausaCommand;
@@ -58,21 +59,28 @@ namespace IMAR_DialogoOperatore.ViewModels
 			FineLavoroCommand = fineLavoroCommand;
 			AnnulaOperazioneCommand = annullaOperazioneCommand;
 
-			_dialogoOperatoreStore.OnAttivitaSelezionataChanged += DialogoOperatoreStore_OnAttivitaSelezionataChanged;
-			_dialogoOperatoreStore.OnOperatoreSelezionatoChanged += DialogoOperatoreStore_OnOperatoreSelezionatoChanged;
+			_dialogoOperatoreObserver.OnAttivitaSelezionataChanged += DialogoOperatoreObserver_OnAttivitaSelezionataChanged;
+			_dialogoOperatoreObserver.OnOperatoreSelezionatoChanged += DialogoOperatoreObserver_OnOperatoreSelezionatoChanged;
+            _dialogoOperatoreObserver.OnIsDettaglioAttivitaOpenChanged += DialogoOperatoreObserver_OnIsDettaglioAttivitaOpenChanged;
         }
 
-		private void DialogoOperatoreStore_OnAttivitaSelezionataChanged()
+		private void DialogoOperatoreObserver_OnAttivitaSelezionataChanged()
 		{
 			OnNotifyStateChanged();
 		}
 
-		private void DialogoOperatoreStore_OnOperatoreSelezionatoChanged()
+		private void DialogoOperatoreObserver_OnOperatoreSelezionatoChanged()
 		{
-			OperatoreSelezionato = _dialogoOperatoreStore.OperatoreSelezionato;
+			OperatoreSelezionato = _dialogoOperatoreObserver.OperatoreSelezionato;
 		}
 
-		private void OperatoreSelezionato_NotifyStateChanged()
+		private void DialogoOperatoreObserver_OnIsDettaglioAttivitaOpenChanged()
+        {
+            OnNotifyStateChanged();
+        }
+
+
+        private void OperatoreSelezionato_NotifyStateChanged()
 		{
 			OnNotifyStateChanged();
 		}
@@ -95,8 +103,9 @@ namespace IMAR_DialogoOperatore.ViewModels
 
 		public override void Dispose()
 		{
-			_dialogoOperatoreStore.OnAttivitaSelezionataChanged -= DialogoOperatoreStore_OnAttivitaSelezionataChanged;
-			_dialogoOperatoreStore.OnOperatoreSelezionatoChanged -= DialogoOperatoreStore_OnOperatoreSelezionatoChanged;
-		}
+			_dialogoOperatoreObserver.OnAttivitaSelezionataChanged -= DialogoOperatoreObserver_OnAttivitaSelezionataChanged;
+			_dialogoOperatoreObserver.OnOperatoreSelezionatoChanged -= DialogoOperatoreObserver_OnOperatoreSelezionatoChanged;
+            _dialogoOperatoreObserver.OnIsDettaglioAttivitaOpenChanged -= DialogoOperatoreObserver_OnIsDettaglioAttivitaOpenChanged;
+        }
 	}
 }

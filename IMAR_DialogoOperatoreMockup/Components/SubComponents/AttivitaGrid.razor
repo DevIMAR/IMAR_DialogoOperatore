@@ -1,18 +1,21 @@
-﻿@using IMAR_DialogoOperatore.Interfaces.Observers
+﻿@using DevExpress.Blazor.Base
+@using IMAR_DialogoOperatore.Interfaces.Observers
 @using IMAR_DialogoOperatore.ViewModels
 
 @inject AttivitaGridViewModel AttivitaGridViewModel
+@inject IDialogoOperatoreObserver DialogoOperatoreObserver
+@inject IJSRuntime JSRuntime
 
-<div @onkeypress="@HandleKeyPress">
+<div tabindex="1">
 	<DxGrid @bind-Data="@AttivitaGridViewModel.Attivita"
 			AllowSort="false"
-			FocusedRowEnabled="true"
 			AllowSelectRowByClick="true"
 			SelectionMode="GridSelectionMode.Single"
 			@bind-SelectedDataItem="@AttivitaGridViewModel.AttivitaSelezionata"
 			PageSize="25"
 			style="--dxbl-grid-font-size:1.668vh;"
-			@ref="Grid">
+			@ref="Grid"
+			id="grid-id">
 		<Columns>
 			<DxGridDataColumn FieldName="@(nameof(AttivitaViewModel.Causale))"
 							  Caption=" "
@@ -57,7 +60,7 @@
 			<DxGridDataColumn FieldName="@(nameof(AttivitaViewModel.DescrizioneArticolo))"
 							  Caption="Desc. Articolo"
 							  TextAlignment="GridTextAlignment.Left"
-							  Width="36%">
+							  Width="31%">
 			</DxGridDataColumn>
 
 			<DxGridDataColumn FieldName="@(nameof(AttivitaViewModel.Fase))"
@@ -70,7 +73,31 @@
 			<DxGridDataColumn FieldName="@(nameof(AttivitaViewModel.DescrizioneFase))"
 							  Caption="Desc. Fase"
 							  TextAlignment="GridTextAlignment.Left"
-							  Width="36%">
+							  Width="31%">
+			</DxGridDataColumn>
+
+			<DxGridDataColumn FieldName="@(nameof(AttivitaViewModel.QuantitaProdotta))"
+							  Caption="Completamento"
+							  TextAlignment="GridTextAlignment.Left"
+							  Width="10%">
+				<CellDisplayTemplate>
+					<div style="text-align: left;">
+						<div style="vertical-align: middle;
+									display: inline-block;">
+							<DxProgressBar Type="ProgressBarType.Horizontal"
+										   Value="Convert.ToDouble(context.Value)"
+										   MaxValue="((AttivitaViewModel)context.DataItem).QuantitaOrdine"
+										   Size="10vh"
+										   Thickness="10px"
+										   ShowLabel="false" />
+						</div>
+
+						<div style="vertical-align: middle;
+									display: inline-block;">
+							@(Convert.ToDouble(context.Value) + "/" + ((AttivitaViewModel)context.DataItem).QuantitaOrdine)
+						</div>
+					</div>
+				</CellDisplayTemplate>
 			</DxGridDataColumn>
 		</Columns>
 	</DxGrid>
@@ -78,45 +105,51 @@
 
 @code {
 	private DxGrid Grid;
+	bool focusGrid = false;
 
 	protected override Task OnInitializedAsync()
 	{
 		AttivitaGridViewModel.NotifyStateChanged += AttivitaGridViewModel_NotifyStateChanged;
+		DialogoOperatoreObserver.OnIsDettaglioAttivitaOpenChanged += DialogoOperatoreObserver_OnIsDettaglioAttivitaOpenChanged;
 
 		return base.OnInitializedAsync();
 	}
 
 	private async void AttivitaGridViewModel_NotifyStateChanged()
 	{
-		if (AttivitaGridViewModel.Attivita != null && Enumerable.Count(AttivitaGridViewModel.Attivita) > 0)
-			Grid.SetFocusedRowIndex(0);
-
 		await InvokeAsync(StateHasChanged);
+
+		if (AttivitaGridViewModel.Attivita != null)
+			focusGrid = true;
 	}
 
-	private void HandleKeyPress(KeyboardEventArgs e)
+	private async void DialogoOperatoreObserver_OnIsDettaglioAttivitaOpenChanged()
 	{
-		if (AttivitaGridViewModel.Attivita != null)
-			return;
-
-		int actualIndex = Grid.GetFocusedRowIndex();
-		int newIndex = 0;
-
-		switch (e.Key)
+		if (AttivitaGridViewModel.Attivita != null && !DialogoOperatoreObserver.IsDettaglioAttivitaOpen)
 		{
-			case "Enter":
-				Grid.SelectedDataItem = Grid.GetFocusedDataItem();
-				break;
+			await InvokeAsync(() =>
+			{
+				Grid.BeginUpdate();
+				Grid.SelectedDataItem = null;
+				Grid.EndUpdate();
+			});
 
-			case "ArrowUp":
-				newIndex = actualIndex < Enumerable.Count(AttivitaGridViewModel.Attivita) - 1 ? actualIndex++ : actualIndex;
-				Grid.SetFocusedRowIndex(newIndex);
-				break;
-
-			case "ArrowDown":
-				newIndex = actualIndex > 0 ? actualIndex-- : actualIndex;
-				Grid.SetFocusedRowIndex(newIndex);
-				break;
+			focusGrid = true;
 		}
 	}
+
+	protected override void OnAfterRender(bool firstRender)
+	{
+		base.OnAfterRender(firstRender);
+
+		if (focusGrid)
+		{
+			FocusGrid();
+			focusGrid = false;
+		}
+	}
+
+	void FocusGrid() => JSRuntime.InvokeVoidAsync("FocusElement", "grid-id");
+
+	//Aggiunta di un commento di prova da committare
 }

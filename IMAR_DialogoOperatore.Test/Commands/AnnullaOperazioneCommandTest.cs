@@ -1,8 +1,8 @@
 ﻿using IMAR_DialogoOperatore.Application;
-using IMAR_DialogoOperatore.Application.Interfaces.ViewModels;
 using IMAR_DialogoOperatore.Commands;
 using IMAR_DialogoOperatore.Domain.Models;
 using IMAR_DialogoOperatore.Interfaces.Mappers;
+using IMAR_DialogoOperatore.Interfaces.ViewModels;
 using IMAR_DialogoOperatore.Observers;
 using IMAR_DialogoOperatore.ViewModels;
 using NSubstitute;
@@ -10,7 +10,7 @@ using System.Collections.ObjectModel;
 
 namespace IMAR_DialogoOperatore.Test.Commands
 {
-	public class AnnullaOperazioneCommandTests
+    public class AnnullaOperazioneCommandTests
 	{
 		private AnnullaOperazioneCommand _command;
 		private DialogoOperatoreObserver _dialogoOperatoreStore;

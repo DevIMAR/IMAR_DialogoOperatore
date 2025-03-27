@@ -22,7 +22,7 @@ namespace IMAR_DialogoOperatore.Test.Commands
 			Operatore operatoreMock = Substitute.For<Operatore>();
 			_dialogoOperatoreStore.OperatoreSelezionato = new OperatoreViewModel(operatoreMock);
 			_dialogoOperatoreStore.OperatoreSelezionato.AttivitaAperte = new ObservableCollection<Attivita>();
-			_dialogoOperatoreStore.AreTastiBloccati = false;
+			_dialogoOperatoreStore.IsUscita = false;
 
 			_command = new IngressoUscitaCommand(_dialogoOperatoreStore, _interruzioneLavoroUtility);
 		}
@@ -58,7 +58,7 @@ namespace IMAR_DialogoOperatore.Test.Commands
 		{
 			//Arrange
 			_dialogoOperatoreStore.OperatoreSelezionato.Stato = Costanti.PRESENTE;
-			_dialogoOperatoreStore.AreTastiBloccati = true;
+			_dialogoOperatoreStore.IsUscita = true;
 
 			//Act
 			var result = _command.CanExecute(null);

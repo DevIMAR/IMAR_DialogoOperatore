@@ -1,8 +1,8 @@
-﻿using IMAR_DialogoOperatore.Application.Interfaces.ViewModels;
+﻿using IMAR_DialogoOperatore.Interfaces.ViewModels;
 
 namespace IMAR_DialogoOperatore.Interfaces.Helpers
 {
-	public interface IInterruzioneAttivitaHelper
+    public interface IInterruzioneAttivitaHelper
 	{
         Task GestisciInterruzioneAttivita(IAttivitaViewModel attivita, bool isUscita);
 	}
