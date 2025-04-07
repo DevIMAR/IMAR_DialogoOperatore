@@ -135,7 +135,8 @@ namespace IMAR_DialogoOperatore.Infrastructure.JMes
                         notCod = attivita.Bolla,
                         tssStr = DateTime.Now.ToString("yyyyMMddHHmmss"),
                         producedQuantity = quantitaProdotta,
-                        rejectedQuantity = quantitaScartata
+                        rejectedQuantity = quantitaScartata,
+                        defDecAdv = attivita.SaldoAcconto == Costanti.ACCONTO
                     }
                 }
             };
@@ -157,8 +158,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.JMes
                     {
                         qck = true,
                         clkBdgCod = badge,
-                        notCod = bolla,
-                        clkMacUid = 476
+                        notCod = bolla
                     }
                 }
             };

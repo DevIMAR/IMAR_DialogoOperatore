@@ -119,10 +119,7 @@ namespace IMAR_DialogoOperatore.Services
             attivitaDaAvanzare.QuantitaScartata += quantitaScartata;
 
             if (attivitaDaAvanzare.SaldoAcconto != "S")
-            {
                 attivitaDaAvanzare.QuantitaResidua = attivitaDaAvanzare.QuantitaOrdine - attivitaDaAvanzare.QuantitaProdotta;
-                attivitaDaAvanzare.SaldoAcconto = attivitaDaAvanzare.QuantitaResidua > 0 ? "A" : "S";
-            }
 
             HttpResponseMessage result = _jmesApiClient.MesAdvanceDeclaration(operatore.Badge, attivitaDaAvanzare, quantitaProdotta, quantitaScartata);
 

@@ -8,7 +8,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.Utilities
     {
         public string? GestioneEventualeErrore(HttpResponseMessage result)
         {
-            var jsonData = result.Content.ReadFromJsonAsync<JMesResultDto>().GetAwaiter().GetResult(); ;
+            var jsonData = result.Content.ReadFromJsonAsync<JMesResultDto>().GetAwaiter().GetResult();
 
             if (jsonData != null && jsonData.result.instanceRef.model.error)
                 return ScritturaTestoErrore(jsonData);
