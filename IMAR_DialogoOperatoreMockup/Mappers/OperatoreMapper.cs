@@ -17,6 +17,7 @@ namespace IMAR_DialogoOperatore.Mappers
 
 		public Operatore OperatoreViewModelToOperatore(IOperatoreViewModel operatoreViewModel)
 		{
+			_operatoriService.Operatore.MacchinaAssegnata = operatoreViewModel.MacchinaAssegnata;
 			return _operatoriService.Operatore;
 		}
 	}

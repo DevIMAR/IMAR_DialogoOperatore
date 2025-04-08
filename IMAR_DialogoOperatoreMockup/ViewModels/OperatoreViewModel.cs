@@ -15,6 +15,7 @@ namespace IMAR_DialogoOperatore.ViewModels
 		public int? Badge => _operatore?.Badge != null ? Int32.Parse(_operatore?.Badge) : null;
 		public string? Nome => _operatore?.Nome;
 		public string? Cognome => _operatore?.Cognome;
+		public Macchina? MacchinaAssegnata { get; set; }
 		public string Stato
 		{
 			get { return _stato; }
@@ -32,7 +33,7 @@ namespace IMAR_DialogoOperatore.ViewModels
 				_attivitaAperte = value;
 				OnNotifyStateChanged();
 			}
-		}
+        }
 
         public OperatoreViewModel(Operatore? operatore)
         {

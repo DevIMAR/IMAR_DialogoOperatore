@@ -9,7 +9,7 @@ namespace IMAR_DialogoOperatore.Application.Interfaces.Clients
 		IList<T>? ChiamaQueryVirtualJmes<T>();
 		string? RegistrazioneOperazioneSuDb(Func<HttpResponseMessage> operazione);
         HttpResponseMessage MesAdvanceDeclaration(string badge, Attivita attivita, int quantitaProdotta, int quantitaScartata);
-		HttpResponseMessage MesWorkStart(string badge, string bolla);
+		HttpResponseMessage MesWorkStart(Operatore operatore, string bolla);
 		HttpResponseMessage MesWorkStartIndiretta(string badge, string codiceAttivitaIndiretta);
         HttpResponseMessage MesWorkEnd(string badge, Attivita attivita, int quantitaProdotta, int quantitaScartata);
 		HttpResponseMessage MesWorkSuspension(string badge, Attivita attivita, int quantitaProdotta, int quantitaScartata);

@@ -31,8 +31,8 @@ namespace IMAR_DialogoOperatore.ViewModels
 
                 SelezionaOperatore();
 
-                if (value != null)
-                    _autoLogoutUtility.StartLogoutTimer(30);
+                //if (value != null)
+                //  _autoLogoutUtility.StartLogoutTimer(30);
             }
         }
 
@@ -109,9 +109,6 @@ namespace IMAR_DialogoOperatore.ViewModels
             {
                 ((OperatoreViewModel)OperatoreSelezionato).NotifyStateChanged += OperatoreSelezionato_NotifyStateChanged;
             }
-
-            _dialogoOperatoreObserver.AttivitaSelezionata = null;
-            _dialogoOperatoreObserver.OperazioneInCorso = Costanti.NESSUNA;
         }
 
         private void UnsubscribeEventoOperatore()

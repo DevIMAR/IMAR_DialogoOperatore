@@ -312,6 +312,8 @@
 
 	protected override Task OnInitializedAsync()
 	{
+		BollaHasFocus = true;
+
 		AttivitaDetailsViewModel.NotifyStateChanged += AttivitaDetailsViewModel_NotifyStateChanged;
 		DialogoOperatoreObserver.OnIsDettaglioAttivitaOpenChanged += DialogoOperatoreObserver_OnIsDettaglioAttivitaOpenChanged;
 
@@ -362,7 +364,7 @@
 			case "Enter":
 				AttivitaDetailsViewModel.Odp = string.Empty;
 
-				if (BollaRef.Value != null)
+				if (BollaRef.Value != null && !AttivitaDetailsViewModel.IsAttivitaSelezionata)
 					AttivitaDetailsViewModel.CercaAttivitaHelper.CercaAttivitaDaBolla(BollaRef.Value.ToString());
 
 				await SetFocusToFasi();
@@ -382,7 +384,7 @@
 			case "Enter":
 				AttivitaDetailsViewModel.Bolla = null;
 
-				if (OdpRef.Text != string.Empty)
+				if (OdpRef.Text != string.Empty && !AttivitaDetailsViewModel.IsAttivitaSelezionata)
 					AttivitaDetailsViewModel.CercaAttivitaHelper.CercaAttivitaDaOdp(OdpRef.Text);
 
 				await SetFocusToFasi();

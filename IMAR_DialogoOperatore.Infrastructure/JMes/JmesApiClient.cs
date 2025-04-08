@@ -136,7 +136,8 @@ namespace IMAR_DialogoOperatore.Infrastructure.JMes
                         tssStr = DateTime.Now.ToString("yyyyMMddHHmmss"),
                         producedQuantity = quantitaProdotta,
                         rejectedQuantity = quantitaScartata,
-                        defDecAdv = attivita.SaldoAcconto == Costanti.ACCONTO
+                        defDecAdv = attivita.SaldoAcconto == Costanti.ACCONTO,
+                        clkMacUid = attivita.Macchina.CodiceJMes
                     }
                 }
             };
@@ -146,7 +147,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.JMes
             return result;
         }
 
-        public HttpResponseMessage MesWorkStart(string badge, string bolla)
+        public HttpResponseMessage MesWorkStart(Operatore operatore, string bolla)
         {
             string wizardPath = "?wzdCod=MesWorkStart";
 
@@ -157,8 +158,9 @@ namespace IMAR_DialogoOperatore.Infrastructure.JMes
                     paramsIO = new
                     {
                         qck = true,
-                        clkBdgCod = badge,
-                        notCod = bolla
+                        clkBdgCod = operatore.Badge,
+                        notCod = bolla,
+                        clkMacUid = operatore.MacchinaAssegnata.CodiceJMes
                     }
                 }
             };

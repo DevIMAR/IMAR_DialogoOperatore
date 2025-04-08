@@ -1,22 +1,27 @@
-﻿using IMAR_DialogoOperatore.Application.Interfaces.Repositories;
+﻿using IMAR_DialogoOperatore.Application.Interfaces.Clients;
+using IMAR_DialogoOperatore.Application.Interfaces.Repositories;
 using IMAR_DialogoOperatore.Application.Interfaces.Services.Activities;
 using IMAR_DialogoOperatore.Application.Interfaces.UoW;
 using IMAR_DialogoOperatore.Domain.Entities.As400;
+using IMAR_DialogoOperatore.Domain.Entities.JMES;
 using IMAR_DialogoOperatore.Domain.Models;
 
 namespace IMAR_DialogoOperatore.Infrastructure.Services
 {
     public class MacchinaService : IMacchinaService
     {
-        private ISynergyJmesUoW _synergyJmesUoW;
+        private readonly ISynergyJmesUoW _synergyJmesUoW;
         private readonly IAs400Repository _as400Repository;
+        private readonly IJmesApiClient _jmesApiClient;
 
         public MacchinaService(
             ISynergyJmesUoW synergyJmesUoW,
-            IAs400Repository as400Repository)
+            IAs400Repository as400Repository,
+            IJmesApiClient jmesApiClient)
         {
             _synergyJmesUoW = synergyJmesUoW;
             _as400Repository = as400Repository;
+            _jmesApiClient = jmesApiClient;
         }
 
         public Macchina GetMacchinaByAttivita(Attivita attivita)
@@ -37,13 +42,40 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
             };
         }
 
+        public Macchina? GetPrimaMacchinaFittiziaNonUtilizzata()
+        {
+            IEnumerable<AngRes> macchineFittizie = _synergyJmesUoW.AngRes.Get(x => x.ResDsc.Contains("FITTIZIA"));
+
+            IEnumerable<mesEvtToEndMac>? macchineFittizieConAttivitaAperte = _jmesApiClient.ChiamaQueryGetJmes<mesEvtToEndMac>()?.Where(x => x.ID_Mac371.Contains("FITTIZIA"));
+            if (macchineFittizieConAttivitaAperte == null || !macchineFittizieConAttivitaAperte.Any())
+                return new Macchina
+                {
+                    CentroDiLavoro = "999",
+                    CodiceMacchina = "001",
+                    CodiceJMes = 491
+                };
+
+            foreach (AngRes macchina in macchineFittizie)
+            {
+                if (!macchineFittizieConAttivitaAperte.Any(x => x.ID_Mac365 == macchina.Uid))
+                {
+                    return new Macchina
+                    {
+                        CentroDiLavoro = macchina.ResCod.Trim().Substring(0, 3),
+                        CodiceMacchina = macchina.ResCod.Trim().Substring(3, 3),
+                        CodiceJMes = (int)macchina.Uid
+                    };
+                }
+            }
+
+            return null;
+        }
+
         public int GetCodiceJmesByCodice(string codiceMacchinaCompleto)
         {
             return (int)_synergyJmesUoW.AngRes.Get(x => x.ResCod == codiceMacchinaCompleto)
                                                         .Select(x => x.Uid)
                                                         .Single();
-
-
         }
     }
 }

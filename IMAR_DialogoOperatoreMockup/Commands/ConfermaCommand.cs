@@ -1,4 +1,5 @@
 ﻿using IMAR_DialogoOperatore.Application;
+using IMAR_DialogoOperatore.Application.Interfaces.Services.Activities;
 using IMAR_DialogoOperatore.Interfaces.Helpers;
 using IMAR_DialogoOperatore.Interfaces.Observers;
 
@@ -11,19 +12,22 @@ namespace IMAR_DialogoOperatore.Commands
 		private readonly IDialogoOperatoreObserver _dialogoOperatoreObserver;
 		private readonly IPopupObserver _popupStore;
 		private readonly IAvanzamentoObserver _avanzamentoObserver;
+		private readonly IMacchinaService _macchinaService;
 
 		public ConfermaCommand(
 			IPopupConfermaHelper popupConfermaUtility,
 			IConfermaOperazioneHelper confermaOperazioneUtility,
 			IDialogoOperatoreObserver dialogoOperatoreObserver,
 			IPopupObserver popupObserver,
-            IAvanzamentoObserver avanzamentoObserver)
+            IAvanzamentoObserver avanzamentoObserver,
+			IMacchinaService macchinaService)
 		{
 			_popupConfermaHelper = popupConfermaUtility;
 			_confermaOperazioneHelper = confermaOperazioneUtility;
 			_dialogoOperatoreObserver = dialogoOperatoreObserver;
 			_popupStore = popupObserver;
 			_avanzamentoObserver = avanzamentoObserver;
+			_macchinaService = macchinaService;
 
 			_popupStore.OnIsConfermatoChanged += PopupStore_OnIsConfermatoChanged;
 		}
@@ -70,18 +74,47 @@ namespace IMAR_DialogoOperatore.Commands
         }
 
 		private void GestioneEsecuzioneOperazione()
-		{
-			if (_dialogoOperatoreObserver.AttivitaSelezionata != null)
-				_dialogoOperatoreObserver.AttivitaSelezionata.SaldoAcconto = _avanzamentoObserver.SaldoAcconto;
+        {
+            AssegnaSaldoAccontoAdAttivitaSelezionata();
 
+            AssegnaMacchinaFittiziaAdOperatore();
+
+            EseguiOperazioneOMostraMessaggio();
+
+            _dialogoOperatoreObserver.OperazioneInCorso = Costanti.NESSUNA;
+        }
+
+        private void AssegnaSaldoAccontoAdAttivitaSelezionata()
+        {
+            if (_dialogoOperatoreObserver.AttivitaSelezionata != null)
+                _dialogoOperatoreObserver.AttivitaSelezionata.SaldoAcconto = _avanzamentoObserver.SaldoAcconto;
+        }
+
+        private void EseguiOperazioneOMostraMessaggio()
+        {
             string? result = _confermaOperazioneHelper.EseguiOperazione();
-			if (result != null)
-				MostraPopupConTesto(result);
+            if (result != null)
+                MostraPopupConTesto(result);
+        }
 
-			_dialogoOperatoreObserver.OperazioneInCorso = Costanti.NESSUNA;
-		}
+        private void AssegnaMacchinaFittiziaAdOperatore()
+        {
+            if (!CanAssegnareMacchinaFittiziaAdOperatore())
+                return;
 
-		private void MostraPopupConTesto(string testo)
+            _dialogoOperatoreObserver.OperatoreSelezionato.MacchinaAssegnata = _macchinaService.GetPrimaMacchinaFittiziaNonUtilizzata();
+            if (_dialogoOperatoreObserver.OperatoreSelezionato.MacchinaAssegnata == null)
+                MostraPopupConTesto("!!! NON CI SONO MACCHINE DISPONIBILI!!!\nCONTATTARE UFFICIO IT");
+        }
+
+        private bool CanAssegnareMacchinaFittiziaAdOperatore()
+        {
+            return (_dialogoOperatoreObserver.OperazioneInCorso == Costanti.INIZIO_ATTREZZAGGIO ||
+                    _dialogoOperatoreObserver.OperazioneInCorso == Costanti.INIZIO_LAVORO) &&
+                    _dialogoOperatoreObserver.OperatoreSelezionato.MacchinaAssegnata == null;
+        }
+
+        private void MostraPopupConTesto(string testo)
 		{
 			_popupStore.TestoPopup = testo;
 			_popupStore.IsPopupVisible = true;

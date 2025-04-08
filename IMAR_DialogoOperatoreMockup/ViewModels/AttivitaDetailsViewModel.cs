@@ -2,7 +2,6 @@
 using IMAR_DialogoOperatore.Interfaces.Helpers;
 using IMAR_DialogoOperatore.Interfaces.Observers;
 using IMAR_DialogoOperatore.Interfaces.ViewModels;
-using System.Text;
 
 namespace IMAR_DialogoOperatore.ViewModels
 {
@@ -32,6 +31,7 @@ namespace IMAR_DialogoOperatore.ViewModels
 		public string QuantitaResidua => _attivitaSelezionata != null ? _attivitaSelezionata.QuantitaResidua.ToString() : "0";
 		public string QuantitaScartataTotale => _attivitaSelezionata != null ? _attivitaSelezionata.QuantitaScartata.ToString() : "0";
 		public string StatoAttivita => (_attivitaSelezionata != null && _attivitaSelezionata.SaldoAcconto == Costanti.SALDO) ? Costanti.ATTIVITA_COMPLETATA : Costanti.ATTIVITA_NON_COMPLETATA;
+		public bool IsAttivitaSelezionata => _dialogoOperatoreObserver.AttivitaSelezionata != null;
 
 		public uint? Bolla
 		{
@@ -54,6 +54,8 @@ namespace IMAR_DialogoOperatore.ViewModels
 			{
 				if (_odp == value)
 					return;
+
+				_odp = value;
 
                 OnNotifyStateChanged();
 			}
@@ -148,7 +150,7 @@ namespace IMAR_DialogoOperatore.ViewModels
         private void DialogoOperatoreObserver_OnIsDettaglioAttivitaOpenChanged()
         {
             Bolla = null;
-            Odp = null;
+            Odp = string.Empty;
         }
 
         private void DialogoOperatoreStore_OnAttivitaSelezionataChanged()
@@ -169,31 +171,18 @@ namespace IMAR_DialogoOperatore.ViewModels
 				_fasiPerAttivita = new List<string> { _attivitaSelezionata.Fase };
 
 			_faseSelezionata = _attivitaSelezionata.Fase;
-			_odp = _attivitaSelezionata.Odp;
-			_bolla = _attivitaSelezionata.Bolla != null ? uint.Parse(_attivitaSelezionata.Bolla) : null;
+			_odp = _attivitaSelezionata.Odp ?? string.Empty;
+			_bolla = _attivitaSelezionata.Bolla != null ? uint.TryParse(_attivitaSelezionata.Bolla, out uint res) ? res : null : null;
 
 			OnNotifyStateChanged();
 		}
 
-        public string RendiSoloNumerico(string nuovoValore)
-        {
-			string valoreNumerico = nuovoValore;
-
-			if (string.IsNullOrWhiteSpace(valoreNumerico))
-				return string.Empty;
-
-			if (!Int32.TryParse(nuovoValore.Last().ToString(), out _))
-				valoreNumerico = nuovoValore.Substring(0, nuovoValore.Length - 1);
-
-            return valoreNumerico;
-        }
-
         public override void Dispose()
-		{
-			_dialogoOperatoreObserver.OnAttivitaSelezionataChanged -= DialogoOperatoreStore_OnAttivitaSelezionataChanged;
-			_dialogoOperatoreObserver.OnOperazioneInCorsoChanged -= DialogoOperatoreStore_OnOperazioneInCorsoChanged;
-
-			_cercaAttivitaObserver.OnAttivitaTrovateChanged -= CercaAttivitaStore_OnAttivitaTrovateChanged;
-		}
+        {
+            _dialogoOperatoreObserver.OnAttivitaSelezionataChanged -= DialogoOperatoreStore_OnAttivitaSelezionataChanged;
+            _dialogoOperatoreObserver.OnOperazioneInCorsoChanged -= DialogoOperatoreStore_OnOperazioneInCorsoChanged;
+            _dialogoOperatoreObserver.OnIsRiaperturaAttivaChanged -= DialogoOperatoreObserver_OnIsRiaperturaAttivaChanged;
+            _dialogoOperatoreObserver.OnIsDettaglioAttivitaOpenChanged -= DialogoOperatoreObserver_OnIsDettaglioAttivitaOpenChanged;
+        }
 	}
 }

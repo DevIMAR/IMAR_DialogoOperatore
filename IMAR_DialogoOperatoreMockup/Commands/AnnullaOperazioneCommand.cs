@@ -43,9 +43,9 @@ namespace IMAR_DialogoOperatore.Commands
 			_dialogoOperatoreObserver.IsOperazioneAnnullata = false;
         }
 
-		private bool IsCondizioneDiLogout() =>
-			_dialogoOperatoreObserver.OperazioneInCorso.Equals(Costanti.NESSUNA)
-			&& _dialogoOperatoreObserver.AttivitaSelezionata == null;
+		private bool IsCondizioneDiLogout() => _dialogoOperatoreObserver.OperazioneInCorso == null ||
+											   _dialogoOperatoreObserver.OperazioneInCorso.Equals(Costanti.NESSUNA) &&
+                                               _dialogoOperatoreObserver.AttivitaSelezionata == null;
 
 		private bool IsAttivitaDetailsDaChiudere() =>
 			!_dialogoOperatoreObserver.OperazioneInCorso.Equals(Costanti.NESSUNA);		

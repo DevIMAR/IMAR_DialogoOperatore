@@ -145,7 +145,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
 						return errore;
 				}
 
-                errore = _jmesApiClient.RegistrazioneOperazioneSuDb(() => _jmesApiClient.MesWorkStart(operatore.Badge, attivitaDaAggiungere.Bolla));
+                errore = _jmesApiClient.RegistrazioneOperazioneSuDb(() => _jmesApiClient.MesWorkStart(operatore, attivitaDaAggiungere.Bolla));
             }
 
             return errore;

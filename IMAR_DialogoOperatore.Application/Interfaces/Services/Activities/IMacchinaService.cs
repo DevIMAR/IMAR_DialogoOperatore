@@ -6,5 +6,6 @@ namespace IMAR_DialogoOperatore.Application.Interfaces.Services.Activities
     {
         Macchina GetMacchinaByAttivita(Attivita attivita);
         int GetCodiceJmesByCodice(string codiceMacchinaCompleto);
+        Macchina? GetPrimaMacchinaFittiziaNonUtilizzata();
     }
 }
