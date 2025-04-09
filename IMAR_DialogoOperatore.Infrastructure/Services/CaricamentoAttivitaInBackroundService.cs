@@ -1,6 +1,8 @@
 ﻿using IMAR_DialogoOperatore.Application.Interfaces.Clients;
+using IMAR_DialogoOperatore.Application.Interfaces.Repositories;
 using IMAR_DialogoOperatore.Domain.Models;
 using Microsoft.Extensions.DependencyInjection;
+using System.Diagnostics;
 
 namespace IMAR_DialogoOperatore.Infrastructure.Services
 {
@@ -20,17 +22,34 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
             _attivitaAperte = new List<vrtManNotActive>();
             _attivitaIndirette = new List<stdMesIndTsk>();
 
-            _timer = new Timer(UpdateAttivita, null, TimeSpan.Zero, TimeSpan.FromSeconds(10));
+            _timer = new Timer(UpdateAttivita, null, TimeSpan.Zero, TimeSpan.FromSeconds(15));
         }
 
         private void UpdateAttivita(object? state)
         {
+            Stopwatch stopwatch = Stopwatch.StartNew();
             try
             {
+                List<dynamic> obj;
+                decimal somma;
+
                 using var scope = _serviceProvider.CreateScope();
                 var jmesApiClient = scope.ServiceProvider.GetRequiredService<IJmesApiClient>();
+                var as400Repository = scope.ServiceProvider.GetRequiredService<IAs400Repository>();
 
                 var nuoveAttivita = jmesApiClient.ChiamaQueryVirtualJmes<vrtManNotActive>();
+                var quantitaProdotteNonContabilizzate = as400Repository.ExecuteQuery<dynamic>("SELECT NRTSKJM, QTVERJM FROM IMA90DAT.JMRILM00F");
+
+                if (nuoveAttivita != null && quantitaProdotteNonContabilizzate != null)
+                {
+                    Parallel.ForEach(nuoveAttivita, (attivita) =>
+                    {
+                        obj = quantitaProdotteNonContabilizzate.Where(x => x.NRTSKJM.Trim() == attivita.notCod.Trim()).ToList();
+                        somma = obj.Sum(y => (decimal)y.QTVERJM);
+                        attivita.qtyPrd += somma;
+                    });
+                }
+
                 var attivitaIndirette = jmesApiClient.ChiamaQueryGetJmes<stdMesIndTsk>();
 
                 _lock.EnterWriteLock();
@@ -48,6 +67,9 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
             {
                 Console.WriteLine($"Errore nell'aggiornamento delle attività: {ex.Message}");
             }
+
+            Console.WriteLine(stopwatch.Elapsed.ToString());
+            stopwatch.Stop();
         }
 
         public IList<vrtManNotActive> GetAttivitaAperte()
