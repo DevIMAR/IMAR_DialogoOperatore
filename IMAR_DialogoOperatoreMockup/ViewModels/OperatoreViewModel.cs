@@ -15,7 +15,10 @@ namespace IMAR_DialogoOperatore.ViewModels
 		public int? Badge => _operatore?.Badge != null ? Int32.Parse(_operatore?.Badge) : null;
 		public string? Nome => _operatore?.Nome;
 		public string? Cognome => _operatore?.Cognome;
-		public Macchina? MacchinaAssegnata { get; set; }
+		public int? IdJMes => _operatore?.IdJMes;
+
+        public Macchina? MacchinaAssegnata { get; set; }
+
 		public string Stato
 		{
 			get { return _stato; }
@@ -41,6 +44,7 @@ namespace IMAR_DialogoOperatore.ViewModels
 
 			Stato = string.IsNullOrEmpty(_operatore.Stato) ? Costanti.ASSENTE : _operatore.Stato;
 			AttivitaAperte = _operatore.AttivitaAperte == null ?  new ObservableCollection<Attivita>() : new ObservableCollection<Attivita>(_operatore.AttivitaAperte);
+			MacchinaAssegnata = operatore.MacchinaAssegnata;
         }
     }
 }

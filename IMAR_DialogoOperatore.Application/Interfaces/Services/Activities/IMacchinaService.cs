@@ -4,8 +4,9 @@ namespace IMAR_DialogoOperatore.Application.Interfaces.Services.Activities
 {
     public interface IMacchinaService
     {
-        Macchina GetMacchinaByAttivita(Attivita attivita);
+        Macchina GetMacchinaRealeByAttivita(Attivita attivita);
         int GetCodiceJmesByCodice(string codiceMacchinaCompleto);
+        Macchina? GetMacchinaFittiziaByFirstAttivitaAperta(Attivita attivitaAperta, int idJMesOperatore);
         Macchina? GetPrimaMacchinaFittiziaNonUtilizzata();
     }
 }

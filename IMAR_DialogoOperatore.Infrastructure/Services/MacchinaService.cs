@@ -24,7 +24,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
             _jmesApiClient = jmesApiClient;
         }
 
-        public Macchina GetMacchinaByAttivita(Attivita attivita)
+        public Macchina GetMacchinaRealeByAttivita(Attivita attivita)
         {
             PCIMP00F? pCIMP00F = _as400Repository.ExecuteQuery<PCIMP00F>($"SELECT * FROM IMA90DAT.PCIMP00F WHERE NRBLCI = '{attivita.Bolla}'").SingleOrDefault();
             if (pCIMP00F == null)
@@ -39,6 +39,22 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
                 CentroDiLavoro = pCIMP00F.CDCLCI,
                 CodiceMacchina = pCIMP00F.CDMUCI,
                 CodiceJMes = codiceJmes
+            };
+        }
+
+        public Macchina? GetMacchinaFittiziaByFirstAttivitaAperta(Attivita attivitaAperta, int idJMesOperatore)
+        {
+            mesEvtToEndMac? macchinaFittiziaConAttivitaOperatoreAperta = _jmesApiClient.ChiamaQueryGetJmes<mesEvtToEndMac>()?
+                                                                                       .SingleOrDefault(x => x.ID_Det3350.Trim() == attivitaAperta.Bolla.ToString() && 
+                                                                                                             x.ID_Evt3245 == idJMesOperatore);
+            if (macchinaFittiziaConAttivitaOperatoreAperta == null)
+                return null;
+
+            return new Macchina
+            {
+                CentroDiLavoro = macchinaFittiziaConAttivitaOperatoreAperta.ID_Mac368.Substring(0, 3),
+                CodiceMacchina = macchinaFittiziaConAttivitaOperatoreAperta.ID_Mac368.Substring(3, 3),
+                CodiceJMes = macchinaFittiziaConAttivitaOperatoreAperta.ID_Mac365
             };
         }
 

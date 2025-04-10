@@ -362,8 +362,6 @@
 		switch (e.Key)
 		{
 			case "Enter":
-				AttivitaDetailsViewModel.Odp = string.Empty;
-
 				if (BollaRef.Value != null && !AttivitaDetailsViewModel.IsAttivitaSelezionata)
 					AttivitaDetailsViewModel.CercaAttivitaHelper.CercaAttivitaDaBolla(BollaRef.Value.ToString());
 
@@ -382,8 +380,6 @@
 		switch (e.Key)
 		{
 			case "Enter":
-				AttivitaDetailsViewModel.Bolla = null;
-
 				if (OdpRef.Text != string.Empty && !AttivitaDetailsViewModel.IsAttivitaSelezionata)
 					AttivitaDetailsViewModel.CercaAttivitaHelper.CercaAttivitaDaOdp(OdpRef.Text);
 
@@ -419,14 +415,14 @@
 			case "ArrowUp":
 				if (listaFasi.Count <= 1)
 					return;
-				AttivitaDetailsViewModel.FaseSelezionata = index < listaFasi.Count - 1 ? listaFasi[index + 1] : listaFasi[index];
+				AttivitaDetailsViewModel.FaseSelezionata = index > 0 ? listaFasi[index - 1] : listaFasi[index];
 				SetFocus(FasiRef);
 				break;
 
 			case "ArrowDown":
 				if (listaFasi.Count <= 1)
 					return;
-				AttivitaDetailsViewModel.FaseSelezionata = index > 0 ? listaFasi[index - 1] : listaFasi[index];
+				AttivitaDetailsViewModel.FaseSelezionata = index < listaFasi.Count - 1 ? listaFasi[index + 1] : listaFasi[index];
 				SetFocus(FasiRef);
 				break;
 

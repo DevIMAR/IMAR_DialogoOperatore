@@ -208,7 +208,7 @@ namespace IMAR_DialogoOperatore.Services
                 attivitaOperatoreAperte.AddRange(OttieniAttivitaIndiretteOperatoreAperte(attivitaAperte, attivitaIndiretteOperatore));
 
             foreach (Attivita attivita in attivitaOperatoreAperte)
-                attivita.Macchina = _macchinaService.GetMacchinaByAttivita(attivita);
+                attivita.Macchina = _macchinaService.GetMacchinaRealeByAttivita(attivita);
 
             return attivitaOperatoreAperte;
         }

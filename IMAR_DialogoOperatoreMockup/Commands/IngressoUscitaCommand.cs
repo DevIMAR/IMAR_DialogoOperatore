@@ -62,8 +62,6 @@ namespace IMAR_DialogoOperatore.Commands
 
             _jmesApiClient.MesAutoClock(_dialogoOperatoreObserver.OperatoreSelezionato.Badge.ToString(), true);
 
-
-
             _dialogoOperatoreObserver.IsLoaderVisibile = false;
 
             _dialogoOperatoreObserver.OperatoreSelezionato.Stato = Costanti.PRESENTE;

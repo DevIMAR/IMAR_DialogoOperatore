@@ -14,18 +14,21 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
 		private readonly IJmesApiClient _jmesApiClient;
 
 		private readonly IAttivitaService _attivitaService;
+		private readonly IMacchinaService _macchinaService;
 
         public Operatore Operatore { get; set; }
 
 		public OperatoreService(
 			ISynergyJmesUoW synergyJmesUoW,
 			IJmesApiClient jmesApiClient,
-			IAttivitaService attivitaService)
+			IAttivitaService attivitaService,
+			IMacchinaService macchinaService)
 		{
 			_synergyJmesUoW = synergyJmesUoW;
 			_jmesApiClient = jmesApiClient;
 
 			_attivitaService = attivitaService;
+			_macchinaService = macchinaService;
 		}
 
 		public Operatore? OttieniOperatore(int? badge)
@@ -54,10 +57,15 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
 				Uscita = DateTime.ParseExact(ingressiUscite.Where(x => x.ID_AngRes368 == risorsa.ResCod).Select(x => x.ID_ClkRes2366).Max() ?? "19000101000000", format, provider),
 				InizioPausa = DateTime.ParseExact(IniziFiniPause.Where(x => x.ID_Res368 == risorsa.ResCod).Select(x => x.ID_ResBrk2426).Max() ?? "19000101000000", format, provider),
 				FinePausa = DateTime.ParseExact(IniziFiniPause.Where(x => x.ID_Res368 == risorsa.ResCod).Select(x => x.ID_ResBrk2427).Max() ?? "19000101000000", format, provider),
-				AttivitaAperte = _attivitaService.OttieniAttivitaOperatore(risorsa.ResCod)
+				AttivitaAperte = _attivitaService.OttieniAttivitaOperatore(risorsa.ResCod),
+				IdJMes = (int)risorsa.Uid
 			};
 
-			Operatore.Stato = GetStatus();
+            Attivita? attivitaDirettaApertaDaOperatore = Operatore.AttivitaAperte.FirstOrDefault(x => !x.Bolla.Contains("AI"));
+            if (attivitaDirettaApertaDaOperatore != null)
+                Operatore.MacchinaAssegnata = _macchinaService.GetMacchinaFittiziaByFirstAttivitaAperta(attivitaDirettaApertaDaOperatore, Operatore.IdJMes);
+
+            Operatore.Stato = GetStatus();
 
 			return Operatore;
 		}

@@ -22,12 +22,11 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
             _attivitaAperte = new List<vrtManNotActive>();
             _attivitaIndirette = new List<stdMesIndTsk>();
 
-            _timer = new Timer(UpdateAttivita, null, TimeSpan.Zero, TimeSpan.FromSeconds(15));
+            _timer = new Timer(UpdateAttivita, null, TimeSpan.Zero, TimeSpan.FromSeconds(10));
         }
 
         private void UpdateAttivita(object? state)
         {
-            Stopwatch stopwatch = Stopwatch.StartNew();
             try
             {
                 List<dynamic> obj;
@@ -38,17 +37,17 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
                 var as400Repository = scope.ServiceProvider.GetRequiredService<IAs400Repository>();
 
                 var nuoveAttivita = jmesApiClient.ChiamaQueryVirtualJmes<vrtManNotActive>();
-                var quantitaProdotteNonContabilizzate = as400Repository.ExecuteQuery<dynamic>("SELECT NRTSKJM, QTVERJM FROM IMA90DAT.JMRILM00F");
+                //var quantitaProdotteNonContabilizzate = as400Repository.ExecuteQuery<dynamic>("SELECT NRTSKJM, QTVERJM FROM IMA90DAT.JMRILM00F");
 
-                if (nuoveAttivita != null && quantitaProdotteNonContabilizzate != null)
-                {
-                    Parallel.ForEach(nuoveAttivita, (attivita) =>
-                    {
-                        obj = quantitaProdotteNonContabilizzate.Where(x => x.NRTSKJM.Trim() == attivita.notCod.Trim()).ToList();
-                        somma = obj.Sum(y => (decimal)y.QTVERJM);
-                        attivita.qtyPrd += somma;
-                    });
-                }
+                //if (nuoveAttivita != null && quantitaProdotteNonContabilizzate != null)
+                //{
+                //    Parallel.ForEach(nuoveAttivita, (attivita) =>
+                //    {
+                //        obj = quantitaProdotteNonContabilizzate.Where(x => x.NRTSKJM.Trim() == attivita.notCod.Trim()).ToList();
+                //        somma = obj.Sum(y => (decimal)y.QTVERJM);
+                //        attivita.qtyPrd += somma;
+                //    });
+                //}
 
                 var attivitaIndirette = jmesApiClient.ChiamaQueryGetJmes<stdMesIndTsk>();
 
@@ -67,9 +66,6 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
             {
                 Console.WriteLine($"Errore nell'aggiornamento delle attività: {ex.Message}");
             }
-
-            Console.WriteLine(stopwatch.Elapsed.ToString());
-            stopwatch.Stop();
         }
 
         public IList<vrtManNotActive> GetAttivitaAperte()
