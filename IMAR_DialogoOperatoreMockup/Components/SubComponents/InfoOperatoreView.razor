@@ -4,8 +4,7 @@
 @inject InfoOperatoreViewModel InfoOperatoreViewModel
 @inject IDialogoOperatoreObserver DialogoOperatoreObserver
 
-<DxGridLayout style="font-size:2.5vh"
-			  class="d-flex justify-content-center align-items-center">
+<DxGridLayout class="d-flex justify-content-center align-items-center testo-grande">
 	<Rows>
 		<DxGridLayoutRow Height="25%" />
 		<DxGridLayoutRow Height="70%" />
@@ -25,12 +24,8 @@
 						OPERATORE
 					</div>
 
-					<DxSpinEdit style="font-size:2.5vh;
-									  width:4vw;
-									  --dxbl-text-edit-font-size: 2.5vh;
-									  --dxbl-text-edit-line-height: 0vh;
-									  --dxbl-text-edit-padding-x: 0.2vw;
-									  --dxbl-text-edit-padding-y: 0vh;"
+					<DxSpinEdit style="width:4vw;"
+								CssClass="testo-grande"
 								@bind-Value="@InfoOperatoreViewModel.Badge"
 								Enabled="@InfoOperatoreViewModel.IsBadgeEditable"
 								ShowSpinButtons="false"
@@ -42,17 +37,22 @@
 		<DxGridLayoutItem Row="1" Column="1"
 						  Visible="@InfoOperatoreViewModel.IsInfoVisible">
 			<Template>
-				<div style="display:flex; margin-left:20px">
-					<div style="font-weight:bold;">
-						@InfoOperatoreViewModel.NomeCognome
+				<div style="display:flex;"
+					 class="ml-20">
+					<div>
+						<strong>
+							@InfoOperatoreViewModel.NomeCognome
+						</strong>
 					</div>
 
-					<div style="margin-left:20px">
+					<div class="ml-20">
 						STATO:
 					</div>
 
-					<div style="font-weight:bold; margin-left:5px">
-						@InfoOperatoreViewModel.Stato
+					<div class="ml-5">
+						<strong>
+							@InfoOperatoreViewModel.Stato
+						</strong>
 					</div>
 				</div>
 			</Template>

@@ -11,8 +11,8 @@ namespace IMAR_DialogoOperatore.ViewModels
 		private readonly ICercaAttivitaObserver _cercaAttivitaObserver;
 		private IAttivitaViewModel? _attivitaSelezionata;
 
-		private uint? _bolla;
-		private string _odp;
+		private string? _bolla;
+		private string? _odp;
 		private IEnumerable<string>? _fasiPerAttivita;
 		private string _faseSelezionata;
 		private bool _isRiaperturaAttiva;
@@ -33,7 +33,7 @@ namespace IMAR_DialogoOperatore.ViewModels
 		public string StatoAttivita => (_attivitaSelezionata != null && _attivitaSelezionata.SaldoAcconto == Costanti.SALDO) ? Costanti.ATTIVITA_COMPLETATA : Costanti.ATTIVITA_NON_COMPLETATA;
 		public bool IsAttivitaSelezionata => _dialogoOperatoreObserver.AttivitaSelezionata != null;
 
-		public uint? Bolla
+		public string? Bolla
 		{
 			get { return _bolla; }
 			set
@@ -47,7 +47,7 @@ namespace IMAR_DialogoOperatore.ViewModels
 			}
 		}
 
-		public string Odp
+		public string? Odp
 		{
 			get { return _odp; }
 			set
@@ -150,7 +150,7 @@ namespace IMAR_DialogoOperatore.ViewModels
         private void DialogoOperatoreObserver_OnIsDettaglioAttivitaOpenChanged()
         {
             Bolla = null;
-            Odp = string.Empty;
+            Odp = null;
         }
 
         private void DialogoOperatoreStore_OnAttivitaSelezionataChanged()
@@ -172,7 +172,7 @@ namespace IMAR_DialogoOperatore.ViewModels
 
 			_faseSelezionata = _attivitaSelezionata.Fase;
 			_odp = _attivitaSelezionata.Odp ?? string.Empty;
-			_bolla = _attivitaSelezionata.Bolla != null ? uint.TryParse(_attivitaSelezionata.Bolla, out uint res) ? res : null : null;
+            _bolla = _attivitaSelezionata.Bolla ?? string.Empty;
 
 			OnNotifyStateChanged();
 		}

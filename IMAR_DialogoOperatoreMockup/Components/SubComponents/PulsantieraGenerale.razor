@@ -3,12 +3,9 @@
 @inject PulsantieraGeneraleViewModel PulsantieraGeneraleViewModel
 
 <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained"
-		   style="margin-bottom:5px;
-				  --dxbl-toolbar-font-size: 1vh;
-				  --dxbl-toolbar-line-height: 1.1vh;">
+		   CssClass="mb-1">
 	<Items>
-		<DxToolbarItem style="margin-right:5px;
-							  width:9vw"
+		<DxToolbarItem CssClass="bottoniera-inferiore"
 					   Click="@(() => PulsantieraGeneraleViewModel.IngressoUscitaCommand.Execute(null))"
 					   Enabled="@PulsantieraGeneraleViewModel.IngressoUscitaCommand.CanExecute(null)"
 					   Visible="@PulsantieraGeneraleViewModel.IsAssente">
@@ -18,8 +15,7 @@
 			</div>
 		</DxToolbarItem>
 
-		<DxToolbarItem style="margin-right:5px;
-							  width:9vw"
+		<DxToolbarItem CssClass="bottoniera-inferiore"
 					   Click="@PulsantieraGeneraleViewModel.IngressoUscitaCommand.Execute"
 					   Enabled="@PulsantieraGeneraleViewModel.IngressoUscitaCommand.CanExecute(null)"
 					   Visible="@(!PulsantieraGeneraleViewModel.IsAssente)">
@@ -29,8 +25,7 @@
 			</div>
 		</DxToolbarItem>
 
-		<DxToolbarItem style="margin-right:5px;
-							  width:9vw"
+		<DxToolbarItem CssClass="bottoniera-inferiore"
 					   Click="@PulsantieraGeneraleViewModel.InizioLavoroCommand.Execute"
 					   Enabled="@PulsantieraGeneraleViewModel.InizioLavoroCommand.CanExecute(null)">
 			<div>
@@ -40,8 +35,7 @@
 			</div>
 		</DxToolbarItem>
 
-		<DxToolbarItem style="margin-right:5px;
-							  width:9vw"
+		<DxToolbarItem CssClass="bottoniera-inferiore"
 					   Click="@PulsantieraGeneraleViewModel.FineLavoroCommand.Execute"
 					   Enabled="@PulsantieraGeneraleViewModel.FineLavoroCommand.CanExecute(null)">
 			<div>
@@ -51,9 +45,7 @@
 			</div>
 		</DxToolbarItem>
 
-		<DxToolbarItem Text="Avanzamento (F4)"
-					   style="margin-right:5px;
-							  width:9vw"
+		<DxToolbarItem CssClass="bottoniera-inferiore"
 					   Click="@PulsantieraGeneraleViewModel.AvanzamentoCommand.Execute"
 					   Enabled="@PulsantieraGeneraleViewModel.AvanzamentoCommand.CanExecute(null)">
 			<div>
@@ -62,8 +54,7 @@
 			</div>
 		</DxToolbarItem>
 
-		<DxToolbarItem style="margin-right:5px;
-							  width:9vw"
+		<DxToolbarItem CssClass="bottoniera-inferiore"
 					   Click="@PulsantieraGeneraleViewModel.InizioFinePausaCommand.Execute"
 					   Enabled="@PulsantieraGeneraleViewModel.InizioFinePausaCommand.CanExecute(!PulsantieraGeneraleViewModel.IsInPausa)">
 			<div>
@@ -73,8 +64,7 @@
 			</div>
 		</DxToolbarItem>
 
-		<DxToolbarItem style="margin-right:5px;
-							  width:9vw"
+		<DxToolbarItem CssClass="bottoniera-inferiore"
 					   Click="@PulsantieraGeneraleViewModel.InizioFinePausaCommand.Execute"
 					   Enabled="@PulsantieraGeneraleViewModel.InizioFinePausaCommand.CanExecute(PulsantieraGeneraleViewModel.IsInPausa)">
 			<div>
@@ -84,8 +74,7 @@
 			</div>
 		</DxToolbarItem>
 
-		<DxToolbarItem style="margin-right:5px;
-							  width:9vw"
+		<DxToolbarItem CssClass="bottoniera-inferiore"
 					   Click="@PulsantieraGeneraleViewModel.InizioAttrezzaggioCommand.Execute"
 					   Enabled="@PulsantieraGeneraleViewModel.InizioAttrezzaggioCommand.CanExecute(null)">
 			<div>
@@ -95,8 +84,7 @@
 			</div>
 		</DxToolbarItem>
 
-		<DxToolbarItem style="margin-right:5px;
-							  width:9vw"
+		<DxToolbarItem CssClass="bottoniera-inferiore"
 					   Click="@PulsantieraGeneraleViewModel.FineAttrezzaggioCommand.Execute"
 					   Enabled="@PulsantieraGeneraleViewModel.FineAttrezzaggioCommand.CanExecute(null)">
 			<div>
@@ -106,9 +94,7 @@
 			</div>
 		</DxToolbarItem>
 
-		<DxToolbarItem Text="Annulla Operazione (Esc)"
-					   style="margin-right:5px;
-							  width:9vw"
+		<DxToolbarItem CssClass="bottoniera-inferiore"
 					   Click="@PulsantieraGeneraleViewModel.AnnulaOperazioneCommand.Execute"
 					   Enabled="@PulsantieraGeneraleViewModel.AnnulaOperazioneCommand.CanExecute(null)" >
 			<div>

@@ -3,8 +3,7 @@
 
 @inject AvanzamentoAttivitaViewModel AvanzamentoAttivitaViewModel
 
-<DxGridLayout style="height:100%;
-					 font-size:1.668vh;">
+<DxGridLayout CssClass="h-100 testo-medio">
 	<Rows>
 		<DxGridLayoutRow />
 		<DxGridLayoutRow />
@@ -26,8 +25,7 @@
 		<DxGridLayoutItem Row="1"
 						  Column="0" ColumnSpan="2">
 			<Template>
-				<div style="height:100% !important"
-					 class="d-flex justify-content-center align-items-center">
+				<div class="d-flex justify-content-center align-items-center h-100">
 					<label>Qt. PRODOTTA</label>
 				</div>
 			</Template>
@@ -36,8 +34,7 @@
 		<DxGridLayoutItem Row="1"
 						  Column="3" ColumnSpan="2">
 			<Template>
-				<div style="height:100% !important"
-					 class="d-flex justify-content-center align-items-center">
+				<div class="d-flex justify-content-center align-items-center h-100">
 					<label>Qt. SCARTATA</label>
 				</div>
 			</Template>
@@ -46,8 +43,7 @@
 		<DxGridLayoutItem Row="1"
 						  Column="6" ColumnSpan="2">
 			<Template>
-				<div style="height:100% !important"
-					 class="d-flex justify-content-center align-items-center">
+				<div class="d-flex justify-content-center align-items-center h-100">
 					FASE COMPLETATA
 				</div>
 			</Template>
@@ -59,10 +55,7 @@
 				<DxSpinEdit @bind-Value="@(AvanzamentoAttivitaViewModel.QuantitaProdotta)"
 							ShowSpinButtons="false"
 							AllowMouseWheel="false"
-							style="margin-bottom:5px;
-								  --dxbl-text-edit-padding-x: 0.35vw;
-								  --dxbl-text-edit-padding-y: 0vh;
-								  --dxbl-text-edit-font-size: 1.668vh;"
+							CssClass="dxbl-text-edit"
 							@ref="Prodotta"
 							@onkeydown="HandleProdottaKeyPress"
 							@onclick="@(() => Click.InvokeAsync())" />
@@ -75,10 +68,7 @@
 				<DxSpinEdit @bind-Value="@(AvanzamentoAttivitaViewModel.QuantitaScartata)"
 							ShowSpinButtons="false"
 							AllowMouseWheel="false"
-							style="margin-bottom:5px;
-								  --dxbl-text-edit-padding-x: 0.35vw;
-								  --dxbl-text-edit-padding-y: 0vh;
-								  --dxbl-text-edit-font-size: 1.668vh;"
+							CssClass="dxbl-text-edit"
 							@ref="Scartata"
 							@onkeydown="HandleScartataKeyPress"
 							@onclick="@(() => Click.InvokeAsync())" />

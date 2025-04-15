@@ -30,6 +30,7 @@ namespace IMAR_DialogoOperatore.ViewModels
                 _badge = value;
 
                 SelezionaOperatore();
+                _dialogoOperatoreObserver.OperazioneInCorso = Costanti.NESSUNA;
 
                 //if (value != null)
                 //  _autoLogoutUtility.StartLogoutTimer(30);

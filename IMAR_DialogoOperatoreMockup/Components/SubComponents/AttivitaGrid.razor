@@ -13,7 +13,6 @@
 			SelectionMode="GridSelectionMode.Single"
 			@bind-SelectedDataItem="@AttivitaGridViewModel.AttivitaSelezionata"
 			PageSize="25"
-			style="--dxbl-grid-font-size:1.668vh;"
 			@ref="Grid"
 			id="grid-id">
 		<Columns>
@@ -87,7 +86,7 @@
 							<DxProgressBar Type="ProgressBarType.Horizontal"
 										   Value="Convert.ToDouble(context.Value)"
 										   MaxValue="((AttivitaViewModel)context.DataItem).QuantitaOrdine"
-										   Size="10vh"
+										   Size="10dvh"
 										   Thickness="10px"
 										   ShowLabel="false" />
 						</div>

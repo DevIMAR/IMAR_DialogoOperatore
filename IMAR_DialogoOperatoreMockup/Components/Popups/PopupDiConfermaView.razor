@@ -5,8 +5,8 @@
 <DxPopup @bind-Visible="@PopupDiConfermaViewModel.IsVisible"
 		 ShowFooter="true">
 	<BodyContentTemplate>
-		<div style="white-space:pre-line;
-				    font-size:1.668vh;">
+		<div style="white-space:pre-line;"
+			 class="testo-medio">
 			@PopupDiConfermaViewModel.Testo
 		</div>
 	</BodyContentTemplate>
@@ -14,19 +14,14 @@
 	<FooterContentTemplate>
 		<DxButton Text="Annulla"
 				  Click="@AnnullaHandler"
-				  RenderStyle="ButtonRenderStyle.Secondary"
-				  class="d-flex justify-content-center align-items-center"
-				  style="padding-top:5%;
-						 padding-bottom:5%;
-						 font-size:1.668vh;" />
+				  RenderStyle="ButtonRenderStyle.Warning"
+				  RenderStyleMode="ButtonRenderStyleMode.Outline"
+				  CssClass="d-flex justify-content-center align-items-center conferma-dettagli" />
 
 		<DxButton Text="Conferma"
 				  Click="@ConfermaHandler"
-				  RenderStyle="ButtonRenderStyle.Primary"
-				  class="d-flex justify-content-center align-items-center"
-				  style="padding-top:5%;
-					     padding-bottom:5%;
-						 font-size:1.668vh;" />
+				  RenderStyle="ButtonRenderStyle.Warning"
+				  CssClass="d-flex justify-content-center align-items-center conferma-dettagli" />
 	</FooterContentTemplate>
 </DxPopup>
 

@@ -1,0 +1,47 @@
+﻿.dxbl-progress-bar {
+    --dxbl-progress-bar-track-color: #9f0000;
+    --dxbl-progress-bar-indicator-color: #31bd3d;
+    --dxbl-progress-bar-label-font-size: 1.668dvh !important;
+}
+
+.dxbl-grid {
+    --dxbl-grid-focus-frame-color: #fd7e14;
+    --dxbl-grid-font-size: 1.668dvh;
+}
+
+.dxbl-text-edit {
+    --dxbl-text-edit-focus-border-color: #fd7e14;
+}
+
+.dxbl-checkbox {
+    --dxbl-checkbox-switch-checked-bg: #fd7e14;
+    --dxbl-checkbox-switch-checked-hover-bg: #ffc08b;
+    --dxbl-checkbox-checked-focus-shadow-color: #ffc08b;
+    --dxbl-checkbox-checked-focus-shadow-spread: 0.3rem;
+    --dxbl-checkbox-unchecked-focus-shadow-color: #fd7e14;
+    --dxbl-checkbox-unchecked-focus-shadow-spread: 0.3rem;
+}
+
+.dxbl-text-edit {
+    --dxbl-text-edit-padding-x: 0.35vw;
+    --dxbl-text-edit-padding-y: 0dvh;
+    --dxbl-text-edit-font-size: 1.668dvh;
+    --dxbl-text-edit-btn-padding-x: 0.35vw;
+    --dxbl-text-edit-btn-padding-y: 0dvh;
+    --dxbl-text-edit-line-height: 0vh;
+}
+
+::selection {
+    background: #fd7e14;
+    color: black;
+}
+
+.dxbl-toolbar {
+    --dxbl-toolbar-font-size: 1dvh;
+    --dxbl-toolbar-line-height: 1.1dvh;
+}
+
+.dxbl-edit-btn-dropdown {
+    --dxbl-edit-btn-dropdown-padding-top: 0;
+    --dxbl-edit-btn-dropdown-padding-bottom: 0;
+}

@@ -56,7 +56,7 @@ namespace IMAR_DialogoOperatore.Services
         {
             Attivita? attivita = null;
 
-            if (bolla.Length == 5)
+            if (Int32.Parse(bolla) < 100)
                 attivita = OttieniAttivitaIndiretta(bolla);
             else
                 attivita = OttieniAttivitaAperta(bolla);
@@ -67,7 +67,7 @@ namespace IMAR_DialogoOperatore.Services
         private Attivita? OttieniAttivitaIndiretta(string bolla)
         {
             stdMesIndTsk? stdMesIndTsk = _caricamentoAttivitaInBackroundService.GetAttivitaIndirette()
-                                                    .SingleOrDefault(x => x.ID_Ind3463 == bolla);
+                                                    .SingleOrDefault(x => Int32.Parse(x.ID_Ind3463) == Int32.Parse(bolla));
             if (stdMesIndTsk == null)
                 return null;
 
@@ -78,7 +78,7 @@ namespace IMAR_DialogoOperatore.Services
         {
             Attivita nuovaAttivita = new Attivita
             {
-                Bolla = stdMesIndTsk.ID_Ind3463,
+                Bolla = "0" + stdMesIndTsk.ID_Ind3463,
                 DescrizioneFase = stdMesIndTsk.ID_Ind3464
             };
 

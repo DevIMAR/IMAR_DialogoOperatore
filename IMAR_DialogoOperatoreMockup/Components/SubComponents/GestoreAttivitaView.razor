@@ -8,7 +8,7 @@
 		  PanelWidth="35%"
 		  CloseOnTargetContentClick="false">
 	<HeaderTemplate>
-		<div style="font-size:2.5vh">
+		<div class="testo-grande">
 			Operazione: @GestoreAttivitaViewModel.OperazioneInCorso
 		</div>
 	</HeaderTemplate>
@@ -20,12 +20,10 @@
 
 	<FooterTemplate>
 		<DxButton Text="Conferma"
+				  RenderStyle="ButtonRenderStyle.Warning"
 				  Enabled="@GestoreAttivitaViewModel.ConfermaCommand.CanExecute(null)"
 				  Click="@GestoreAttivitaViewModel.ConfermaCommand.Execute"
-				  class="d-flex justify-content-center align-items-center"
-				  style="padding-top:3%;
-					     padding-bottom:3%;
-						 font-size:1.668vh;" />
+				  CssClass="d-flex justify-content-center align-items-center conferma-dettagli" />
 	</FooterTemplate>
 
 	<TargetContent>
