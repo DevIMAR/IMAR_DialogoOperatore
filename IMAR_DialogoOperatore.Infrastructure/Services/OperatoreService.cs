@@ -112,7 +112,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
             return errore;
         }
 
-		public string? AggiungiAttivitaAdOperatore(bool isAttrezzaggio, Operatore operatore, Attivita attivitaDaAggiungere)
+		public string? AggiungiAttivitaAdOperatore(bool isAttrezzaggio, Operatore operatore, Attivita attivitaDaAggiungere, bool isAttivitaIndiretta)
         {
 			if (attivitaDaAggiungere == null)
                 return "Nessuna attività da aprire selezionata";
@@ -128,7 +128,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
                 errore = _jmesApiClient.RegistrazioneOperazioneSuDb(() => _jmesApiClient.MesEquipStart(operatore.Badge, attivitaDaAggiungere.Bolla, attivitaDaAggiungere.Macchina.CodiceJMes));
             }
             else
-                errore = GestisciAperturaLavoro(operatore, attivitaDaAggiungere, isCambioCausaleApertura);
+                errore = GestisciAperturaLavoro(operatore, attivitaDaAggiungere, isCambioCausaleApertura, isAttivitaIndiretta);
 
             if (errore != null)
 				return errore;
@@ -136,11 +136,11 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
             return null;
         }
 
-        private string? GestisciAperturaLavoro(Operatore operatore, Attivita attivitaDaAggiungere, bool isCambioCausaleApertura)
+        private string? GestisciAperturaLavoro(Operatore operatore, Attivita attivitaDaAggiungere, bool isCambioCausaleApertura, bool isAttivitaIndiretta)
         {
             string? errore;
 
-            if (string.IsNullOrEmpty(attivitaDaAggiungere.Odp))
+            if (isAttivitaIndiretta)
                 errore = _jmesApiClient.RegistrazioneOperazioneSuDb(() => _jmesApiClient.MesWorkStartIndiretta(operatore.Badge, attivitaDaAggiungere.Bolla));
             else
             {

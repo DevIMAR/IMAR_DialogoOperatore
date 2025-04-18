@@ -1,7 +1,9 @@
 ﻿using IMAR_DialogoOperatore.Application;
+using IMAR_DialogoOperatore.Commands;
 using IMAR_DialogoOperatore.Interfaces.Helpers;
 using IMAR_DialogoOperatore.Interfaces.Observers;
 using IMAR_DialogoOperatore.Interfaces.ViewModels;
+using System.Windows.Input;
 
 namespace IMAR_DialogoOperatore.ViewModels
 {
@@ -19,6 +21,8 @@ namespace IMAR_DialogoOperatore.ViewModels
 		private bool _isAperturaLavoroAutomaticaAttiva;
 
         public ICercaAttivitaHelper CercaAttivitaHelper { get; private set; }
+		public ICommand ApriListaIndirette { get; private set; }
+
         public string? Articolo => _attivitaSelezionata != null ? _attivitaSelezionata.Articolo : string.Empty;
 		public string? DescrizioneArticolo => _attivitaSelezionata != null ? _attivitaSelezionata.DescrizioneArticolo : string.Empty;
 		public string? DescrizioneFase => _attivitaSelezionata != null ? _attivitaSelezionata.DescrizioneFase : string.Empty;
@@ -112,14 +116,17 @@ namespace IMAR_DialogoOperatore.ViewModels
 		public AttivitaDetailsViewModel(
 			IDialogoOperatoreObserver dialogoOperatoreStore,
 			ICercaAttivitaObserver cercaAttivitaStore,
-			ICercaAttivitaHelper cercaAttivitaUtility)
+			ICercaAttivitaHelper cercaAttivitaUtility,
+			MostraIndiretteCommand mostraIndiretteCommand)
         {
             _dialogoOperatoreObserver = dialogoOperatoreStore;
 			_cercaAttivitaObserver = cercaAttivitaStore;
 
             CercaAttivitaHelper = cercaAttivitaUtility;
 
-			_dialogoOperatoreObserver.OnAttivitaSelezionataChanged += DialogoOperatoreStore_OnAttivitaSelezionataChanged;
+            ApriListaIndirette = mostraIndiretteCommand;
+
+            _dialogoOperatoreObserver.OnAttivitaSelezionataChanged += DialogoOperatoreStore_OnAttivitaSelezionataChanged;
 			_dialogoOperatoreObserver.OnOperazioneInCorsoChanged += DialogoOperatoreStore_OnOperazioneInCorsoChanged;
             _dialogoOperatoreObserver.OnIsRiaperturaAttivaChanged += DialogoOperatoreObserver_OnIsRiaperturaAttivaChanged;
             _dialogoOperatoreObserver.OnIsDettaglioAttivitaOpenChanged += DialogoOperatoreObserver_OnIsDettaglioAttivitaOpenChanged;

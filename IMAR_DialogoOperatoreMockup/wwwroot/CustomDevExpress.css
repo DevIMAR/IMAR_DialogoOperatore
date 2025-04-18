@@ -7,6 +7,8 @@
 .dxbl-grid {
     --dxbl-grid-focus-frame-color: #fd7e14;
     --dxbl-grid-font-size: 1.668dvh;
+    --dxbl-grid-selection-bg: #fd7e14;
+    --dxbl-grid-selection-color: black;
 }
 
 .dxbl-text-edit {
@@ -28,7 +30,7 @@
     --dxbl-text-edit-font-size: 1.668dvh;
     --dxbl-text-edit-btn-padding-x: 0.35vw;
     --dxbl-text-edit-btn-padding-y: 0dvh;
-    --dxbl-text-edit-line-height: 0vh;
+    --dxbl-text-edit-line-height: 0dvh;
 }
 
 ::selection {
@@ -42,6 +44,9 @@
 }
 
 .dxbl-edit-btn-dropdown {
-    --dxbl-edit-btn-dropdown-padding-top: 0;
-    --dxbl-edit-btn-dropdown-padding-bottom: 0;
+    --dxbl-edit-btn-dropdown-padding-y: 0dvh;
+}
+
+.dxbl-image {
+    --dxbl-image-height: 1.668dvh;
 }

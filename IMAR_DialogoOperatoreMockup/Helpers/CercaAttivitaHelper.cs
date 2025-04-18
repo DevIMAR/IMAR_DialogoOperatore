@@ -11,24 +11,27 @@ namespace IMAR_DialogoOperatore.Helpers
 	{
 		private readonly IDialogoOperatoreObserver _dialogoOperatoreObserver;
 		private readonly ICercaAttivitaObserver _cercaAttivitaObserver;
+		private readonly IAttivitaIndirettaObserver _attivitaIndirettaObserver;
 		private readonly IAttivitaService _attivitaService;
 		private readonly IAttivitaMapper _attivitaMapper;
 
 		public CercaAttivitaHelper(
 			IDialogoOperatoreObserver dialogoOperatoreObserver,
 			ICercaAttivitaObserver cercaAttivitaObserver,
+			IAttivitaIndirettaObserver attivitaIndirettaObserver,
 			IAttivitaService attivitaService,
 			IAttivitaMapper attivitaMapper)
 		{
 			_dialogoOperatoreObserver = dialogoOperatoreObserver;
 			_cercaAttivitaObserver = cercaAttivitaObserver;
+			_attivitaIndirettaObserver = attivitaIndirettaObserver;
 			_attivitaService = attivitaService;
 			_attivitaMapper = attivitaMapper;
 		}
 
 		public void CercaAttivita(string? bolla = null, string? odp = null)
 		{
-			if (bolla != null)
+            if (bolla != null)
 				CercaAttivitaDaBolla(bolla);
 
 			if (odp != null)
@@ -39,7 +42,7 @@ namespace IMAR_DialogoOperatore.Helpers
 		{
 			_cercaAttivitaObserver.IsAttivitaCercata = true;
 
-            Attivita attivita = _attivitaService.CercaAttivitaPerBolla(bolla);
+            Attivita attivita = _attivitaService.CercaAttivitaDaBolla(bolla);
 			if (attivita == null)
 			{
 				_dialogoOperatoreObserver.AttivitaSelezionata = null;
@@ -63,8 +66,9 @@ namespace IMAR_DialogoOperatore.Helpers
 		public void CercaAttivitaDaOdp(string odp)
 		{
 			_cercaAttivitaObserver.IsAttivitaCercata = true;
+            _attivitaIndirettaObserver.IsAttivitaIndiretta = false;
 
-			_cercaAttivitaObserver.AttivitaTrovate = _attivitaMapper.ListaAttivitaToListaAttivitaViewModel(_attivitaService.GetAttivitaPerOdp(odp));
+            _cercaAttivitaObserver.AttivitaTrovate = _attivitaMapper.ListaAttivitaToListaAttivitaViewModel(_attivitaService.GetAttivitaPerOdp(odp));
 
 			_dialogoOperatoreObserver.AttivitaSelezionata = _cercaAttivitaObserver.AttivitaTrovate.FirstOrDefault();
 

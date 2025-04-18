@@ -15,6 +15,7 @@ namespace IMAR_DialogoOperatore
 	{
 		public static IServiceCollection AddDialogoOperatoreServices(this IServiceCollection services)
 		{
+			services.AddScoped<IAttivitaIndirettaObserver, AttivitaIndirettaObserver>();
 			services.AddScoped<IAvanzamentoObserver, AvanzamentoObserver>();
 			services.AddScoped<ICercaAttivitaObserver, CercaAttivitaObserver>();
 			services.AddScoped<IDialogoOperatoreObserver, DialogoOperatoreObserver>();
@@ -25,19 +26,21 @@ namespace IMAR_DialogoOperatore
 			services.AddScoped<IInterruzioneAttivitaHelper, InterruzioneAttivitaHelper>();
 			services.AddScoped<IPopupConfermaHelper, PopupConfermaHelper>();
 
-			services.AddScoped<IOperatoreMapper, OperatoreMapper>();
 			services.AddScoped<IAttivitaMapper, AttivitaMapper>();
+			services.AddScoped<IOperatoreMapper, OperatoreMapper>();
 			services.AddScoped<IStatoAttivitaMapper, StatoAttivitaMapper>();
 
-			services.AddScoped<DialogoOperatoreViewModel>();
-			services.AddScoped<InfoOperatoreViewModel>();
-			services.AddScoped<AttivitaGridViewModel>();
-			services.AddScoped<GestoreAttivitaViewModel>();
 			services.AddScoped<AttivitaDetailsViewModel>();
+			services.AddScoped<AttivitaGridViewModel>();
 			services.AddScoped<AvanzamentoAttivitaViewModel>();
-			services.AddScoped<PulsantieraGeneraleViewModel>();
-			services.AddScoped<PopupDiConfermaViewModel>();
+			services.AddScoped<DialogoOperatoreViewModel>();
 			services.AddScoped<DocumentaleViewModel>();
+			services.AddScoped<FasiIndiretteGridViewModel>();
+			services.AddScoped<FasiIndirettePopupViewModel>();
+			services.AddScoped<GestoreAttivitaViewModel>();
+			services.AddScoped<InfoOperatoreViewModel>();
+			services.AddScoped<PopupDiConfermaViewModel>();
+			services.AddScoped<PulsantieraGeneraleViewModel>();
 
 			services.AddScoped<AnnullaOperazioneCommand>();
 			services.AddScoped<AvanzamentoCommand>();
@@ -48,6 +51,7 @@ namespace IMAR_DialogoOperatore
 			services.AddScoped<InizioAttrezzaggioCommand>();
 			services.AddScoped<InizioFinePausaCommand>();
 			services.AddScoped<InizioLavoroCommand>();
+			services.AddScoped<MostraIndiretteCommand>();
 			services.AddScoped<RispostaPopupDiConfermaCommand>();
 
 			return services;

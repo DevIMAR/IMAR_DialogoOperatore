@@ -4,6 +4,7 @@ using IMAR_DialogoOperatore.Domain.Models;
 using IMAR_DialogoOperatore.Interfaces.Helpers;
 using IMAR_DialogoOperatore.Interfaces.Mappers;
 using IMAR_DialogoOperatore.Interfaces.Observers;
+using IMAR_DialogoOperatore.Observers;
 using IMAR_DialogoOperatore.ViewModels;
 
 namespace IMAR_DialogoOperatore.Helpers
@@ -15,6 +16,7 @@ namespace IMAR_DialogoOperatore.Helpers
 		private readonly IAttivitaService _attivitaService;
 		private readonly IDialogoOperatoreObserver _dialogoOperatoreObserver;
 		private readonly IAvanzamentoObserver _avanzamentoObserver;
+		private readonly IAttivitaIndirettaObserver _attivitaIndirettaObserver;
 		private readonly IOperatoreMapper _operatoreMapper;
 		private readonly IAttivitaMapper _attivitaMapper;
 
@@ -24,6 +26,7 @@ namespace IMAR_DialogoOperatore.Helpers
 			IAttivitaService attivitaService,
 			IDialogoOperatoreObserver dialogoOperatoreObserver,
 			IAvanzamentoObserver avanzamentoObserver,
+			IAttivitaIndirettaObserver attivitaIndirettaObserver,
 			IOperatoreMapper operatoreMapper,
 			IAttivitaMapper AttivitaMapper)
 		{						
@@ -32,6 +35,7 @@ namespace IMAR_DialogoOperatore.Helpers
 			_attivitaService = attivitaService;
 			_dialogoOperatoreObserver = dialogoOperatoreObserver;
 			_avanzamentoObserver = avanzamentoObserver;
+			_attivitaIndirettaObserver = attivitaIndirettaObserver;
 			_operatoreMapper = operatoreMapper;
 			_attivitaMapper = AttivitaMapper;
 		}
@@ -81,7 +85,10 @@ namespace IMAR_DialogoOperatore.Helpers
 			string? result = null;
 
 			if (_dialogoOperatoreObserver.IsAperturaLavoroAutomaticaAttiva)
-				result = AggiungiAttivitaAdOperatore(false);
+			{
+				_attivitaIndirettaObserver.IsAttivitaIndiretta = false;
+                result = AggiungiAttivitaAdOperatore(false);
+			}
 			else
 				result = RimuoviAttivitaDaOperatore();
 
@@ -130,7 +137,8 @@ namespace IMAR_DialogoOperatore.Helpers
             string? result = _operatoriService.AggiungiAttivitaAdOperatore(
                 isAttrezzaggio,
                 _operatoreMapper.OperatoreViewModelToOperatore(_dialogoOperatoreObserver.OperatoreSelezionato),
-                _attivitaMapper.AttivitaViewModelToAttivita(_dialogoOperatoreObserver.AttivitaSelezionata)
+                _attivitaMapper.AttivitaViewModelToAttivita(_dialogoOperatoreObserver.AttivitaSelezionata),
+                _attivitaIndirettaObserver.IsAttivitaIndiretta
             );
 
 			return result;

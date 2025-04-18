@@ -52,19 +52,19 @@ namespace IMAR_DialogoOperatore.Services
             return true;
         }
 
-        public Attivita? CercaAttivitaPerBolla(string bolla)
+        public Attivita? CercaAttivitaDaBolla(string bolla)
         {
             Attivita? attivita = null;
 
-            if (Int32.Parse(bolla) < 100)
-                attivita = OttieniAttivitaIndiretta(bolla);
+            if (bolla.Length == 5)
+                attivita = OttieniAttivitaIndirettaDaBolla(bolla);
             else
-                attivita = OttieniAttivitaAperta(bolla);
+                attivita = OttieniAttivitaApertaDaBolla(bolla);
 
             return attivita;
         }
 
-        private Attivita? OttieniAttivitaIndiretta(string bolla)
+        private Attivita? OttieniAttivitaIndirettaDaBolla(string bolla)
         {
             stdMesIndTsk? stdMesIndTsk = _caricamentoAttivitaInBackroundService.GetAttivitaIndirette()
                                                     .SingleOrDefault(x => Int32.Parse(x.ID_Ind3463) == Int32.Parse(bolla));
@@ -78,14 +78,14 @@ namespace IMAR_DialogoOperatore.Services
         {
             Attivita nuovaAttivita = new Attivita
             {
-                Bolla = "0" + stdMesIndTsk.ID_Ind3463,
+                Bolla = stdMesIndTsk.ID_Ind3463,
                 DescrizioneFase = stdMesIndTsk.ID_Ind3464
             };
 
             return nuovaAttivita;
         }
 
-        private Attivita? OttieniAttivitaAperta(string bolla)
+        private Attivita? OttieniAttivitaApertaDaBolla(string bolla)
         {
 
             vrtManNotActive? vrtManNotActive = _caricamentoAttivitaInBackroundService.GetAttivitaAperte()
@@ -267,6 +267,24 @@ namespace IMAR_DialogoOperatore.Services
                                                                 x.Causale == Costanti.ATTREZZAGGIO_SOSPESO)
                                                     .ToList();
             return attivitaOperatoreAperte;
+        }
+
+        public IList<Attivita> GetAttivitaIndirette()
+        {
+            IList<Attivita> attivitaIndirette = new List<Attivita>();
+
+            IList<stdMesIndTsk> stdMesIndTsks = _caricamentoAttivitaInBackroundService.GetAttivitaIndirette();
+
+            foreach (stdMesIndTsk stdMesIndTsk in stdMesIndTsks)
+            {
+                attivitaIndirette.Add(new Attivita
+                {
+                    Bolla = stdMesIndTsk.ID_Ind3463,
+                    DescrizioneFase = stdMesIndTsk.ID_Ind3464
+                });
+            }
+
+            return attivitaIndirette;
         }
     }
 }

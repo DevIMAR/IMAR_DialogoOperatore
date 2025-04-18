@@ -1,0 +1,53 @@
+﻿@using IMAR_DialogoOperatore.Components.SubComponents
+@using IMAR_DialogoOperatore.ViewModels
+
+@inject FasiIndirettePopupViewModel FasiIndirettePopupViewModel
+
+<DxPopup Visible="@FasiIndirettePopupViewModel.MostraPopup"
+		 ShowCloseButton="false"
+		 CloseOnEscape="false"
+		 CloseOnOutsideClick="false"
+		 ShowFooter="true">
+	<BodyContentTemplate>
+		<FasiIndiretteGrid OnStateChanged="@(async () => await InvokeAsync(StateHasChanged))" />
+	</BodyContentTemplate>
+
+	<FooterContentTemplate>
+		<DxButton Text="Annulla"
+				  Click="@AnnullaHandler"
+				  RenderStyle="ButtonRenderStyle.Warning"
+				  RenderStyleMode="ButtonRenderStyleMode.Outline"
+				  CssClass="d-flex justify-content-center align-items-center conferma-dettagli" />
+
+		<DxButton Text="Conferma"
+				  Click="@ConfermaHandler"
+				  Enabled="@FasiIndirettePopupViewModel.ConfermaCommand.CanExecute(null)"
+				  RenderStyle="ButtonRenderStyle.Warning"
+				  CssClass="d-flex justify-content-center align-items-center conferma-dettagli" />
+	</FooterContentTemplate>
+</DxPopup>
+
+@code {
+	protected override Task OnInitializedAsync()
+	{
+		FasiIndirettePopupViewModel.NotifyStateChanged += FasiIndirettePopupViewModel_NotifyStateChanged;
+
+		return base.OnInitializedAsync();
+	}
+
+	private async void FasiIndirettePopupViewModel_NotifyStateChanged()
+	{
+		await InvokeAsync(StateHasChanged);
+	}
+
+	void AnnullaHandler()
+	{
+		FasiIndirettePopupViewModel.MostraPopup = false;
+	}
+
+	void ConfermaHandler()
+	{
+		FasiIndirettePopupViewModel.ConfermaCommand.Execute(null);
+		FasiIndirettePopupViewModel.MostraPopup = false;
+	}
+}

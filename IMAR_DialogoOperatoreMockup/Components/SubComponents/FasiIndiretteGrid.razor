@@ -1,0 +1,46 @@
+﻿@using IMAR_DialogoOperatore.ViewModels
+
+@inject FasiIndiretteGridViewModel FasiIndiretteGridViewModel
+
+<DxGrid @bind-Data="@FasiIndiretteGridViewModel.FasiIndirette"
+		@bind-SelectedDataItem="@FasiIndiretteGridViewModel.AttivitaSelezionata"
+		SelectionMode="GridSelectionMode.Single"
+		AllowSelectRowByClick="true"
+		AllowSort="false"
+		PageSize="50">
+	<Columns>
+		<DxGridDataColumn FieldName="@(nameof(AttivitaViewModel.Bolla))"
+						  Caption="Codice"
+						  TextAlignment="GridTextAlignment.Center"
+						  Width="33.3%"
+						  SortIndex="1"
+						  SortOrder="GridColumnSortOrder.Ascending">
+		</DxGridDataColumn>
+
+		<DxGridDataColumn FieldName="@(nameof(AttivitaViewModel.DescrizioneFase))"
+						  Caption="Descrizione Fase"
+						  TextAlignment="GridTextAlignment.Center"
+						  Width="66.6%">
+		</DxGridDataColumn>
+	</Columns>
+</DxGrid>
+
+@code {
+	[Parameter] public EventCallback OnStateChanged { get; set; }
+
+	protected override Task OnInitializedAsync()
+	{
+		FasiIndiretteGridViewModel.NotifyStateChanged += FasiIndiretteGridViewModel_OnNotifyStateChanged;
+
+		return base.OnInitializedAsync();
+	}
+
+	private async void FasiIndiretteGridViewModel_OnNotifyStateChanged()
+	{
+		await InvokeAsync(StateHasChanged);
+
+		await OnStateChanged.InvokeAsync();
+	}
+
+
+}

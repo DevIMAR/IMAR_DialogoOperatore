@@ -66,11 +66,19 @@
 				<DxMaskedInput @bind-Value="@(AttivitaDetailsViewModel.Bolla)"
 							   BindValueMode="BindValueMode.OnInput"
 							   Mask="000000"
+							   MaskMode="MaskMode.Numeric"
 							   CssClass="dxbl-text-edit"
 							   @ref="@BollaRef"
 							   @onkeydown="HandleBollaKeyPress"
-							   @onclick="@(() => BollaHasFocus = true)">
-					<DxTextMaskProperties Placeholder="'0'" />
+							   @onclick="@(() => BollaHasFocus = true)"
+							   inputmode="text"
+							   enterkeyhint="enter">
+					<Buttons>
+						<DxEditorButton Text="Ind"
+										Tooltip="Apri indiretta"
+										Click="AttivitaDetailsViewModel.ApriListaIndirette.Execute"
+										Enabled="AttivitaDetailsViewModel.ApriListaIndirette.CanExecute(null)" />
+					</Buttons>
 				</DxMaskedInput>
 			</Template>
 		</DxGridLayoutItem>
@@ -81,11 +89,13 @@
 				<DxMaskedInput @bind-Value="@(AttivitaDetailsViewModel.Odp)"
 							   BindValueMode="BindValueMode.OnInput"
 							   Mask="00000000"
+							   MaskMode="MaskMode.Numeric"
 							   CssClass="dxbl-text-edit"
 							   @ref="@OdpRef"
 							   @onkeydown="HandleOdpKeyPress"
-							   @onclick="@(() => BollaHasFocus = false)">
-					<DxTextMaskProperties Placeholder="'0'" />
+							   @onclick="@(() => BollaHasFocus = false)"
+							   inputmode="text"
+							   enterkeyhint="enter">
 				</DxMaskedInput>
 			</Template>
 		</DxGridLayoutItem>
@@ -335,10 +345,8 @@
 		switch (e.Key)
 		{
 			case "Enter":
-				string bollaCercata = BollaRef.Value != null ? BollaRef.Value.ToString() : string.Empty;
-				AttivitaDetailsViewModel.Odp = string.Empty;
 
-				AttivitaDetailsViewModel.CercaAttivitaHelper.CercaAttivitaDaBolla(bollaCercata);
+				TriggerRicercaAttivitaDaBolla();
 
 				await SetFocusToFasi();
 				break;
@@ -350,15 +358,23 @@
 		}
 	}
 
+	private void TriggerRicercaAttivitaDaBolla()
+	{
+		if (string.IsNullOrWhiteSpace(BollaRef.Value))
+			return;
+
+		string bollaCercata = BollaRef.Value != null ? BollaRef.Value.ToString() : string.Empty;
+		AttivitaDetailsViewModel.Odp = string.Empty;
+
+		AttivitaDetailsViewModel.CercaAttivitaHelper.CercaAttivitaDaBolla(bollaCercata);
+	}
+
 	private async void HandleOdpKeyPress(KeyboardEventArgs e)
 	{
 		switch (e.Key)
 		{
 			case "Enter":
-				string odpCercato = OdpRef.Value != null ? OdpRef.Value.ToString() : string.Empty;
-				AttivitaDetailsViewModel.Bolla = string.Empty;
-
-				AttivitaDetailsViewModel.CercaAttivitaHelper.CercaAttivitaDaOdp(odpCercato);
+				TriggerRicercaAttivitaDaOdp();
 
 				await SetFocusToFasi();
 				break;
@@ -368,6 +384,14 @@
 				SetFocus(BollaRef);
 				break;
 		}
+	}
+
+	private void TriggerRicercaAttivitaDaOdp()
+	{
+		string odpCercato = OdpRef.Value != null ? OdpRef.Value.ToString() : string.Empty;
+		AttivitaDetailsViewModel.Bolla = string.Empty;
+
+		AttivitaDetailsViewModel.CercaAttivitaHelper.CercaAttivitaDaOdp(odpCercato);
 	}
 
 	private async Task SetFocusToFasi()
