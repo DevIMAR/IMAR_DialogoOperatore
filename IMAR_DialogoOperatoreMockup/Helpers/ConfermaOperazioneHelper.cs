@@ -100,8 +100,8 @@ namespace IMAR_DialogoOperatore.Helpers
             string? result = _operatoriService.RimuoviAttivitaDaOperatore(
                 _operatoreMapper.OperatoreViewModelToOperatore(_dialogoOperatoreObserver.OperatoreSelezionato),
 				_attivitaMapper.AttivitaViewModelToAttivita(_dialogoOperatoreObserver.AttivitaSelezionata),
-                _avanzamentoObserver.QuantitaProdotta,
-                _avanzamentoObserver.QuantitaScartata,
+                _avanzamentoObserver.QuantitaProdotta != null ? (int)_avanzamentoObserver.QuantitaProdotta : 0,
+                _avanzamentoObserver.QuantitaScartata != null ? (int)_avanzamentoObserver.QuantitaScartata : 0,
                 _dialogoOperatoreObserver.IsRiaperturaAttiva);
 
             AzzeraValoriAvanzamento();
@@ -114,8 +114,8 @@ namespace IMAR_DialogoOperatore.Helpers
             string? result = _attivitaService.AvanzaAttivita(
                 _operatoreMapper.OperatoreViewModelToOperatore(_dialogoOperatoreObserver.OperatoreSelezionato),
                 _attivitaMapper.AttivitaViewModelToAttivita(_dialogoOperatoreObserver.AttivitaSelezionata),
-                _avanzamentoObserver.QuantitaProdotta,
-                _avanzamentoObserver.QuantitaScartata);
+                _avanzamentoObserver.QuantitaProdotta != null ? (int)_avanzamentoObserver.QuantitaProdotta : 0,
+                _avanzamentoObserver.QuantitaScartata != null ? (int)_avanzamentoObserver.QuantitaScartata : 0);
 
             AzzeraValoriAvanzamento();
 

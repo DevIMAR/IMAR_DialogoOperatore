@@ -1,5 +1,9 @@
 ﻿using IMAR_DialogoOperatore.Application;
+using IMAR_DialogoOperatore.Application.DTOs;
+using IMAR_DialogoOperatore.Application.Interfaces.Clients;
 using IMAR_DialogoOperatore.Application.Interfaces.Services.Activities;
+using IMAR_DialogoOperatore.Application.Interfaces.Services.External;
+using IMAR_DialogoOperatore.Domain.Entities.Imar_Produzione;
 using IMAR_DialogoOperatore.Interfaces.Helpers;
 using IMAR_DialogoOperatore.Interfaces.Observers;
 
@@ -9,10 +13,16 @@ namespace IMAR_DialogoOperatore.Commands
 	{
 		private readonly IPopupConfermaHelper _popupConfermaHelper;
 		private readonly IConfermaOperazioneHelper _confermaOperazioneHelper;
+
 		private readonly IDialogoOperatoreObserver _dialogoOperatoreObserver;
-		private readonly IPopupObserver _popupStore;
+		private readonly IPopupObserver _popupObserver;
 		private readonly IAvanzamentoObserver _avanzamentoObserver;
+		private readonly ISegnalazioneObserver _segnalazioneObserver;
+
 		private readonly IMacchinaService _macchinaService;
+		private readonly ISegnalazioniDifformitaService _segnalazioniDifformitaService;
+
+        private readonly IImarApiClient _imarApiClient;
 
 		public ConfermaCommand(
 			IPopupConfermaHelper popupConfermaUtility,
@@ -20,34 +30,75 @@ namespace IMAR_DialogoOperatore.Commands
 			IDialogoOperatoreObserver dialogoOperatoreObserver,
 			IPopupObserver popupObserver,
             IAvanzamentoObserver avanzamentoObserver,
-			IMacchinaService macchinaService)
+            ISegnalazioneObserver segnalazioneObserver,
+			IMacchinaService macchinaService,
+            ISegnalazioniDifformitaService segnalazioniDifformitaService,
+            IImarApiClient imarApiClient)
 		{
 			_popupConfermaHelper = popupConfermaUtility;
 			_confermaOperazioneHelper = confermaOperazioneUtility;
+
 			_dialogoOperatoreObserver = dialogoOperatoreObserver;
-			_popupStore = popupObserver;
+			_popupObserver = popupObserver;
 			_avanzamentoObserver = avanzamentoObserver;
+            _segnalazioneObserver = segnalazioneObserver;
+
 			_macchinaService = macchinaService;
+            _segnalazioniDifformitaService = segnalazioniDifformitaService;
 
-			_popupStore.OnIsConfermatoChanged += PopupStore_OnIsConfermatoChanged;
-		}
+            _imarApiClient = imarApiClient;
 
-		public override bool CanExecute(object? parameter)
+			_popupObserver.OnIsConfermatoChanged += PopupStore_OnIsConfermatoChanged;
+
+        }
+
+        public override bool CanExecute(object? parameter)
 		{
 			return _dialogoOperatoreObserver.OperatoreSelezionato != null
-				   && _dialogoOperatoreObserver.OperatoreSelezionato.Stato != Costanti.ASSENTE
-				   && _dialogoOperatoreObserver.OperatoreSelezionato.Stato != Costanti.IN_PAUSA
+				   && _dialogoOperatoreObserver.OperatoreSelezionato.Stato == Costanti.PRESENTE
 				   && _dialogoOperatoreObserver.OperazioneInCorso != Costanti.NESSUNA
 				   && _dialogoOperatoreObserver.AttivitaSelezionata != null
 				   && base.CanExecute(parameter);
 		}
 
-		private async void PopupStore_OnIsConfermatoChanged()
+        private async void PopupStore_OnIsConfermatoChanged()
         {
-            if (!_popupStore.IsConfermato)
+            if (!_popupObserver.IsConfermato)
                 return;
 
+            if (_avanzamentoObserver.QuantitaScartata != null && _avanzamentoObserver.QuantitaScartata != 0)
+            {
+                _dialogoOperatoreObserver.IsLoaderVisibile = true;
+                await Task.Delay(1);
+                await CreaEdInviaSegnalazioneDifformita();
+            }
+
             await MostraLoaderEGestisciOperazione();
+        }
+
+        private async Task CreaEdInviaSegnalazioneDifformita()
+        {
+            CostiArticoloDTO costiArticoloDTO = await _imarApiClient.GetCostiArticolo(_dialogoOperatoreObserver.AttivitaSelezionata.Articolo);
+
+            _segnalazioniDifformitaService.InsertSegnalazione(new SegnalazioneDifformita
+            {
+                OrigineSegnalazione = "I",
+                Richiedente = _dialogoOperatoreObserver.OperatoreSelezionato.Badge + " - " + _dialogoOperatoreObserver.OperatoreSelezionato.Cognome + " " + _dialogoOperatoreObserver.OperatoreSelezionato.Nome,
+                FaseDifformita = _dialogoOperatoreObserver.AttivitaSelezionata.Fase,
+                DescrizioneFase = _dialogoOperatoreObserver.AttivitaSelezionata.DescrizioneFase,
+                Odp = _dialogoOperatoreObserver.AttivitaSelezionata.Odp,
+                Articolo = _dialogoOperatoreObserver.AttivitaSelezionata.Articolo,
+                DescrizioneArticolo = _dialogoOperatoreObserver.AttivitaSelezionata.DescrizioneArticolo,
+                QtaProdotta = _avanzamentoObserver.QuantitaProdotta,
+                QtaDifforme = _avanzamentoObserver.QuantitaScartata,
+                CostoGestioneDifformita = 5,
+                CostoUnitarioMateriale = Math.Round(costiArticoloDTO.CostoUnitarioMateriale, 2),
+                CostoLavorazione = Math.Round(costiArticoloDTO.CostoUnitarioLavorazione, 2),
+                DescrizioneDifformita = _segnalazioneObserver.DescrizioneDifetto,
+                CategoriaDifformita = _segnalazioneObserver.Categoria,
+                QtaDifformiRecuperati = _segnalazioneObserver.QuantitaRecuperata,
+                Sorgente = "DialogoOperatore"
+            });
         }
 
         public override async void Execute(object? parameter)
@@ -69,7 +120,6 @@ namespace IMAR_DialogoOperatore.Commands
             GestioneEsecuzioneOperazione();
             _dialogoOperatoreObserver.IsLoaderVisibile = false;
 
-
             _dialogoOperatoreObserver.IsOperazioneGestita = true;
         }
 
@@ -90,13 +140,6 @@ namespace IMAR_DialogoOperatore.Commands
                 _dialogoOperatoreObserver.AttivitaSelezionata.SaldoAcconto = _avanzamentoObserver.SaldoAcconto;
         }
 
-        private void EseguiOperazioneOMostraMessaggio()
-        {
-            string? result = _confermaOperazioneHelper.EseguiOperazione();
-            if (result != null)
-                MostraPopupConTesto(result);
-        }
-
         private void AssegnaMacchinaFittiziaAdOperatore()
         {
             if (!CanAssegnareMacchinaFittiziaAdOperatore())
@@ -114,10 +157,17 @@ namespace IMAR_DialogoOperatore.Commands
                     _dialogoOperatoreObserver.OperatoreSelezionato.MacchinaAssegnata == null;
         }
 
+        private void EseguiOperazioneOMostraMessaggio()
+        {
+            string? result = _confermaOperazioneHelper.EseguiOperazione();
+            if (result != null)
+                MostraPopupConTesto(result);
+        }
+
         private void MostraPopupConTesto(string testo)
 		{
-			_popupStore.TestoPopup = testo;
-			_popupStore.IsPopupVisible = true;
+			_popupObserver.TestoPopup = testo;
+			_popupObserver.IsPopupVisible = true;
 		}
 	}
 }

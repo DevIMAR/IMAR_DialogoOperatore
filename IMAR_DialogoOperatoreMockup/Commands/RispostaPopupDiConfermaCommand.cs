@@ -1,22 +1,38 @@
 ﻿using IMAR_DialogoOperatore.Interfaces.Observers;
+using IMAR_DialogoOperatore.Observers;
 
 namespace IMAR_DialogoOperatore.Commands
 {
 	public class RispostaPopupDiConfermaCommand : CommandBase
 	{
-		IPopupObserver _popupStore;
+		IPopupObserver _popupObserver;
+        IAvanzamentoObserver _avanzamentoObserver;
+        ISegnalazioneObserver _segnalazioneObserver;
 
-        public RispostaPopupDiConfermaCommand(IPopupObserver popupStore)
+        public RispostaPopupDiConfermaCommand(
+            IPopupObserver popupObserver,
+            IAvanzamentoObserver avanzamentoObserver,
+            ISegnalazioneObserver segnalazioneObserver)
         {
-            _popupStore = popupStore;
+            _popupObserver = popupObserver;
+            _avanzamentoObserver = avanzamentoObserver;
+            _segnalazioneObserver = segnalazioneObserver;
+        }
+
+        public override bool CanExecute(object? parameter)
+        {
+            return _avanzamentoObserver.QuantitaScartata <= 0 ||
+                   !(_popupObserver.IsPopupVisible &&
+                     string.IsNullOrWhiteSpace(_segnalazioneObserver.DescrizioneDifetto))
+                   && base.CanExecute(parameter);
         }
 
         public override async void Execute(object? parameter)
         {
             if (parameter is bool isConfermato)
             {
-                _popupStore.IsPopupVisible = false;
-                _popupStore.IsConfermato = isConfermato;
+                _popupObserver.IsPopupVisible = false;
+                _popupObserver.IsConfermato = isConfermato;
             }
         }
 	}

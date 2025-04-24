@@ -1,14 +1,18 @@
-﻿@using IMAR_DialogoOperatore.ViewModels
+﻿@using IMAR_DialogoOperatore.Components.SubComponents
+@using IMAR_DialogoOperatore.ViewModels
 
 @inject PopupDiConfermaViewModel PopupDiConfermaViewModel
 
 <DxPopup @bind-Visible="@PopupDiConfermaViewModel.IsVisible"
-		 ShowFooter="true">
+		 ShowFooter="true"
+		 Width="35%">
 	<BodyContentTemplate>
 		<div style="white-space:pre-line;"
 			 class="testo-medio">
 			@PopupDiConfermaViewModel.Testo
 		</div>
+
+		<FormSegnalazioneDifformita OnStateChanged="@PopupDiConfermaViewModel_NotifyStateChanged" />
 	</BodyContentTemplate>
 
 	<FooterContentTemplate>
@@ -20,6 +24,7 @@
 
 		<DxButton Text="Conferma"
 				  Click="@ConfermaHandler"
+				  Enabled="PopupDiConfermaViewModel.RispostaPopupDiConfermaCommand.CanExecute(null)"
 				  RenderStyle="ButtonRenderStyle.Warning"
 				  CssClass="d-flex justify-content-center align-items-center conferma-dettagli" />
 	</FooterContentTemplate>

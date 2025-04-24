@@ -18,6 +18,6 @@ namespace IMAR_DialogoOperatore.Application.Interfaces.Repositories
 		void Delete(object id);
 		void Delete(TEntity entityToDelete);
 		void Update(TEntity entityToUpdate);
-		public IQueryable<TEntity> ExecuteQuery(string query);
+		public IQueryable<TEntity> ExecuteQuery<T>(string query);
 	}
 }

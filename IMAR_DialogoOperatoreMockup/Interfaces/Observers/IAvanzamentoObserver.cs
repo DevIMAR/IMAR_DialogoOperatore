@@ -2,8 +2,8 @@
 {
 	public interface IAvanzamentoObserver
 	{
-		int QuantitaProdotta { get; set; }
-		int QuantitaScartata { get; set; }
+		uint? QuantitaProdotta { get; set; }
+		uint? QuantitaScartata { get; set; }
 		string SaldoAcconto { get; set; }
 
 		event Action OnIsFaseSaldataChanged;

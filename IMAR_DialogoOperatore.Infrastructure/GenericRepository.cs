@@ -100,9 +100,9 @@ namespace IMAR_DialogoOperatore.Infrastructure
 			throw new NotImplementedException();
 		}
 
-		public IQueryable<TEntity> ExecuteQuery(string query)
-		{
-			return dbSet.FromSql($"{query}");
-		}
-	}
+        public IQueryable<TEntity> ExecuteQuery<T>(string sql)
+        {
+            return dbSet.FromSqlRaw(sql);
+        }
+    }
 }

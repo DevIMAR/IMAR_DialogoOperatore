@@ -9,20 +9,20 @@ namespace IMAR_DialogoOperatore.ViewModels
 		private readonly IAvanzamentoObserver _avanzamentoObserver;
 		private readonly IDialogoOperatoreObserver _dialogoOperatoreObserver;
 
-		private int? _quantitaProdotta;
-		private int? _quantitaScartata;
+		private uint? _quantitaProdotta;
+		private uint? _quantitaScartata;
 		private bool _isFaseCompletabile;
 
 		public object? AttivitaSelezionata => _dialogoOperatoreObserver.AttivitaSelezionata;
 
-		public int? QuantitaProdotta 
+		public uint? QuantitaProdotta 
 		{ 
 			get {  return _quantitaProdotta; }
 			set
 			{
 				_quantitaProdotta = value;
 
-				if (Int32.TryParse(_quantitaProdotta.ToString(), out int quantitaProdotta) && AttivitaSelezionata != null)
+				if (UInt32.TryParse(_quantitaProdotta.ToString(), out uint quantitaProdotta) && AttivitaSelezionata != null)
 				{
 					IsFaseCompletabile = Int32.Parse(_quantitaProdotta.ToString()) >= ((IAttivitaViewModel)AttivitaSelezionata).QuantitaResidua;
 					_avanzamentoObserver.QuantitaProdotta = quantitaProdotta;
@@ -31,14 +31,14 @@ namespace IMAR_DialogoOperatore.ViewModels
 				OnNotifyStateChanged();
 			}
 		}
-        public int? QuantitaScartata
+        public uint? QuantitaScartata
 		{ 
 			get {  return _quantitaScartata; }
 			set
 			{
 				_quantitaScartata = value;
 
-				if (Int32.TryParse(_quantitaScartata.ToString(), out int quantitaScartata) && AttivitaSelezionata != null)
+				if (UInt32.TryParse(_quantitaScartata.ToString(), out uint quantitaScartata) && AttivitaSelezionata != null)
 					_avanzamentoObserver.QuantitaScartata = quantitaScartata;
 
 				OnNotifyStateChanged();

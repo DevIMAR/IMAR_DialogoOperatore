@@ -37,17 +37,6 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
                 var as400Repository = scope.ServiceProvider.GetRequiredService<IAs400Repository>();
 
                 var nuoveAttivita = jmesApiClient.ChiamaQueryVirtualJmes<vrtManNotActive>();
-                //var quantitaProdotteNonContabilizzate = as400Repository.ExecuteQuery<dynamic>("SELECT NRTSKJM, QTVERJM FROM IMA90DAT.JMRILM00F");
-
-                //if (nuoveAttivita != null && quantitaProdotteNonContabilizzate != null)
-                //{
-                //    Parallel.ForEach(nuoveAttivita, (attivita) =>
-                //    {
-                //        obj = quantitaProdotteNonContabilizzate.Where(x => x.NRTSKJM.Trim() == attivita.notCod.Trim()).ToList();
-                //        somma = obj.Sum(y => (decimal)y.QTVERJM);
-                //        attivita.qtyPrd += somma;
-                //    });
-                //}
 
                 var attivitaIndirette = jmesApiClient.ChiamaQueryGetJmes<stdMesIndTsk>();
 

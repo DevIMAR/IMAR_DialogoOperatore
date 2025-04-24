@@ -1,0 +1,290 @@
+﻿@using DevExpress.Blazor.Internal
+@using IMAR_DialogoOperatore.ViewModels
+
+@inject FormSegnalazioneDifformitaViewModel FormSegnalazioneDifformitaViewModel
+
+@if (FormSegnalazioneDifformitaViewModel.QuantitaScartata > 0)
+{
+	<DxGridLayout CssClass="testo-medio">
+		<Rows>
+			<DxGridLayoutRow />
+			<DxGridLayoutRow />
+			<DxGridLayoutRow />
+			<DxGridLayoutRow />
+			<DxGridLayoutRow />
+			<DxGridLayoutRow />
+			<DxGridLayoutRow />
+			<DxGridLayoutRow />
+			<DxGridLayoutRow />
+			<DxGridLayoutRow />
+			<DxGridLayoutRow />
+			<DxGridLayoutRow />
+		</Rows>
+
+		<Columns>
+			<DxGridLayoutColumn />
+			<DxGridLayoutColumn />
+			<DxGridLayoutColumn />
+			<DxGridLayoutColumn />
+			<DxGridLayoutColumn />
+			<DxGridLayoutColumn />
+			<DxGridLayoutColumn />
+			<DxGridLayoutColumn />
+			<DxGridLayoutColumn />
+			<DxGridLayoutColumn />
+			<DxGridLayoutColumn />
+			<DxGridLayoutColumn />
+		</Columns>
+
+		<Items>
+			<DxGridLayoutItem Row="1"
+							  Column="0" ColumnSpan="3">
+				<Template>
+					<div class="d-flex align-items-center h-100 testo-medio">
+						<label>BOLLA: @FormSegnalazioneDifformitaViewModel.Bolla</label>
+					</div>
+				</Template>
+			</DxGridLayoutItem>
+
+			<DxGridLayoutItem Row="1"
+							  Column="4" ColumnSpan="3">
+				<Template>
+					<div class="d-flex align-items-center h-100 testo-medio">
+						<label>ODP: @FormSegnalazioneDifformitaViewModel.Odp</label>
+					</div>
+				</Template>
+			</DxGridLayoutItem>
+
+			<DxGridLayoutItem Row="2"
+							  Column="0" ColumnSpan="3">
+				<Template>
+					<div class="d-flex align-items-center h-100 testo-medio">
+						<label>FASE: @FormSegnalazioneDifformitaViewModel.Fase</label>
+					</div>
+				</Template>
+			</DxGridLayoutItem>
+
+			<DxGridLayoutItem Row="2"
+							  Column="4" ColumnSpan="8">
+				<Template>
+					<div class="d-flex align-items-center h-100 testo-medio">
+						<label>DESCRIZIONE FASE: @FormSegnalazioneDifformitaViewModel.DescrizioneFase</label>
+					</div>
+				</Template>
+			</DxGridLayoutItem>
+
+
+			<DxGridLayoutItem Row="3"
+							  Column="0" ColumnSpan="3">
+				<Template>
+					<div class="d-flex align-items-center h-100">
+						<label>Qt. SCARTATA</label>
+					</div>
+				</Template>
+			</DxGridLayoutItem>
+
+			<DxGridLayoutItem Row="3"
+							  Column="4" ColumnSpan="3">
+				<Template>
+					<div class="d-flex align-items-center h-100">
+						<label>Qt. RECUPERATA</label>
+					</div>
+				</Template>
+			</DxGridLayoutItem>
+
+			<DxGridLayoutItem Row="3"
+							  Column="8" ColumnSpan="3">
+				<Template>
+					<div class="d-flex align-items-center h-100">
+						<label>CATEGORIA</label>
+					</div>
+				</Template>
+			</DxGridLayoutItem>
+
+			<DxGridLayoutItem Row="4"
+							  Column="0" ColumnSpan="3">
+				<Template>
+					<DxSpinEdit @bind-Value="@(FormSegnalazioneDifformitaViewModel.QuantitaScartata)"
+								ShowSpinButtons="false"
+								AllowMouseWheel="false"
+								CssClass="dxbl-text-edit justify-content-center"
+								@ref="Scartata"
+								@onkeydown="HandleScartataKeyPress" />
+				</Template>
+			</DxGridLayoutItem>
+
+			<DxGridLayoutItem Row="4"
+							  Column="4" ColumnSpan="3">
+				<Template>
+					<DxSpinEdit @bind-Value="@(FormSegnalazioneDifformitaViewModel.QuantitaRecuperata)"
+								ShowSpinButtons="false"
+								AllowMouseWheel="false"
+								CssClass="dxbl-text-edit"
+								@ref="Recuperata"
+								@onkeydown="HandleRecuperataKeyPress" />
+				</Template>
+			</DxGridLayoutItem>
+
+			<DxGridLayoutItem Row="4"
+							  Column="8" ColumnSpan="4">
+				<Template>
+					<DxComboBox Data="@FormSegnalazioneDifformitaViewModel.ListaCategorie"
+								@bind-Value="@(FormSegnalazioneDifformitaViewModel.Categoria)"
+								CssClass="dxbl-text-edit"
+								@ref="Categoria"
+								@onkeydown="HandleCausaleKeyPress" />
+				</Template>
+			</DxGridLayoutItem>
+
+			<DxGridLayoutItem Row="5"
+							  Column="4" ColumnSpan="3">
+				<Template>
+					<div class="d-flex align-items-center h-100">
+						ERRORE FASE ATTUALE
+					</div>
+				</Template>
+			</DxGridLayoutItem>
+
+			<DxGridLayoutItem Row="6"
+							  Column="4" ColumnSpan="3">
+				<Template>
+					<DxCheckBox CheckType="CheckType.Switch"
+								@bind-Checked="@FormSegnalazioneDifformitaViewModel.IsErroreFaseAttuale"
+								Alignment="CheckBoxContentAlignment.Center"
+								SizeMode="SizeMode.Large"
+								@ref="ErroreFaseAttuale"
+								@onkeydown="HandleErroreFaseAttualeKeyPress" />
+				</Template>
+			</DxGridLayoutItem>
+
+			<DxGridLayoutItem Row="7"
+							  Column="0" ColumnSpan="10">
+				<Template>
+					<div class="d-flex align-items-center h-100">
+						<label>DESCRIZIONE DIFETTO</label>
+					</div>
+				</Template>
+			</DxGridLayoutItem>
+
+			<DxGridLayoutItem Row="8" RowSpan="4"
+							  Column="0" ColumnSpan="12">
+				<Template>
+					<DxMemo @bind-Text="@FormSegnalazioneDifformitaViewModel.DescrizioneDifetto"
+							BindValueMode="BindValueMode.OnInput"
+							Rows="4"
+							@ref="DescrizioneDifetto" />
+				</Template>
+			</DxGridLayoutItem>
+		</Items>
+	</DxGridLayout>
+}
+
+@code {
+	[Parameter] public EventCallback OnStateChanged { get; set; }
+
+	private DxSpinEdit<uint?> Scartata;
+	private DxSpinEdit<uint?> Recuperata;
+	private DxComboBox<string, string> Categoria;
+	private DxCheckBox<bool> ErroreFaseAttuale;
+	private DxMemo DescrizioneDifetto;
+
+	protected override Task OnInitializedAsync()
+	{
+		FormSegnalazioneDifformitaViewModel.NotifyStateChanged += FormSegnalazioneDifformitaViewModel_NotifyStateChanged;
+
+		return base.OnInitializedAsync();
+	}
+
+	protected override Task OnAfterRenderAsync(bool firstRender)
+	{
+		if (firstRender)
+			SetFocus(Scartata);
+
+		return base.OnAfterRenderAsync(firstRender);
+	}
+
+	private async void FormSegnalazioneDifformitaViewModel_NotifyStateChanged()
+	{
+		await InvokeAsync(StateHasChanged);
+
+		await OnStateChanged.InvokeAsync();
+	}
+
+	private async void SetFocus(IFocusableEditor element)
+	{
+		try
+		{
+			await Task.Delay(10);
+			await element.FocusAsync();
+		}
+		catch
+		{
+
+		}
+	}
+
+	private void HandleScartataKeyPress(KeyboardEventArgs e)
+	{
+		switch (e.Key)
+		{
+			case "Enter":
+				SetFocus(Recuperata);
+				break;
+		}
+	}
+
+	private void HandleRecuperataKeyPress(KeyboardEventArgs e)
+	{
+		switch (e.Key)
+		{
+			case "Enter":
+				SetFocus(Categoria);
+				break;
+		}
+	}
+
+	private void HandleCausaleKeyPress(KeyboardEventArgs e)
+	{
+		List<string> listaCausali = FormSegnalazioneDifformitaViewModel.ListaCategorie;
+		int index = listaCausali.IndexOf(FormSegnalazioneDifformitaViewModel.Categoria);
+
+		switch (e.Key)
+		{
+			case "ArrowUp":
+				if (listaCausali.Count <= 1)
+					return;
+				FormSegnalazioneDifformitaViewModel.Categoria = index > 0 ? listaCausali[index - 1] : listaCausali[index];
+				SetFocus(Categoria);
+				break;
+
+			case "ArrowDown":
+				if (listaCausali.Count <= 1)
+					return;
+				FormSegnalazioneDifformitaViewModel.Categoria = index < listaCausali.Count - 1 ? listaCausali[index + 1] : listaCausali[index];
+				SetFocus(Categoria);
+				break;
+
+			case "Enter":
+				SetFocus(ErroreFaseAttuale);
+				break;
+		}
+	}
+
+	private async void HandleErroreFaseAttualeKeyPress(KeyboardEventArgs e)
+	{
+		switch (e.Key)
+		{
+			case "Enter":
+				SetFocus(DescrizioneDifetto);
+				break;
+
+			case "ArrowRight":
+				FormSegnalazioneDifformitaViewModel.IsErroreFaseAttuale = true;
+				break;
+
+			case "ArrowLeft":
+				FormSegnalazioneDifformitaViewModel.IsErroreFaseAttuale = false;
+				break;
+		}
+	}
+}

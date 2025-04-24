@@ -4,11 +4,11 @@ namespace IMAR_DialogoOperatore.Observers
 {
 	public class AvanzamentoObserver : ObserverBase, IAvanzamentoObserver
 	{
-		private int _quantitaProdotta;
-		private int _quantitaScartata;
+		private uint? _quantitaProdotta;
+		private uint? _quantitaScartata;
 		private string _saldoAcconto;
 
-		public int QuantitaProdotta
+		public uint? QuantitaProdotta
 		{
 			get { return _quantitaProdotta; }
 			set
@@ -17,7 +17,7 @@ namespace IMAR_DialogoOperatore.Observers
 				CallAction(OnQuantitaProdottaChanged);
 			}
 		}
-		public int QuantitaScartata
+		public uint? QuantitaScartata
 		{
 			get { return _quantitaScartata; }
 			set

@@ -20,6 +20,7 @@ namespace IMAR_DialogoOperatore
 			services.AddScoped<ICercaAttivitaObserver, CercaAttivitaObserver>();
 			services.AddScoped<IDialogoOperatoreObserver, DialogoOperatoreObserver>();
 			services.AddScoped<IPopupObserver, PopupObserver>();
+			services.AddScoped<ISegnalazioneObserver, SegnalazioneObserver>();
 
 			services.AddScoped<ICercaAttivitaHelper, CercaAttivitaHelper>();
 			services.AddScoped<IConfermaOperazioneHelper, ConfermaOperazioneHelper>();
@@ -37,6 +38,7 @@ namespace IMAR_DialogoOperatore
 			services.AddScoped<DocumentaleViewModel>();
 			services.AddScoped<FasiIndiretteGridViewModel>();
 			services.AddScoped<FasiIndirettePopupViewModel>();
+			services.AddScoped<FormSegnalazioneDifformitaViewModel>();
 			services.AddScoped<GestoreAttivitaViewModel>();
 			services.AddScoped<InfoOperatoreViewModel>();
 			services.AddScoped<PopupDiConfermaViewModel>();

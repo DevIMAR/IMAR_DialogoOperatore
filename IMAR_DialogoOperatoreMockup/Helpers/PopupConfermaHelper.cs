@@ -158,7 +158,7 @@ namespace IMAR_DialogoOperatore.Helpers
         private string GestisciAvanzamentoOChiusuraLavoro()
         {
             string messaggioPopup = string.Empty;
-            int quantitaProdottaAggiornata = _dialogoOperatoreObserver.AttivitaSelezionata.QuantitaProdotta + _avanzamentoObserver.QuantitaProdotta;
+            int quantitaProdottaAggiornata = _dialogoOperatoreObserver.AttivitaSelezionata.QuantitaProdotta + (int)_avanzamentoObserver.QuantitaProdotta;
 
             messaggioPopup += GestisciCambioDiFaseSelezionata();
             messaggioPopup += GestisciFaseConQtaProdottaMaggioreDiFasePrecedente();
@@ -173,7 +173,7 @@ namespace IMAR_DialogoOperatore.Helpers
 
         private string GestisciFaseConQtaProdottaMaggioreDiFasePrecedente()
         {
-            int quantitaProdottaAggiornata = _dialogoOperatoreObserver.AttivitaSelezionata.QuantitaProdotta + _avanzamentoObserver.QuantitaProdotta;
+            int quantitaProdottaAggiornata = _dialogoOperatoreObserver.AttivitaSelezionata.QuantitaProdotta + (int)_avanzamentoObserver.QuantitaProdotta;
 
             Attivita? attivitaFasePrecedente = GetAttivitaFasePrecedente();
 

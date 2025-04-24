@@ -53,6 +53,7 @@
 						  Column="0" ColumnSpan="2">
 			<Template>
 				<DxSpinEdit @bind-Value="@(AvanzamentoAttivitaViewModel.QuantitaProdotta)"
+							BindValueMode="BindValueMode.OnInput"
 							ShowSpinButtons="false"
 							AllowMouseWheel="false"
 							CssClass="dxbl-text-edit"
@@ -66,6 +67,7 @@
 						  Column="3" ColumnSpan="2">
 			<Template>
 				<DxSpinEdit @bind-Value="@(AvanzamentoAttivitaViewModel.QuantitaScartata)"
+							BindValueMode="BindValueMode.OnInput"
 							ShowSpinButtons="false"
 							AllowMouseWheel="false"
 							CssClass="dxbl-text-edit"
@@ -94,9 +96,9 @@
 	[Parameter] public EventCallback DatiAvanzamentoInseriti { get; set; }
 	[Parameter] public EventCallback Click { get; set; }
 
-	public DxSpinEdit<int?> Prodotta { get; set; }
+	public DxSpinEdit<uint?> Prodotta { get; set; }
 
-	private DxSpinEdit<int?> Scartata;
+	private DxSpinEdit<uint?> Scartata;
 	private DxCheckBox<bool> Saldo;
 
 	protected override Task OnInitializedAsync()

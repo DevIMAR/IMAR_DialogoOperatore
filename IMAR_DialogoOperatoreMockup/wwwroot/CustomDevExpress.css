@@ -50,3 +50,8 @@
 .dxbl-image {
     --dxbl-image-height: 1.668dvh;
 }
+
+.dxbl-text-edit.dxbl-memo-edit {
+    --dxbl-text-edit-padding-y: 1dvh;
+    --dxbl-text-edit-line-height: 1.668dvh;
+}

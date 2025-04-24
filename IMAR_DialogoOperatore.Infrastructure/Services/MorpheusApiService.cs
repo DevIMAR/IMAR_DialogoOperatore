@@ -33,6 +33,6 @@ namespace IMAR_DialogoOperatore.Services
 				return null;
 
 			return STRINGA_CONNESSIONE + $"/Gateway/ImarApi/Documentale/Odp/?codiceOdp={odp}";
-		}
-	}
+        }
+    }
 }

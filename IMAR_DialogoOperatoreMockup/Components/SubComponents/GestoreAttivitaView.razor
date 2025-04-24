@@ -15,7 +15,7 @@
 
 	<BodyTemplate>
 		<AttivitaDetails @ref="@AttivitaDetails"
-						 WorkDoneCallback="@GestoreAttivitaViewModel.ConfermaCommand.Execute" />
+						 WorkDoneCallback="@Conferma" />
 	</BodyTemplate>
 
 	<FooterTemplate>
@@ -46,5 +46,11 @@
 	private async void GestoreAttivitaViewModel_NotifyStateChanged()
 	{
 		await InvokeAsync(StateHasChanged);
+	}
+
+	private void Conferma()
+	{
+		if (GestoreAttivitaViewModel.ConfermaCommand.CanExecute(null))
+			GestoreAttivitaViewModel.ConfermaCommand.Execute(null);
 	}
 }

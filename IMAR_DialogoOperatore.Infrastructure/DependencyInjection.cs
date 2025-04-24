@@ -4,8 +4,11 @@ using IMAR_DialogoOperatore.Application.Interfaces.Services.Activities;
 using IMAR_DialogoOperatore.Application.Interfaces.Services.External;
 using IMAR_DialogoOperatore.Application.Interfaces.UoW;
 using IMAR_DialogoOperatore.Application.Interfaces.Utilities;
+using IMAR_DialogoOperatore.Domain.Imar_Produzione;
 using IMAR_DialogoOperatore.Domain.JMes;
 using IMAR_DialogoOperatore.Infrastructure.As400;
+using IMAR_DialogoOperatore.Infrastructure.Imar_Produzione;
+using IMAR_DialogoOperatore.Infrastructure.ImarApi;
 using IMAR_DialogoOperatore.Infrastructure.JMes;
 using IMAR_DialogoOperatore.Infrastructure.Services;
 using IMAR_DialogoOperatore.Infrastructure.Utilities;
@@ -18,18 +21,22 @@ namespace IMAR_DialogoOperatore.Infrastructure
 	{
 		public static IServiceCollection AddInfrastructureServices(this IServiceCollection services)
 		{
-			services.AddDbContext<SynergyJmesContext>();
 			services.AddDbContext<As400Context>();
+			services.AddDbContext<ImarProduzioneContext>();
+			services.AddDbContext<SynergyJmesContext>();
 
 			services.AddSingleton<CaricamentoAttivitaInBackroundService>();
 
 			services.AddScoped<ISynergyJmesUoW, SynergyJmesUoW>();
+			services.AddScoped<IImarProduzioneUoW, ImarProduzioneUoW>();
 
 			services.AddScoped<IAttivitaService, AttivitaService>();
 			services.AddScoped<IMorpheusApiService, MorpheusApiService>();
 			services.AddScoped<IOperatoriService, OperatoreService>();
 			services.AddScoped<IMacchinaService, MacchinaService>();
+			services.AddScoped<ISegnalazioniDifformitaService, SegnalazioniDifformitaService>();
 
+			services.AddScoped<IImarApiClient, ImarApiClient>();
 			services.AddScoped<IJmesApiClient, JmesApiClient>();
 
 			services.AddScoped<IAs400Repository, As400Repository>();
