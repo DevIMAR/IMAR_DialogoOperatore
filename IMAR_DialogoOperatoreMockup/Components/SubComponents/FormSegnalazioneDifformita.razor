@@ -197,6 +197,9 @@
 
 	protected override Task OnAfterRenderAsync(bool firstRender)
 	{
+		if (FormSegnalazioneDifformitaViewModel.QuantitaScartata == null || FormSegnalazioneDifformitaViewModel.QuantitaScartata <= 0)
+			return base.OnAfterRenderAsync(firstRender);
+
 		if (firstRender)
 			SetFocus(Scartata);
 

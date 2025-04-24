@@ -21,10 +21,11 @@ namespace IMAR_DialogoOperatore.Commands
 
         public override bool CanExecute(object? parameter)
         {
-            return _avanzamentoObserver.QuantitaScartata <= 0 ||
-                   !(_popupObserver.IsPopupVisible &&
-                     string.IsNullOrWhiteSpace(_segnalazioneObserver.DescrizioneDifetto))
-                   && base.CanExecute(parameter);
+            return (_avanzamentoObserver.QuantitaScartata <= 0 ||
+                        _avanzamentoObserver.QuantitaScartata == null ||
+                        !string.IsNullOrWhiteSpace(_segnalazioneObserver.DescrizioneDifetto)
+                  ) &&
+                  base.CanExecute(parameter);
         }
 
         public override async void Execute(object? parameter)
