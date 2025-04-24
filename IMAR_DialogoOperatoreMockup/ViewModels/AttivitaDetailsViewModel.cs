@@ -158,6 +158,7 @@ namespace IMAR_DialogoOperatore.ViewModels
         {
             Bolla = null;
             Odp = null;
+			_cercaAttivitaObserver.FaseCercata = string.Empty;
         }
 
         private void DialogoOperatoreStore_OnAttivitaSelezionataChanged()
