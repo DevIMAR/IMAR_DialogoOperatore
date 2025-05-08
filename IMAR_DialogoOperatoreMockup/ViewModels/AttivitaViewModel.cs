@@ -25,12 +25,17 @@ namespace IMAR_DialogoOperatore.ViewModels
 		public string? Fase => _attivita?.Fase;
 		public string? DescrizioneFase => _attivita?.DescrizioneFase;
 		public int QuantitaOrdine => _attivita != null ? _attivita.QuantitaOrdine : 0;
-		public int QuantitaProdotta { get; set; }
-		public int QuantitaScartata { get; set; }
+		public int QuantitaProdotta => QuantitaProdottaNonContabilizzata + QuantitaProdottaContabilizzata;
+        public int QuantitaProdottaNonContabilizzata { get; set; }
+        public int QuantitaProdottaContabilizzata { get; set; }
+		public int QuantitaScartata => QuantitaScartataNonContabilizzata + QuantitaScartataContabilizzata;
+        public int QuantitaScartataNonContabilizzata { get; set; }
+        public int QuantitaScartataContabilizzata { get; set; }
 		public int QuantitaResidua => QuantitaOrdine - QuantitaProdotta;
 		public string SaldoAcconto { get; set; }
 		public double? CodiceJMes => _attivita?.CodiceJMes;
 		public Macchina? Macchina => _attivita?.Macchina;
+
 
         public AttivitaViewModel(Attivita? attivita)
 		{
@@ -39,8 +44,10 @@ namespace IMAR_DialogoOperatore.ViewModels
 				return;
 
 			Causale = _attivita.Causale == null ? string.Empty : _attivita.Causale;
-			QuantitaProdotta = _attivita.QuantitaProdotta;
-			QuantitaScartata = _attivita.QuantitaScartata;
+			QuantitaProdottaNonContabilizzata = _attivita.QuantitaProdottaNonContabilizzata;
+			QuantitaProdottaContabilizzata = _attivita.QuantitaProdottaContabilizzata;
+			QuantitaScartataNonContabilizzata = _attivita.QuantitaScartataNonContabilizzata;
+            QuantitaScartataContabilizzata = _attivita.QuantitaScartataContabilizzata;
 			SaldoAcconto = _attivita.SaldoAcconto;
 		}
 	}

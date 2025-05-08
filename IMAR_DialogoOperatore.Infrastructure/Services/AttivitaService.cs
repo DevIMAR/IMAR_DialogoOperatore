@@ -14,7 +14,7 @@ namespace IMAR_DialogoOperatore.Services
         private readonly IJmesApiClient _jmesApiClient;
         private readonly IJMesApiClientErrorUtility _jMesApiClientErrorUtility;
         private readonly IStatoAttivitaMapper _statoAttivitaMapper;
-        private readonly CaricamentoAttivitaInBackroundService _caricamentoAttivitaInBackroundService;
+        private readonly CaricamentoAttivitaInBackgroundService _caricamentoAttivitaInBackroundService;
 
         public Attivita Attivita { get; private set; }
         public IList<Attivita> AttivitaTrovate { get; private set; }
@@ -24,7 +24,7 @@ namespace IMAR_DialogoOperatore.Services
             IJmesApiClient jmesApiClient,
             IJMesApiClientErrorUtility jMesApiClientErrorUtility,
             IStatoAttivitaMapper statoAttivitaMapper,
-            CaricamentoAttivitaInBackroundService caricamentoAttivitaInBackroundService)
+            CaricamentoAttivitaInBackgroundService caricamentoAttivitaInBackroundService)
         {
             _macchinaService = macchinaService;
 
@@ -87,76 +87,33 @@ namespace IMAR_DialogoOperatore.Services
 
         private Attivita? OttieniAttivitaApertaDaBolla(string bolla)
         {
-
-            vrtManNotActive? vrtManNotActive = _caricamentoAttivitaInBackroundService.GetAttivitaAperte()
-                                                    .SingleOrDefault(x => x.notCod == bolla);
-            if (vrtManNotActive == null)
-                return null;
-
-            return CreateNuovaAttivita(vrtManNotActive);
+            return _caricamentoAttivitaInBackroundService.GetAttivitaAperte()
+                                                    .SingleOrDefault(x => x.Bolla == bolla);
         }
 
-        public IList<Attivita> GetAttivitaPerOdp(string odp)
+        public IEnumerable<Attivita> GetAttivitaPerOdp(string odp)
         {
-            IEnumerable<vrtManNotActive> attivitaFiltrate = _caricamentoAttivitaInBackroundService.GetAttivitaAperte()
-                                                                .Where(x => x.prdOrdUid == odp);
+            IEnumerable<Attivita> attivitaFiltrate = _caricamentoAttivitaInBackroundService.GetAttivitaAperte()
+                                                                .Where(x => x.Odp == odp);
 
-            PopolaAttivitaTrovate(attivitaFiltrate);
-            return AttivitaTrovate;
-        }
-
-        private void PopolaAttivitaTrovate(IEnumerable<vrtManNotActive> attivitaFiltrate)
-        {
-            AttivitaTrovate = new List<Attivita>();
-
-            foreach (vrtManNotActive attivita in attivitaFiltrate)
-                AttivitaTrovate.Add(CreateNuovaAttivita(attivita));
+            return attivitaFiltrate;
         }
 
         public string? AvanzaAttivita(Operatore operatore, Attivita attivitaDaAvanzare, int quantitaProdotta, int quantitaScartata)
         {
-            attivitaDaAvanzare.QuantitaProdotta += quantitaProdotta;
-            attivitaDaAvanzare.QuantitaScartata += quantitaScartata;
+            attivitaDaAvanzare.QuantitaProdottaNonContabilizzata += quantitaProdotta;
+            attivitaDaAvanzare.QuantitaScartataNonContabilizzata += quantitaScartata;
 
             if (attivitaDaAvanzare.SaldoAcconto != "S")
-                attivitaDaAvanzare.QuantitaResidua = attivitaDaAvanzare.QuantitaOrdine - attivitaDaAvanzare.QuantitaProdotta;
+                attivitaDaAvanzare.QuantitaResidua = attivitaDaAvanzare.QuantitaOrdine - attivitaDaAvanzare.QuantitaProdottaNonContabilizzata;
 
-            HttpResponseMessage result = _jmesApiClient.MesAdvanceDeclaration(operatore.Badge, attivitaDaAvanzare, quantitaProdotta, quantitaScartata);
+            HttpResponseMessage result = _jmesApiClient.MesAdvanceDeclaration(operatore, attivitaDaAvanzare, quantitaProdotta, quantitaScartata);
 
             string? errore = _jMesApiClientErrorUtility.GestioneEventualeErrore(result);
             if (errore != null)
                 return errore;
 
             return null;
-        }
-
-        private Attivita CreateNuovaAttivita(vrtManNotActive vrtManNotActive)
-        {
-            Attivita nuovaAttivita = new Attivita
-            {
-                Bolla = vrtManNotActive.notCod,
-                Odp = vrtManNotActive.prdOrdUid,
-                Fase = vrtManNotActive.prdPhsCod,
-                Articolo = vrtManNotActive.itmCod,
-                DescrizioneFase = vrtManNotActive.prdPhsDsc,
-                DescrizioneArticolo = vrtManNotActive.itmDsc,
-                QuantitaOrdine = (int)vrtManNotActive.prdOrdQty,
-                QuantitaProdotta = (int)vrtManNotActive.qtyPrd,
-                QuantitaScartata = (int)vrtManNotActive.qtyRej,
-                Macchina = new Macchina
-                {
-                    CentroDiLavoro = vrtManNotActive.macUid.Substring(0, 3),
-                    CodiceMacchina = vrtManNotActive.macUid.Substring(2, 3),
-                    CodiceJMes = _macchinaService.GetCodiceJmesByCodice(vrtManNotActive.macUid)
-                },
-
-                //Placeholder
-                SaldoAcconto = "A"
-            };
-
-            nuovaAttivita.QuantitaResidua = nuovaAttivita.QuantitaOrdine - nuovaAttivita.QuantitaProdotta;
-
-            return nuovaAttivita;
         }
 
         public IList<Attivita> OttieniAttivitaOperatore(string badgeOperatore)
@@ -228,8 +185,8 @@ namespace IMAR_DialogoOperatore.Services
                                                                 Articolo = aa.ID_Det3358,
                                                                 DescrizioneArticolo = aa.ID_Det3359,
                                                                 QuantitaOrdine = (int)aa.ID_Det3375,
-                                                                QuantitaProdotta = (int)aa.ID_Det3371,
-                                                                QuantitaScartata = (int)aa.ID_Det3372,
+                                                                QuantitaProdottaNonContabilizzata = (int)aa.ID_Det3371,
+                                                                QuantitaScartataNonContabilizzata = (int)aa.ID_Det3372,
                                                                 QuantitaResidua = (int)aa.ID_Det3374,
                                                                 CodiceJMes = aa.ID_Det3348,
                                                                 Causale = _statoAttivitaMapper.FromJMesStatus(aa.ID_Sts3130),

@@ -12,9 +12,13 @@ namespace IMAR_DialogoOperatore.Interfaces.ViewModels
         string? Fase { get; }
         string? Odp { get; }
         int QuantitaOrdine { get; }
-        int QuantitaProdotta { get; set; }
+        int QuantitaProdotta { get; }
+        int QuantitaProdottaNonContabilizzata { get; set; }
+        int QuantitaProdottaContabilizzata { get; set; }
         int QuantitaResidua { get; }
-        int QuantitaScartata { get; set; }
+        int QuantitaScartata { get; }
+        int QuantitaScartataNonContabilizzata { get; set; }
+        int QuantitaScartataContabilizzata { get; set; }
         string SaldoAcconto { get; set; }
         double? CodiceJMes { get; }
         Macchina? Macchina { get; }

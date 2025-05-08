@@ -8,6 +8,7 @@ using IMAR_DialogoOperatore.Domain.Imar_Produzione;
 using IMAR_DialogoOperatore.Domain.JMes;
 using IMAR_DialogoOperatore.Infrastructure.As400;
 using IMAR_DialogoOperatore.Infrastructure.Imar_Produzione;
+using IMAR_DialogoOperatore.Infrastructure.Imar_Schedulatore;
 using IMAR_DialogoOperatore.Infrastructure.ImarApi;
 using IMAR_DialogoOperatore.Infrastructure.JMes;
 using IMAR_DialogoOperatore.Infrastructure.Services;
@@ -23,12 +24,14 @@ namespace IMAR_DialogoOperatore.Infrastructure
 		{
 			services.AddDbContext<As400Context>();
 			services.AddDbContext<ImarProduzioneContext>();
+			services.AddDbContext<ImarSchedulatoreContext>();
 			services.AddDbContext<SynergyJmesContext>();
 
-			services.AddSingleton<CaricamentoAttivitaInBackroundService>();
+			services.AddSingleton<CaricamentoAttivitaInBackgroundService>();
 
 			services.AddScoped<ISynergyJmesUoW, SynergyJmesUoW>();
 			services.AddScoped<IImarProduzioneUoW, ImarProduzioneUoW>();
+			services.AddScoped<IImarSchedulatoreUoW, ImarSchedulatoreUoW>();
 
 			services.AddScoped<IAttivitaService, AttivitaService>();
 			services.AddScoped<IMorpheusApiService, MorpheusApiService>();

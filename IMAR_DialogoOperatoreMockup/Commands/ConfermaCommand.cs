@@ -58,6 +58,7 @@ namespace IMAR_DialogoOperatore.Commands
 				   && _dialogoOperatoreObserver.OperatoreSelezionato.Stato == Costanti.PRESENTE
 				   && _dialogoOperatoreObserver.OperazioneInCorso != Costanti.NESSUNA
 				   && _dialogoOperatoreObserver.AttivitaSelezionata != null
+                   && _dialogoOperatoreObserver.AttivitaSelezionata.SaldoAcconto != Costanti.SALDO
 				   && base.CanExecute(parameter);
 		}
 

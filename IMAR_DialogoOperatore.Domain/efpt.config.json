@@ -1,5 +1,5 @@
 ﻿{
-   "CodeGenerationMode": 4,
+   "CodeGenerationMode": 5,
    "ContextClassName": "synergyJMES",
    "ContextNamespace": null,
    "FilterSchemas": false,
@@ -15,7 +15,7 @@
    "T4TemplatePath": null,
    "Tables": [
       {
-         "Name": "[dbo].[SegnalazioneDifformita]",
+         "Name": "[dbo].[DATIMONITOR]",
          "ObjectType": 0
       }
    ],

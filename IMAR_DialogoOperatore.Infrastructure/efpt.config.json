@@ -1,21 +1,21 @@
 ﻿{
    "CodeGenerationMode": 5,
-   "ContextClassName": "ImarProduzioneContext",
+   "ContextClassName": "ImarSchedulatoreContext",
    "ContextNamespace": null,
    "FilterSchemas": false,
    "IncludeConnectionString": false,
    "ModelNamespace": null,
    "OutputContextPath": null,
-   "OutputPath": "Imar_Produzione",
+   "OutputPath": "Imar_Schedulatore",
    "PreserveCasingWithRegex": true,
-   "ProjectRootNamespace": "IMAR_DialogoOperatore.Domain",
+   "ProjectRootNamespace": "IMAR_DialogoOperatore.Infrastructure.Imar_Schedulatore",
    "Schemas": null,
    "SelectedHandlebarsLanguage": 2,
    "SelectedToBeGenerated": 1,
    "T4TemplatePath": null,
    "Tables": [
       {
-         "Name": "[dbo].[SegnalazioneDifformita]",
+         "Name": "[dbo].[DATIMONITOR]",
          "ObjectType": 0
       }
    ],
