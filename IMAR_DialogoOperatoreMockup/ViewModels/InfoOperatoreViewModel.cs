@@ -32,8 +32,8 @@ namespace IMAR_DialogoOperatore.ViewModels
                 SelezionaOperatore();
                 _dialogoOperatoreObserver.OperazioneInCorso = Costanti.NESSUNA;
 
-                //if (value != null)
-                //  _autoLogoutUtility.StartLogoutTimer(30);
+                if (value != null)
+                    _autoLogoutUtility.StartLogoutTimer(30);
             }
         }
 

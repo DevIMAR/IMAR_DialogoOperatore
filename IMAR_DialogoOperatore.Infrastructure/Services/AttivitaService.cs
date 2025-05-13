@@ -16,9 +16,6 @@ namespace IMAR_DialogoOperatore.Services
         private readonly IStatoAttivitaMapper _statoAttivitaMapper;
         private readonly CaricamentoAttivitaInBackgroundService _caricamentoAttivitaInBackroundService;
 
-        public Attivita Attivita { get; private set; }
-        public IList<Attivita> AttivitaTrovate { get; private set; }
-
         public AttivitaService(
             IMacchinaService macchinaService,
             IJmesApiClient jmesApiClient,
@@ -199,6 +196,19 @@ namespace IMAR_DialogoOperatore.Services
                                                                 x.Causale == Costanti.LAVORO_SOSPESO ||
                                                                 x.Causale == Costanti.ATTREZZAGGIO_SOSPESO)
                                                     .ToList();
+
+            IList<Attivita> attivita = _caricamentoAttivitaInBackroundService.GetAttivitaAperte();
+            Attivita? attivitaTrovata = null;
+
+            foreach (Attivita attivitaOperatoreAperta in attivitaOperatoreAperte)
+            {
+                attivitaTrovata = attivita.SingleOrDefault(x => x.Bolla == attivitaOperatoreAperta.Bolla);
+                attivitaOperatoreAperta.QuantitaProdottaContabilizzata = attivitaTrovata != null ? attivitaTrovata.QuantitaProdottaContabilizzata : -1;
+                attivitaOperatoreAperta.QuantitaProdottaNonContabilizzata = attivitaTrovata != null ? attivitaTrovata.QuantitaProdottaNonContabilizzata : 0;
+                attivitaOperatoreAperta.QuantitaScartataContabilizzata = attivitaTrovata != null ? attivitaTrovata.QuantitaScartataContabilizzata : -1;
+                attivitaOperatoreAperta.QuantitaScartataNonContabilizzata = attivitaTrovata != null ? attivitaTrovata.QuantitaScartataNonContabilizzata : 0;
+            }
+
             return attivitaOperatoreAperte;
         }
 

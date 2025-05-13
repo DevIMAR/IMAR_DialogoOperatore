@@ -1,5 +1,7 @@
 ﻿using IMAR_DialogoOperatore.Application;
+using IMAR_DialogoOperatore.Application.Interfaces.Utilities;
 using IMAR_DialogoOperatore.Commands;
+using IMAR_DialogoOperatore.Infrastructure.Utilities;
 using IMAR_DialogoOperatore.Interfaces.Helpers;
 using IMAR_DialogoOperatore.Interfaces.Observers;
 using IMAR_DialogoOperatore.Interfaces.ViewModels;
@@ -11,6 +13,7 @@ namespace IMAR_DialogoOperatore.ViewModels
 	{
 		private readonly IDialogoOperatoreObserver _dialogoOperatoreObserver;
 		private readonly ICercaAttivitaObserver _cercaAttivitaObserver;
+		private readonly IAutoLogoutUtility _autoLogoutUtility;
 		private IAttivitaViewModel? _attivitaSelezionata;
 
 		private string? _bolla;
@@ -117,12 +120,14 @@ namespace IMAR_DialogoOperatore.ViewModels
 			IDialogoOperatoreObserver dialogoOperatoreStore,
 			ICercaAttivitaObserver cercaAttivitaStore,
 			ICercaAttivitaHelper cercaAttivitaUtility,
-			MostraIndiretteCommand mostraIndiretteCommand)
+			IAutoLogoutUtility autoLogoutUtility,
+            MostraIndiretteCommand mostraIndiretteCommand)
         {
             _dialogoOperatoreObserver = dialogoOperatoreStore;
 			_cercaAttivitaObserver = cercaAttivitaStore;
 
             CercaAttivitaHelper = cercaAttivitaUtility;
+            _autoLogoutUtility = autoLogoutUtility;
 
             ApriListaIndirette = mostraIndiretteCommand;
 
@@ -159,6 +164,8 @@ namespace IMAR_DialogoOperatore.ViewModels
             Bolla = null;
             Odp = null;
 			_cercaAttivitaObserver.FaseCercata = string.Empty;
+
+            _autoLogoutUtility.StartLogoutTimer(300);
         }
 
         private void DialogoOperatoreStore_OnAttivitaSelezionataChanged()
