@@ -52,11 +52,13 @@ namespace IMAR_DialogoOperatore.Helpers
 			{
 				case Costanti.INIZIO_LAVORO:
                     result = AggiungiAttivitaAdOperatore(false);
-					break;
+                    AggiornaOperatoreSelezionato();
+                    break;
 
 				case Costanti.INIZIO_ATTREZZAGGIO:
 					result = AggiungiAttivitaAdOperatore(true);
-					break;
+                    AggiornaOperatoreSelezionato();
+                    break;
 
 				case Costanti.AVANZAMENTO:
 					result = AggiornaAttivitaAvanzata();
@@ -64,17 +66,17 @@ namespace IMAR_DialogoOperatore.Helpers
 
 				case Costanti.FINE_LAVORO:
                     result = RimuoviAttivitaDaOperatore();
-					break;
+                    AggiornaOperatoreSelezionato();
+                    break;
 
 				case Costanti.FINE_ATTREZZAGGIO:
 					result = GestisciFineAttrezzaggio();
-					break;
+                    AggiornaOperatoreSelezionato();
+                    break;
 
 				default:
 					break;
             }
-
-            AggiornaOperatoreSelezionato();
             _attivitaGridViewModel.AttivitaSelezionata = null;
 
             return result;
@@ -111,6 +113,9 @@ namespace IMAR_DialogoOperatore.Helpers
 
 		private string? AggiornaAttivitaAvanzata()
         {
+			_dialogoOperatoreObserver.AttivitaSelezionata.QuantitaProdottaNonContabilizzata += _avanzamentoObserver.QuantitaProdotta != null ? (int)_avanzamentoObserver.QuantitaProdotta : 0;
+			_dialogoOperatoreObserver.AttivitaSelezionata.QuantitaScartataNonContabilizzata += _avanzamentoObserver.QuantitaScartata != null ? (int)_avanzamentoObserver.QuantitaScartata : 0;
+
             string? result = _attivitaService.AvanzaAttivita(
                 _operatoreMapper.OperatoreViewModelToOperatore(_dialogoOperatoreObserver.OperatoreSelezionato),
                 _attivitaMapper.AttivitaViewModelToAttivita(_dialogoOperatoreObserver.AttivitaSelezionata),

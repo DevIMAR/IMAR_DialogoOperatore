@@ -13,13 +13,13 @@
 	</Rows>
 
 	<Items>
-		<DxGridLayoutItem Row="0" Column="1">
+		<DxGridLayoutItem Row="0" Column="0">
 			<Template>
-				<InfoOperatoreView />
+				<HeaderToolbar />
 			</Template>
 		</DxGridLayoutItem>
 
-		<DxGridLayoutItem Row="2" Column="1">
+		<DxGridLayoutItem Row="2" Column="0">
 			<Template>
 				<GestoreAttivitaView @ref="GestoreAttivita" />
 			</Template>
@@ -30,6 +30,8 @@
 <PopupDiConfermaView />
 
 <FasiIndirettePopup />
+
+<TaskPopup />
 
 @code {
 	private GestoreAttivitaView GestoreAttivita;

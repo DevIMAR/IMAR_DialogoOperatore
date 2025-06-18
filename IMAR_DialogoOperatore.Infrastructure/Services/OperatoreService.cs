@@ -33,44 +33,51 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
 
 		public Operatore? OttieniOperatore(int? badge)
         {
-			if (badge == null)
-				return null;
+            if (badge == null)
+                return null;
 
             string format = "yyyyMMddHHmmss";
             CultureInfo provider = CultureInfo.InvariantCulture;
 
             IList<mesOpeClk>? ingressiUscite = _jmesApiClient.ChiamaQueryGetJmes<mesOpeClk>();
-			IList<stdTblResBrk>? IniziFiniPause = _jmesApiClient.ChiamaQueryGetJmes<stdTblResBrk>();
+            IList<stdTblResBrk>? iniziFiniPause = _jmesApiClient.ChiamaQueryGetJmes<stdTblResBrk>();
 
-			AngRes? risorsa = _synergyJmesUoW.AngRes.Get(x => !string.IsNullOrEmpty(x.ResNam + x.ResSur))
-													.ToList()
-													.SingleOrDefault(x => x.ResCod.TrimStart('0').Trim() == badge.ToString().TrimStart('0').Trim());
-			if (risorsa == null)
-				return null;
+            AngRes? risorsa = _synergyJmesUoW.AngRes.Get(x => !string.IsNullOrEmpty(x.ResNam + x.ResSur))
+                                                    .ToList()
+                                                    .SingleOrDefault(x => x.ResCod.TrimStart('0').Trim() == badge.ToString().TrimStart('0').Trim());
+            if (risorsa == null)
+                return null;
 
-			Operatore = new Operatore
-			{
-				Badge = risorsa.ResCod.TrimStart('0'),
-				Nome = risorsa.ResNam,
-				Cognome = risorsa.ResSur,
-				Ingresso = DateTime.ParseExact(ingressiUscite.Where(x => x.ID_AngRes368 == risorsa.ResCod).Select(x => x.ID_ClkRes2365).Max() ?? "19000101000000", format, provider),
-				Uscita = DateTime.ParseExact(ingressiUscite.Where(x => x.ID_AngRes368 == risorsa.ResCod).Select(x => x.ID_ClkRes2366).Max() ?? "19000101000000", format, provider),
-				InizioPausa = DateTime.ParseExact(IniziFiniPause.Where(x => x.ID_Res368 == risorsa.ResCod).Select(x => x.ID_ResBrk2426).Max() ?? "19000101000000", format, provider),
-				FinePausa = DateTime.ParseExact(IniziFiniPause.Where(x => x.ID_Res368 == risorsa.ResCod).Select(x => x.ID_ResBrk2427).Max() ?? "19000101000000", format, provider),
-				AttivitaAperte = _attivitaService.OttieniAttivitaOperatore(risorsa.ResCod),
-				IdJMes = (int)risorsa.Uid
-			};
+            Operatore = new Operatore
+            {
+                Badge = risorsa.ResCod.TrimStart('0'),
+                Nome = risorsa.ResNam,
+                Cognome = risorsa.ResSur,
+                Ingresso = DateTime.ParseExact(ingressiUscite.Where(x => x.ID_AngRes368 == risorsa.ResCod).Select(x => x.ID_ClkRes2365).Max() ?? "19000101000000", format, provider),
+                Uscita = DateTime.ParseExact(ingressiUscite.Where(x => x.ID_AngRes368 == risorsa.ResCod).Select(x => x.ID_ClkRes2366).Max() ?? "19000101000000", format, provider),
+                InizioPausa = DateTime.ParseExact(iniziFiniPause.Where(x => x.ID_Res368 == risorsa.ResCod).Select(x => x.ID_ResBrk2426).Max() ?? "19000101000000", format, provider),
+                FinePausa = DateTime.ParseExact(iniziFiniPause.Where(x => x.ID_Res368 == risorsa.ResCod).Select(x => x.ID_ResBrk2427).Max() ?? "19000101000000", format, provider),
+                AttivitaAperte = _attivitaService.OttieniAttivitaOperatore(risorsa.ResCod),
+                IdJMes = (int)risorsa.Uid
+            };
 
-            Attivita? attivitaDirettaApertaDaOperatore = Operatore.AttivitaAperte.FirstOrDefault(x => !x.Bolla.Contains("AI"));
-            if (attivitaDirettaApertaDaOperatore != null)
-                Operatore.MacchinaAssegnata = _macchinaService.GetMacchinaFittiziaByFirstAttivitaAperta(attivitaDirettaApertaDaOperatore, Operatore.IdJMes);
+            AssegnaMacchinaAdOperatore();
 
             Operatore.Stato = GetStatus();
 
-			return Operatore;
-		}
+            return Operatore;
+        }
 
-		private string GetStatus()
+        private void AssegnaMacchinaAdOperatore()
+        {
+            Attivita? attivitaDirettaApertaDaOperatore = Operatore.AttivitaAperte.FirstOrDefault(x => !x.Bolla.Contains("AI"));
+            if (attivitaDirettaApertaDaOperatore != null)
+                Operatore.MacchinaAssegnata = _macchinaService.GetMacchinaFittiziaByFirstAttivitaAperta(attivitaDirettaApertaDaOperatore, Operatore.IdJMes);
+            else
+                Operatore.MacchinaAssegnata = _macchinaService.GetPrimaMacchinaFittiziaNonUtilizzata();
+        }
+
+        private string GetStatus()
 		{
 			if (Operatore.Uscita >= Operatore.Ingresso)
 				return Costanti.ASSENTE;

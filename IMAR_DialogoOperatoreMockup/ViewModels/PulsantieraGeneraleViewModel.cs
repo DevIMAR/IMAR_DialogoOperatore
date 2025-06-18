@@ -2,7 +2,6 @@
 using IMAR_DialogoOperatore.Commands;
 using IMAR_DialogoOperatore.Interfaces.Observers;
 using IMAR_DialogoOperatore.Interfaces.ViewModels;
-using IMAR_DialogoOperatore.Observers;
 using System.Windows.Input;
 
 namespace IMAR_DialogoOperatore.ViewModels

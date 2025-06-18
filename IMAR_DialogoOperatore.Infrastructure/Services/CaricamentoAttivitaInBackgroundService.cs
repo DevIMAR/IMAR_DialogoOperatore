@@ -3,6 +3,7 @@ using IMAR_DialogoOperatore.Application.Interfaces.Repositories;
 using IMAR_DialogoOperatore.Application.Interfaces.UoW;
 using IMAR_DialogoOperatore.Domain.Models;
 using Microsoft.Extensions.DependencyInjection;
+using System.Diagnostics;
 
 namespace IMAR_DialogoOperatore.Infrastructure.Services
 {
@@ -13,7 +14,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
         private readonly Timer _timerDatiDaMonitor;
         private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
 
-        private string _odpDatiMonitor;
+        private List<string> _odpDatiMonitor;
         private IList<Attivita>? _attivitaAperte;
         private IList<stdMesIndTsk>? _attivitaIndirette;
 
@@ -25,45 +26,66 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
             _attivitaIndirette = new List<stdMesIndTsk>();
 
             _timerDatiDaMonitor = new Timer(UpdateDatiDaMonitor, null, TimeSpan.Zero, TimeSpan.FromMinutes(15));
-            _timer = new Timer(UpdateAttivita, null, TimeSpan.Zero, TimeSpan.FromSeconds(10));
+            _timer = new Timer(UpdateAttivita, null, TimeSpan.Zero, TimeSpan.FromSeconds(5));
         }
 
         private void UpdateAttivita(object? state)
         {
+            if (_odpDatiMonitor == null)
+                return;
+
             try
             {
+                Stopwatch stopwatch = Stopwatch.StartNew();
+
                 using var scope = _serviceProvider.CreateScope();
                 var jmesApiClient = scope.ServiceProvider.GetRequiredService<IJmesApiClient>();
                 var as400Repository = scope.ServiceProvider.GetRequiredService<IAs400Repository>();
 
-                var nuoveAttivita = as400Repository.ExecuteQuery<Attivita>(@"SELECT
-                                                                             NRBLCI AS BOLLA, ORPRCI AS ODP, CDARCI AS ARTICOLO, trim(DSARMA) AS DESCRIZIONEARTICOLO, 
-                                                                             CDFACI AS FASE, DSFACI AS DESCRIZIONEFASE, PF2.QORDCI AS QUANTITAORDINE, 
-                                                                             COALESCE(SUM(jf.QTVERJM), 0) AS QUANTITAPRODOTTANONCONTABILIZZATA, 
-                                                                             pf2.QPROCI AS QUANTITAPRODOTTACONTABILIZZATA,
-                                                                             COALESCE(SUM(jf.QTSCAJM), 0) AS QUNATITASCARTATANONCONTABILIZZATA, 
-                                                                             pf2.QSCACI AS QUANTITASCARTATACONTABILIZZATA,
-                                                                             COALESCE(SUM(jf.QTNCOJM), 0) AS QTANONCONFORMENONCONTABILIZZATA,
-                                                                             pf2.QRESCI AS QTANONCONFORMECONTABILIZZATA,
-                                                                             CASE WHEN MAX(SAACCJM) IS NULL THEN max(TIRECI) ELSE  MAX(SAACCJM) end AS SALDOACCONTO
-                                                                             FROM IMA90DAT.PCIMP00F pf2 
-                                                                             JOIN IMA90DAT.MGART00F mf ON pf2.CDARCI = mf.CDARMA 
-                                                                             LEFT JOIN IMA90DAT.JMRILM00F jf ON NRBLCI = NRTSKJM AND jf.QCONTJM = ''
-                                                                             WHERE ORPRCI IN (" + _odpDatiMonitor + @")
-                                                                             GROUP BY NRBLCI, ORPRCI, CDARCI, DSARMA, 
-                                                                             CDFACI, DSFACI, PF2.QORDCI, QPROCI , QSCACI, QRESCI");
+                List<Attivita> nuoveAttivita = new List<Attivita>();
+
+                decimal dimensioneBatch = 1000;
+                decimal batchCount = Math.Ceiling(_odpDatiMonitor.Count / dimensioneBatch);
+
+                for (int i = 0; i < batchCount; i++)
+                {
+                    var batchConsiderato = Math.Min((int)dimensioneBatch, _odpDatiMonitor.Count - (int)dimensioneBatch * i);
+                    var batchOdp = string.Join(',', _odpDatiMonitor.Slice((int)dimensioneBatch * i, batchConsiderato));
+
+                    var batchAttivita = as400Repository.ExecuteQuery<Attivita>(@"SELECT
+                                                                                 NRBLCI AS BOLLA, ORPRCI AS ODP, CDARCI AS ARTICOLO, trim(DSARMA) AS DESCRIZIONEARTICOLO, 
+                                                                                 CDFACI AS FASE, DSFACI AS DESCRIZIONEFASE, PF2.QORDCI AS QUANTITAORDINE, 
+                                                                                 COALESCE(SUM(jf.QTVERJM), 0) AS QUANTITAPRODOTTANONCONTABILIZZATA, 
+                                                                                 pf2.QPROCI AS QUANTITAPRODOTTACONTABILIZZATA,
+                                                                                 COALESCE(SUM(jf.QTSCAJM), 0) AS QUNATITASCARTATANONCONTABILIZZATA, 
+                                                                                 pf2.QSCACI AS QUANTITASCARTATACONTABILIZZATA,
+                                                                                 COALESCE(SUM(jf.QTNCOJM), 0) AS QTANONCONFORMENONCONTABILIZZATA,
+                                                                                 pf2.QRESCI AS QTANONCONFORMECONTABILIZZATA,
+                                                                                 CASE WHEN MAX(SAACCJM) IS NULL THEN max(TIRECI) ELSE  MAX(SAACCJM) end AS SALDOACCONTO
+                                                                                 FROM IMA90DAT.PCIMP00F pf2 
+                                                                                 JOIN IMA90DAT.MGART00F mf ON pf2.CDARCI = mf.CDARMA 
+                                                                                 LEFT JOIN IMA90DAT.JMRILM00F jf ON NRBLCI = NRTSKJM AND jf.QCONTJM = ''
+                                                                                 WHERE ORPRCI IN (" + batchOdp + @")
+                                                                                 GROUP BY NRBLCI, ORPRCI, CDARCI, DSARMA, CDFACI, DSFACI,
+                                                                                          pf2.QORDCI, pf2.QPROCI, pf2.QSCACI, pf2.QRESCI");
+
+                    nuoveAttivita.AddRange(batchAttivita);
+                }
 
                 var attivitaIndirette = jmesApiClient.ChiamaQueryGetJmes<stdMesIndTsk>();
 
                 _lock.EnterWriteLock();
                 try
                 {
-                    _attivitaAperte = nuoveAttivita.ToList();
+                    _attivitaAperte = nuoveAttivita;
                     _attivitaIndirette = attivitaIndirette;
                 }
                 finally
                 {
                     _lock.ExitWriteLock();
+
+                    stopwatch.Stop();
+                    Console.WriteLine(stopwatch.Elapsed.ToString());
                 }
             }
             catch (Exception ex)
@@ -80,17 +102,11 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
             _lock.EnterWriteLock();
             try
             {
-                _odpDatiMonitor = "'";
-                List<DATIMONITOR> datiMonitor = imarSchedulatoreUoW.DatiMonitorRepository.Get()
-                                                .OrderBy(x => x.ODP)
-                                                .ThenBy(x => x.FASE)
+                _odpDatiMonitor = imarSchedulatoreUoW.DatiMonitorRepository.Get()
+                                                .Select(x => x.ODP)
+                                                .Distinct()
+                                                .Order()
                                                 .ToList();
-
-                foreach (DATIMONITOR dato in datiMonitor)
-                {
-                    _odpDatiMonitor += dato.ODP + "'";
-                    _odpDatiMonitor += dato == datiMonitor.Last() ? string.Empty : ",'";
-                }
             }
             finally
             {

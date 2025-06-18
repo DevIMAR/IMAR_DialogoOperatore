@@ -16,6 +16,8 @@ namespace IMAR_DialogoOperatore
                 .AddInteractiveServerComponents();
 
             builder.Services.AddDevExpressBlazor(configure => configure.BootstrapVersion = BootstrapVersion.v5);
+            builder.Services.AddServerSideBlazor()
+                            .AddCircuitOptions(options => { options.DetailedErrors = true; });
 
             builder.Services.AddApplicationServices();
             builder.Services.AddInfrastructureServices();

@@ -4,12 +4,7 @@
 @inject InfoOperatoreViewModel InfoOperatoreViewModel
 @inject IDialogoOperatoreObserver DialogoOperatoreObserver
 
-<DxGridLayout class="d-flex justify-content-center align-items-center testo-grande">
-	<Rows>
-		<DxGridLayoutRow Height="25%" />
-		<DxGridLayoutRow Height="70%" />
-		<DxGridLayoutRow Height="5%" />
-	</Rows>
+<DxGridLayout>
 	<Columns>
 		<DxGridLayoutColumn Width="auto" />
 		<DxGridLayoutColumn />
@@ -17,7 +12,7 @@
 	</Columns>
 
 	<Items>
-		<DxGridLayoutItem Row="1" Column="0">
+		<DxGridLayoutItem Column="0">
 			<Template>
 				<div style="display:flex;">
 					<div style="margin-right:5px">
@@ -34,7 +29,7 @@
 			</Template>
 		</DxGridLayoutItem>
 
-		<DxGridLayoutItem Row="1" Column="1"
+		<DxGridLayoutItem Column="1"
 						  Visible="@InfoOperatoreViewModel.IsInfoVisible">
 			<Template>
 				<div style="display:flex;"

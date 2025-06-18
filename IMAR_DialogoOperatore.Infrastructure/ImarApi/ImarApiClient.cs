@@ -1,5 +1,6 @@
 ﻿using IMAR_DialogoOperatore.Application.DTOs;
 using IMAR_DialogoOperatore.Application.Interfaces.Clients;
+using IMAR_DialogoOperatore.Domain.Models;
 using Newtonsoft.Json;
 using System.Net.Http.Headers;
 using System.Text;
@@ -21,6 +22,21 @@ namespace IMAR_DialogoOperatore.Infrastructure.ImarApi
             response.EnsureSuccessStatusCode();
             string responseBody = await response.Content.ReadAsStringAsync();
             return JsonConvert.DeserializeObject<CostiArticoloDTO>(responseBody);
+        }
+
+        public async Task<string> SendTaskAsana(TaskAsana taskAsana, string creatoreTask)
+        {
+            HttpClient client = new HttpClient();
+            SetAutentication(client);
+            var url = hostConnection + "pms/Asana/CreateTaskFromJson?createdBy=" + creatoreTask;
+            string json = JsonConvert.SerializeObject(taskAsana);
+
+            var buffer = System.Text.Encoding.UTF8.GetBytes(json);
+            var byteContent = new ByteArrayContent(buffer);
+            byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+
+            HttpResponseMessage response = client.PostAsync(url, byteContent).Result;
+            return await response.Content.ReadAsStringAsync();
         }
 
         private void SetAutentication(HttpClient client)

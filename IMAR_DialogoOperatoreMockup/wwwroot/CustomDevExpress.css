@@ -1,7 +1,11 @@
 ﻿.dxbl-progress-bar {
     --dxbl-progress-bar-track-color: #9f0000;
     --dxbl-progress-bar-indicator-color: #31bd3d;
-    --dxbl-progress-bar-label-font-size: 1.668dvh !important;
+    --dxbl-progress-bar-label-font-size: 3dvh !important;
+}
+
+.dxbl-progress-bar-label-container > p {
+    line-height: 3dvh !important;
 }
 
 .dxbl-grid {

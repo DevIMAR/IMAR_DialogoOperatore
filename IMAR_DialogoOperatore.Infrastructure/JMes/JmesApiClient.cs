@@ -2,7 +2,6 @@
 using IMAR_DialogoOperatore.Application.Interfaces.Clients;
 using IMAR_DialogoOperatore.Application.Interfaces.Utilities;
 using IMAR_DialogoOperatore.Domain.Models;
-using IMAR_DialogoOperatore.Infrastructure.Utilities;
 using Newtonsoft.Json.Linq;
 using System.Text;
 
@@ -14,7 +13,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.JMes
         private const string JMES_LOGIN_PATH = "base/appLogin?app=imarConnect-jmes&key=";
         private const string DIAOPE_LOGIN_PATH = "base/appLogin?app=imarConnect-DiaOpe&key=";
         private const string JMES_LOGIN_TOKEN = "1hWP47cnCCmH9Ob5WxFttYl2FP4O5lvqPfWIHJm9dnfN4Jx2OJQcn296rRxVZ4FEuPqAYy6PJx09bKl1qHgEqN6LM";
-        private const string DIAOPE_LOGIN_TOKEN = "FdwJGwemTrW7e60iQWsRoYloazVkA7EOUCVCyMKOczYA6ohRkoFVmlAbzXsflSOc0ZVfc5K5Ovrf48PMtdVuL2iq8iHiHt";
+        private const string DIAOPE_LOGIN_TOKEN = "ekmeJ216zWHSdHXuT2kxTqp6l3aWL2WUEKaODo57TzC5inv4I1FbQ5UNioMaOFg8b3f31WHl2FUWJ7AEUz5VhTfQDbljBFB3sadY";
         private const string TOKEN = "B02F752B0299BD1B5C35B82823B53185";
         private const string WIZARD_WORK_PATH = "spec/sys/wzd/start";
         private const string QUERY_WORK_PATH = "spec/sys/qry/exec";

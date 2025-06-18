@@ -1,0 +1,15 @@
+<svg width="16" height="16" viewBox="0 0 120 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+	<!-- Balloon da fumetto -->
+	<path fill="none" stroke="currentColor" stroke-width="8"
+		  d="M15 0 h90 a10 10 0 0 1 10 10 v60 a10 10 0 0 1 -10 10 h-25 l-15 15 -5 -15 h-45 a10 10 0 0 1 -10 -10 v-60 a10 10 0 0 1 10 -10 z"/>
+
+	<!-- Triangolo di avvertimento -->
+	<polygon points="25,70 60,10 95,70"
+			 fill="none" stroke="currentColor" stroke-width="8"/>
+
+	<!-- Punto esclamativo -->
+	<line x1="60" y1="27" x2="60" y2="55"
+		  stroke="currentColor" stroke-width="7.5"/>
+	<circle cx="60" cy="60" r="4"
+			fill="currentColor" />
+</svg>

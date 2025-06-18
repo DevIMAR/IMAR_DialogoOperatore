@@ -98,9 +98,6 @@ namespace IMAR_DialogoOperatore.Services
 
         public string? AvanzaAttivita(Operatore operatore, Attivita attivitaDaAvanzare, int quantitaProdotta, int quantitaScartata)
         {
-            attivitaDaAvanzare.QuantitaProdottaNonContabilizzata += quantitaProdotta;
-            attivitaDaAvanzare.QuantitaScartataNonContabilizzata += quantitaScartata;
-
             if (attivitaDaAvanzare.SaldoAcconto != "S")
                 attivitaDaAvanzare.QuantitaResidua = attivitaDaAvanzare.QuantitaOrdine - attivitaDaAvanzare.QuantitaProdottaNonContabilizzata;
 
@@ -169,47 +166,34 @@ namespace IMAR_DialogoOperatore.Services
 
         private List<Attivita> OttieniAttivitaOperatoreAperte(IList<mesEvtOpe> attivitaOperatore, IList<mesDiaOpe> attivitaAperte)
         {
-            List<Attivita> attivitaOperatoreAperte = attivitaAperte
+            IEnumerable<Attivita> attivitaOperatoreAperte = attivitaAperte
                                                     .Join(attivitaOperatore,
                                                             aa => aa.ID_Evt3240,
                                                             ao => ao.ID_Ope3278,
                                                             (aa, ao) => new Attivita
                                                             {
                                                                 Bolla = aa.ID_Det3350,
-                                                                Odp = aa.ID_Det3353,
-                                                                Fase = aa.ID_Det3355,
-                                                                DescrizioneFase = aa.ID_Det3356,
-                                                                Articolo = aa.ID_Det3358,
-                                                                DescrizioneArticolo = aa.ID_Det3359,
-                                                                QuantitaOrdine = (int)aa.ID_Det3375,
-                                                                QuantitaProdottaNonContabilizzata = (int)aa.ID_Det3371,
-                                                                QuantitaScartataNonContabilizzata = (int)aa.ID_Det3372,
-                                                                QuantitaResidua = (int)aa.ID_Det3374,
                                                                 CodiceJMes = aa.ID_Det3348,
-                                                                Causale = _statoAttivitaMapper.FromJMesStatus(aa.ID_Sts3130),
-
-                                                                //Placeholder
-                                                                SaldoAcconto = "A"
+                                                                Causale = _statoAttivitaMapper.FromJMesStatus(aa.ID_Sts3130)
                                                             })
                                                     .Where(x => x.Causale == Costanti.IN_LAVORO ||
                                                                 x.Causale == Costanti.IN_ATTREZZAGGIO ||
                                                                 x.Causale == Costanti.LAVORO_SOSPESO ||
-                                                                x.Causale == Costanti.ATTREZZAGGIO_SOSPESO)
-                                                    .ToList();
+                                                                x.Causale == Costanti.ATTREZZAGGIO_SOSPESO);
 
-            IList<Attivita> attivita = _caricamentoAttivitaInBackroundService.GetAttivitaAperte();
-            Attivita? attivitaTrovata = null;
+            List<Attivita> attivita = _caricamentoAttivitaInBackroundService.GetAttivitaAperte()
+                                       .Join(attivitaOperatoreAperte,
+                                             a => a.Bolla,
+                                             aoa => aoa.Bolla,
+                                             (a, aoa) =>
+                                             {
+                                                 a.Causale = aoa.Causale;
+                                                 a.CodiceJMes = aoa.CodiceJMes;
+                                                 return a;
+                                             })
+                                       .ToList();
 
-            foreach (Attivita attivitaOperatoreAperta in attivitaOperatoreAperte)
-            {
-                attivitaTrovata = attivita.SingleOrDefault(x => x.Bolla == attivitaOperatoreAperta.Bolla);
-                attivitaOperatoreAperta.QuantitaProdottaContabilizzata = attivitaTrovata != null ? attivitaTrovata.QuantitaProdottaContabilizzata : -1;
-                attivitaOperatoreAperta.QuantitaProdottaNonContabilizzata = attivitaTrovata != null ? attivitaTrovata.QuantitaProdottaNonContabilizzata : 0;
-                attivitaOperatoreAperta.QuantitaScartataContabilizzata = attivitaTrovata != null ? attivitaTrovata.QuantitaScartataContabilizzata : -1;
-                attivitaOperatoreAperta.QuantitaScartataNonContabilizzata = attivitaTrovata != null ? attivitaTrovata.QuantitaScartataNonContabilizzata : 0;
-            }
-
-            return attivitaOperatoreAperte;
+            return attivita;
         }
 
         private List<Attivita> OttieniAttivitaIndiretteOperatoreAperte(IList<mesDiaOpe> attivitaAperte, IList<mesTskForOpe> attivitaIndiretteOperatore)

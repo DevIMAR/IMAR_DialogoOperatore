@@ -176,19 +176,20 @@
 		<DxGridLayoutItem Row="8" RowSpan="3"
 						  Column="1" ColumnSpan="2">
 			<Template>
-				<DxProgressBar Type="ProgressBarType.Circular"
+				<DxProgressBar Type="ProgressBarType.Horizontal"
 							   MaxValue="@AttivitaDetailsViewModel.QuantitaOrdine"
 							   Value="@AttivitaDetailsViewModel.QuantitaProdottaPrecedentemente"
-							   Size="10dvh"
-							   Thickness="8px"
+							   Size="12dvw"
+							   Thickness="15px"
 							   Label="@AttivitaDetailsViewModel.CompletamentoFase"
 							   LabelPosition="ProgressBarLabelPosition.Top"
-							   ShowLabel="true" />
+							   ShowLabel="true" 
+							   CssClass="mt-2" />
 			</Template>
 		</DxGridLayoutItem>
 
 		<DxGridLayoutItem Row="8"
-						  Column="4" ColumnSpan="5">
+						  Column="6" ColumnSpan="5">
 			<Template>
 				<div class="d-flex h-100 testo-medio">
 					<label>Qt. RESIDUA: @AttivitaDetailsViewModel.QuantitaResidua</label>
@@ -197,7 +198,7 @@
 		</DxGridLayoutItem>
 
 		<DxGridLayoutItem Row="9"
-						  Column="4" ColumnSpan="5">
+						  Column="6" ColumnSpan="5">
 			<Template>
 				<div class="d-flex h-100 testo-medio">
 					<label>Qt. SCARTATA TOTALE: @AttivitaDetailsViewModel.QuantitaScartataTotale</label>
@@ -206,7 +207,7 @@
 		</DxGridLayoutItem>
 
 		<DxGridLayoutItem Row="10"
-						  Column="4" ColumnSpan="5">
+						  Column="6" ColumnSpan="5">
 			<Template>
 				<div class="d-flex h-100 testo-medio">
 					<label>@AttivitaDetailsViewModel.StatoAttivita</label>
@@ -375,6 +376,9 @@
 	{
 		if (string.IsNullOrWhiteSpace(OdpRef.Value) || AttivitaDetailsViewModel.IsAttivitaSelezionata)
 			return;
+
+		while (OdpRef.Value.Length < 8)
+			OdpRef.Value = "0" + OdpRef.Value;
 
 		AttivitaDetailsViewModel.Bolla = string.Empty;
 

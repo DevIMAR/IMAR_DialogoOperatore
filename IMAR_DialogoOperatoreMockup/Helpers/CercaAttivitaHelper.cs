@@ -51,7 +51,7 @@ namespace IMAR_DialogoOperatore.Helpers
 
 			if (string.IsNullOrEmpty(attivita.Odp))
 			{
-				_dialogoOperatoreObserver.AttivitaSelezionata = new AttivitaViewModel(attivita);
+				_dialogoOperatoreObserver.AttivitaSelezionata = null;
 				return;
 			}
 

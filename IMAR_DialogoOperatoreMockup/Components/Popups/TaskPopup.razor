@@ -1,0 +1,80 @@
+﻿@using IMAR_DialogoOperatore.ViewModels;
+
+@inject TaskPopupViewModel TaskPopupViewModel
+
+<DxPopup @bind-Visible="@TaskPopupViewModel.Visible"
+		 HeaderText="Invio notifica errore"
+		 ShowHeader="true"
+		 ShowCloseButton="true"
+		 CloseOnOutsideClick="false"
+		 ShowFooter="true"
+		 EnableAdaptivity="true"
+		 Width="35%">
+	<BodyContentTemplate>
+		<DxGridLayout>
+			<Rows>
+				<DxGridLayoutRow Height="auto" />
+				<DxGridLayoutRow />
+			</Rows>
+
+			<Columns>
+				<DxGridLayoutColumn />
+				<DxGridLayoutColumn />
+			</Columns>
+
+			<Items>
+				<DxGridLayoutItem Row="0" Column="0"
+								  CssClass="m-1">
+					<Template>
+						<label>Categoria errore</label>
+						<DxComboBox Data="@TaskPopupViewModel.CategorieErrori" 
+									@bind-Value="@TaskPopupViewModel.CategoriaErroreSelezionata"
+									CssClass="mt-1" />
+					</Template>
+				</DxGridLayoutItem>
+
+				<DxGridLayoutItem Row="1" 
+								  Column="0" ColumnSpan="2"
+								  CssClass="m-1">
+					<Template>
+						<label>Descrizione errore</label>
+						<DxMemo @bind-Text="@TaskPopupViewModel.TaskAsana.Html_notes" 
+								NullText="Inserisci la descrizione dell'errore"
+								Rows="10"
+								CssClass="mt-1" 
+								Enabled="@TaskPopupViewModel.IsDescrizioneErroreAttiva" />
+					</Template>
+				</DxGridLayoutItem>
+			</Items>
+		</DxGridLayout>
+	</BodyContentTemplate>
+
+	<FooterContentTemplate>
+		<DxButton Text="Annulla"
+				  Click="@AnnullaHandler"
+				  RenderStyle="ButtonRenderStyle.Warning"
+				  RenderStyleMode="ButtonRenderStyleMode.Outline"
+				  CssClass="d-flex justify-content-center align-items-center conferma-dettagli" />
+
+		<DxButton Text="Conferma"
+				  Click="@TaskPopupViewModel.InviaTaskCommand.Execute"
+				  Enabled="TaskPopupViewModel.InviaTaskCommand.CanExecute(null)"
+				  RenderStyle="ButtonRenderStyle.Warning"
+				  CssClass="d-flex justify-content-center align-items-center conferma-dettagli" />
+	</FooterContentTemplate>
+</DxPopup>
+
+@code {
+	protected override void OnInitialized()
+	{
+		TaskPopupViewModel.NotifyStateChanged += TaskPopupViewModel_NotifyStateChanged;
+		base.OnInitialized();
+	}
+
+	private async void TaskPopupViewModel_NotifyStateChanged() => await InvokeAsync(StateHasChanged);
+
+	void AnnullaHandler()
+	{
+		TaskPopupViewModel.Visible = false;
+	}
+}

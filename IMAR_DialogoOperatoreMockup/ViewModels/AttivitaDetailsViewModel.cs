@@ -1,7 +1,6 @@
 ﻿using IMAR_DialogoOperatore.Application;
 using IMAR_DialogoOperatore.Application.Interfaces.Utilities;
 using IMAR_DialogoOperatore.Commands;
-using IMAR_DialogoOperatore.Infrastructure.Utilities;
 using IMAR_DialogoOperatore.Interfaces.Helpers;
 using IMAR_DialogoOperatore.Interfaces.Observers;
 using IMAR_DialogoOperatore.Interfaces.ViewModels;
@@ -38,9 +37,11 @@ namespace IMAR_DialogoOperatore.ViewModels
 		public string QuantitaResidua => _attivitaSelezionata != null ? _attivitaSelezionata.QuantitaResidua.ToString() : "0";
 		public string QuantitaScartataTotale => _attivitaSelezionata != null ? _attivitaSelezionata.QuantitaScartata.ToString() : "0";
 		public string StatoAttivita => (_attivitaSelezionata != null && _attivitaSelezionata.SaldoAcconto == Costanti.SALDO) ? Costanti.ATTIVITA_COMPLETATA : Costanti.ATTIVITA_NON_COMPLETATA;
-		public bool IsAttivitaSelezionata => _dialogoOperatoreObserver.AttivitaSelezionata != null;
+		public bool IsAttivitaSelezionata => _dialogoOperatoreObserver.AttivitaSelezionata?.Bolla == Bolla &&
+											 _dialogoOperatoreObserver.AttivitaSelezionata?.Odp == Odp;
 
-		public string? Bolla
+
+        public string? Bolla
 		{
 			get { return _bolla; }
 			set
