@@ -1,4 +1,5 @@
 ﻿using IMAR_DialogoOperatore.Application.Interfaces.Clients;
+using IMAR_DialogoOperatore.Interfaces.Observers;
 using IMAR_DialogoOperatore.ViewModels;
 
 namespace IMAR_DialogoOperatore.Commands
@@ -7,13 +8,16 @@ namespace IMAR_DialogoOperatore.Commands
     {
         private readonly TaskPopupViewModel _taskPopupViewModel;
         private readonly IImarApiClient _imarApiClient;
+        private readonly IDialogoOperatoreObserver _dialogoOperatoreObserver;
 
         public InviaTaskCommand(
             TaskPopupViewModel taskPopupViewModel,
-            IImarApiClient imarApiClient)
+            IImarApiClient imarApiClient,
+            IDialogoOperatoreObserver dialogoOperatoreObserver)
         {
             _taskPopupViewModel = taskPopupViewModel;
             _imarApiClient = imarApiClient;
+            _dialogoOperatoreObserver = dialogoOperatoreObserver;
         }
 
         public override bool CanExecute(object? parameter)
@@ -22,9 +26,12 @@ namespace IMAR_DialogoOperatore.Commands
                    !string.IsNullOrWhiteSpace(_taskPopupViewModel.TaskAsana.Html_notes); 
         }
 
-        public override void Execute(object? parameter)
+        public override async void Execute(object? parameter)
         {
-            _imarApiClient.SendTaskAsana(_taskPopupViewModel.TaskAsana, "server@imarsrl.com");
+            string firmaOperatore = _dialogoOperatoreObserver.OperatoreSelezionato.Nome + " " + _dialogoOperatoreObserver.OperatoreSelezionato.Cognome;
+            _taskPopupViewModel.TaskAsana.Html_notes += "\n\n" + firmaOperatore;
+
+            string feedback = await _imarApiClient.SendTaskAsana(_taskPopupViewModel.TaskAsana, "server@imarsrl.com");
 
             _taskPopupViewModel.Visible = false;
         }

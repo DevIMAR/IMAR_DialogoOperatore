@@ -1,6 +1,11 @@
-﻿@using IMAR_DialogoOperatore.ViewModels;
+﻿@using IMAR_DialogoOperatore.Application
+@using IMAR_DialogoOperatore.Application.Interfaces.Utilities
+@using IMAR_DialogoOperatore.Interfaces.Observers
+@using IMAR_DialogoOperatore.ViewModels;
 
 @inject TaskPopupViewModel TaskPopupViewModel
+@inject IDialogoOperatoreObserver DialogoOperatoreObserver
+@inject IAutoLogoutUtility AutoLogoutUtility
 
 <DxPopup @bind-Visible="@TaskPopupViewModel.Visible"
 		 HeaderText="Invio notifica errore"
@@ -9,7 +14,11 @@
 		 CloseOnOutsideClick="false"
 		 ShowFooter="true"
 		 EnableAdaptivity="true"
-		 Width="35%">
+		 Width="35%"
+		 @onkeydown="RestartAutoLogoutTimer"
+		 @onclick="RestartAutoLogoutTimer"
+		 @onmousemove="RestartAutoLogoutTimer"
+		 @onmousedown="RestartAutoLogoutTimer">
 	<BodyContentTemplate>
 		<DxGridLayout>
 			<Rows>
@@ -72,6 +81,20 @@
 	}
 
 	private async void TaskPopupViewModel_NotifyStateChanged() => await InvokeAsync(StateHasChanged);
+
+	private void RestartAutoLogoutTimer()
+	{
+		if (isRestartTimerActive())
+			AutoLogoutUtility.RestartTimer();
+	}
+
+	private bool isRestartTimerActive()
+	{
+		return AutoLogoutUtility.IsActive &&
+			   DialogoOperatoreObserver.OperatoreSelezionato != null &&
+			   DialogoOperatoreObserver.OperatoreSelezionato.Stato != Costanti.ASSENTE &&
+			   DialogoOperatoreObserver.OperatoreSelezionato.Stato != Costanti.IN_PAUSA;
+	}
 
 	void AnnullaHandler()
 	{

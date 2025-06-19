@@ -14,7 +14,7 @@ namespace IMAR_DialogoOperatore.ViewModels
         private TaskAsana _taskAsana;
         private string _categoriaErroreSelezionata;
 
-        public List<string> CategorieErrori => new List<string>() { "---", "Quantità prodotta errata", "Quantità scartata errata", "Chiusura a saldo errata", "Timbratura errata" };
+        public List<string> CategorieErrori => new List<string>() { "Quantità prodotta errata", "Quantità scartata errata", "Chiusura a saldo errata", "Timbratura errata", "Altro"};
         public bool IsDescrizioneErroreAttiva => CategoriaErroreSelezionata != null;
 
         public ICommand InviaTaskCommand { get; }
@@ -57,7 +57,7 @@ namespace IMAR_DialogoOperatore.ViewModels
             IImarApiClient imarApiClient)
         {
             _dialogoOperatoreObserver = dialogoOperatoreObserver;
-            InviaTaskCommand = new InviaTaskCommand(this, imarApiClient);
+            InviaTaskCommand = new InviaTaskCommand(this, imarApiClient, dialogoOperatoreObserver);
         }
 
         private void InizializzaCampi()
@@ -105,6 +105,11 @@ namespace IMAR_DialogoOperatore.ViewModels
                                            "Badge: " + _dialogoOperatoreObserver.OperatoreSelezionato.Badge + "\n" +
                                            "Tipologia timbratura (entrata/uscita): \n" +
                                            "Orario timbratura (approssimativo): \n";
+                    break;
+
+                case "Altro":
+                    TaskAsana.Name = "Richiesta per altro errore: leggere descrizione";
+                    TaskAsana.Html_notes = "";
                     break;
 
                 default:
