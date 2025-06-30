@@ -21,11 +21,13 @@ namespace IMAR_DialogoOperatore
 			services.AddScoped<IDialogoOperatoreObserver, DialogoOperatoreObserver>();
 			services.AddScoped<IPopupObserver, PopupObserver>();
 			services.AddScoped<ISegnalazioneObserver, SegnalazioneObserver>();
+			services.AddScoped<ITaskCompilerObserver, TaskCompilerObserver>();
 
 			services.AddScoped<ICercaAttivitaHelper, CercaAttivitaHelper>();
 			services.AddScoped<IConfermaOperazioneHelper, ConfermaOperazioneHelper>();
 			services.AddScoped<IInterruzioneAttivitaHelper, InterruzioneAttivitaHelper>();
 			services.AddScoped<IPopupConfermaHelper, PopupConfermaHelper>();
+			services.AddScoped<ITaskCompilerHelper, AsanaTaskCompilerHelper>();
 
 			services.AddScoped<IAttivitaMapper, AttivitaMapper>();
 			services.AddScoped<IOperatoreMapper, OperatoreMapper>();
@@ -34,6 +36,7 @@ namespace IMAR_DialogoOperatore
 			services.AddScoped<AttivitaDetailsViewModel>();
 			services.AddScoped<AttivitaGridViewModel>();
 			services.AddScoped<AvanzamentoAttivitaViewModel>();
+			services.AddScoped<CompilatoreTaskViewModel>();
 			services.AddScoped<DialogoOperatoreViewModel>();
 			services.AddScoped<DocumentaleViewModel>();
 			services.AddScoped<FasiIndiretteGridViewModel>();
@@ -41,7 +44,9 @@ namespace IMAR_DialogoOperatore
 			services.AddScoped<FormSegnalazioneDifformitaViewModel>();
 			services.AddScoped<GestoreAttivitaViewModel>();
 			services.AddScoped<HeaderToolbarViewModel>();
+			services.AddScoped<InfoBaseAttivitaViewModel>();
 			services.AddScoped<InfoOperatoreViewModel>();
+			services.AddScoped<InfoTaskOperatoreViewModel>();
 			services.AddScoped<PopupDiConfermaViewModel>();
 			services.AddScoped<PulsantieraGeneraleViewModel>();
 			services.AddScoped<TaskPopupViewModel>();

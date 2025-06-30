@@ -42,134 +42,13 @@
 	</Columns>
 
 	<Items>
-		<DxGridLayoutItem Row="0"
-						  Column="1" ColumnSpan="5">
-			<Template>
-				<div class="d-flex justify-content-center align-items-center h-100 testo-medio">
-					<label>BOLLA</label>
-				</div>
-			</Template>
-		</DxGridLayoutItem>
-
-		<DxGridLayoutItem Row="0"
-						  Column="6" ColumnSpan="5">
-			<Template>
-				<div class="d-flex justify-content-center align-items-center h-100 testo-medio">
-					<label>ODP</label>
-				</div>
-			</Template>
-		</DxGridLayoutItem>
-
-		<DxGridLayoutItem Row="1"
-						  Column="1" ColumnSpan="5">
-			<Template>
-				<DxMaskedInput @bind-Value="@(AttivitaDetailsViewModel.Bolla)"
-							   BindValueMode="BindValueMode.OnInput"
-							   Mask="000000"
-							   MaskMode="MaskMode.Numeric"
-							   CssClass="dxbl-text-edit"
-							   @ref="@BollaRef"
-							   @onkeydown="HandleBollaKeyPress"
-							   inputmode="text"
-							   enterkeyhint="enter">
-					<Buttons>
-						<DxEditorButton Text="Ind"
-										Tooltip="Apri indiretta"
-										Click="AttivitaDetailsViewModel.ApriListaIndirette.Execute"
-										Enabled="AttivitaDetailsViewModel.ApriListaIndirette.CanExecute(null)" />
-					</Buttons>
-				</DxMaskedInput>
-			</Template>
-		</DxGridLayoutItem>
-
-		<DxGridLayoutItem Row="1"
-						  Column="6" ColumnSpan="5">
-			<Template>
-				<DxMaskedInput @bind-Value="@(AttivitaDetailsViewModel.Odp)"
-							   BindValueMode="BindValueMode.OnInput"
-							   Mask="00000000"
-							   MaskMode="MaskMode.Numeric"
-							   CssClass="dxbl-text-edit"
-							   @ref="@OdpRef"
-							   @onkeydown="HandleOdpKeyPress"
-							   inputmode="text"
-							   enterkeyhint="enter">
-				</DxMaskedInput>
-			</Template>
-		</DxGridLayoutItem>
-
-		<DxGridLayoutItem Row="2"
-						  Column="1" ColumnSpan="5">
-			<Template>
-				<div class="d-flex justify-content-center align-items-center h-100 testo-medio">
-					<label>ARTICOLO</label>
-				</div>
-			</Template>
-		</DxGridLayoutItem>
-
-		<DxGridLayoutItem Row="2"
-						  Column="6" ColumnSpan="5">
-			<Template>
-				<div class="d-flex justify-content-center align-items-center h-100 testo-medio">
-					<label>FASE</label>
-				</div>
-			</Template>
-		</DxGridLayoutItem>
-
-		<DxGridLayoutItem Row="3"
-						  Column="1" ColumnSpan="5">
-			<Template>
-				<DxTextBox Enabled="false"
-						   Text="@(AttivitaDetailsViewModel.Articolo)"
-						   CssClass="dxbl-text-edit" />
-			</Template>
-		</DxGridLayoutItem>
-
-		<DxGridLayoutItem Row="3"
-						  Column="6" ColumnSpan="5">
-			<Template>
-				<DxComboBox Data="@AttivitaDetailsViewModel.FasiPerAttivita"
-							@bind-Value="@(AttivitaDetailsViewModel.FaseSelezionata)"
-							Enabled="@(AttivitaDetailsViewModel.FasiPerAttivita != null && AttivitaDetailsViewModel.FasiPerAttivita.Count() != 0)"
-							CssClass="dxbl-text-edit"
-							@ref="@FasiRef"
-							@onkeydown="HandleFaseKeyPress" />
-			</Template>
-		</DxGridLayoutItem>
-
-		<DxGridLayoutItem Row="4"
+		<DxGridLayoutItem Row="0" RowSpan="8"
 						  Column="1" ColumnSpan="10">
 			<Template>
-				<div class="d-flex justify-content-center align-items-center h-100 testo-medio">
-					<label>DESCRIZIONE ARTICOLO</label>
-				</div>
-			</Template>
-		</DxGridLayoutItem>
-
-		<DxGridLayoutItem Row="5"
-						  Column="1" ColumnSpan="10">
-			<Template>
-				<DxTextBox Text="@(AttivitaDetailsViewModel.DescrizioneArticolo)"
-						   Enabled="false"
-						   CssClass="dxbl-text-edit" />
-			</Template>
-		</DxGridLayoutItem>
-
-		<DxGridLayoutItem Row="6"
-						  Column="1" ColumnSpan="10">
-			<Template>
-				<div class="d-flex justify-content-center align-items-center h-100 testo-medio">
-					<label>DESCRIZIONE FASE</label>
-				</div>
-			</Template>
-		</DxGridLayoutItem>
-
-		<DxGridLayoutItem Row="7"
-						  Column="1" ColumnSpan="10">
-			<Template>
-				<DxTextBox Text="@(AttivitaDetailsViewModel.DescrizioneFase)"
-						   Enabled="false"
-						   CssClass="dxbl-text-edit" />
+				<InfoBaseAttivita InfoBaseInserite="@InfoBaseInserite"
+								  ShowArticolo="true"
+								  ShowDescrizioni="true"
+								  ShowBottoneIndirette="true" />
 			</Template>
 		</DxGridLayoutItem>
 
@@ -289,7 +168,6 @@
 	protected override Task OnInitializedAsync()
 	{
 		AttivitaDetailsViewModel.NotifyStateChanged += AttivitaDetailsViewModel_NotifyStateChanged;
-		DialogoOperatoreObserver.OnIsDettaglioAttivitaOpenChanged += DialogoOperatoreObserver_OnIsDettaglioAttivitaOpenChanged;
 
 		return base.OnInitializedAsync();
 	}
@@ -305,12 +183,6 @@
 	private async void AttivitaDetailsViewModel_NotifyStateChanged()
 	{
 		await InvokeAsync(StateHasChanged);
-	}
-
-	private async void DialogoOperatoreObserver_OnIsDettaglioAttivitaOpenChanged()
-	{
-		await Task.Delay(1);
-		await SetFocus(BollaRef);
 	}
 
 	private async Task SetFocus(IFocusableEditor element)
@@ -329,103 +201,16 @@
 		}
 	}
 
-	private async void HandleBollaKeyPress(KeyboardEventArgs e)
+	private async void InfoBaseInserite()
 	{
-		switch (e.Key)
-		{
-			case "Enter":
-
-				TriggerRicercaAttivitaDaBolla();
-
-				await SetFocusToFasi();
-				break;
-
-			case "Tab":
-				await SetFocus(OdpRef);
-				break;
-		}
-	}
-
-	private void TriggerRicercaAttivitaDaBolla()
-	{
-		if (string.IsNullOrWhiteSpace(BollaRef.Value) || AttivitaDetailsViewModel.IsAttivitaSelezionata)
-			return;
-
-		AttivitaDetailsViewModel.Odp = string.Empty;
-
-		AttivitaDetailsViewModel.CercaAttivitaHelper.CercaAttivitaDaBolla(BollaRef.Value);
-	}
-
-	private async void HandleOdpKeyPress(KeyboardEventArgs e)
-	{
-		switch (e.Key)
-		{
-			case "Enter":
-				TriggerRicercaAttivitaDaOdp();
-
-				await SetFocusToFasi();
-				break;
-
-			case "Tab":
-				await SetFocus(BollaRef);
-				break;
-		}
-	}
-
-	private void TriggerRicercaAttivitaDaOdp()
-	{
-		if (string.IsNullOrWhiteSpace(OdpRef.Value) || AttivitaDetailsViewModel.IsAttivitaSelezionata)
-			return;
-
-		while (OdpRef.Value.Length < 8)
-			OdpRef.Value = "0" + OdpRef.Value;
-
-		AttivitaDetailsViewModel.Bolla = string.Empty;
-
-		AttivitaDetailsViewModel.CercaAttivitaHelper.CercaAttivitaDaOdp(OdpRef.Value);
-	}
-
-	private async Task SetFocusToFasi()
-	{
-		await Task.Delay(10);
-
-		if (FasiRef.Data.Count() != 0)
-			await SetFocus(FasiRef);
-	}
-
-	private async void HandleFaseKeyPress(KeyboardEventArgs e)
-	{
-		List<string> listaFasi = AttivitaDetailsViewModel.FasiPerAttivita.ToList();
-
-		int index = listaFasi.IndexOf(AttivitaDetailsViewModel.FaseSelezionata);
-
-		switch (e.Key)
-		{
-			case "ArrowUp":
-				if (listaFasi.Count <= 1)
-					return;
-				AttivitaDetailsViewModel.FaseSelezionata = index > 0 ? listaFasi[index - 1] : listaFasi[index];
-				await SetFocus(FasiRef);
-				break;
-
-			case "ArrowDown":
-				if (listaFasi.Count <= 1)
-					return;
-				AttivitaDetailsViewModel.FaseSelezionata = index < listaFasi.Count - 1 ? listaFasi[index + 1] : listaFasi[index];
-				await SetFocus(FasiRef);
-				break;
-
-			case "Enter":
-				if (AttivitaDetailsViewModel.IsAvanzamento)
-					await SetFocus(Avanzamento.Prodotta);
-				else if (AttivitaDetailsViewModel.IsFineAttrezzaggio)
-					await SetFocus(InizioLavoro);
-				else if (AttivitaDetailsViewModel.IsFineAttivitaInUscita)
-					await SetFocus(Riapertura);
-				else
-					await WorkDoneCallback.InvokeAsync();
-				break;
-		}
+		if (AttivitaDetailsViewModel.IsAvanzamento)
+			await SetFocus(Avanzamento.Prodotta);
+		else if (AttivitaDetailsViewModel.IsFineAttrezzaggio)
+			await SetFocus(InizioLavoro);
+		else if (AttivitaDetailsViewModel.IsFineAttivitaInUscita)
+			await SetFocus(Riapertura);
+		else
+			await WorkDoneCallback.InvokeAsync();
 	}
 
 	private async void DatiAvanzamentoInseriti()

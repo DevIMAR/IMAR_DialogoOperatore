@@ -1,0 +1,73 @@
+﻿@using IMAR_DialogoOperatore.ViewModels
+
+@inject CompilatoreTaskViewModel CompilatoreTaskViewModel
+
+<DxGridLayout>
+	<Rows>
+		<DxGridLayoutRow Height="auto" />
+		<DxGridLayoutRow Height="auto" />
+		<DxGridLayoutRow Height="auto" />
+		<DxGridLayoutRow Height="auto" />
+	</Rows>
+
+	<Items>
+		<DxGridLayoutItem Row="0" Column="0">
+			<Template>
+				@if (!string.IsNullOrWhiteSpace(CompilatoreTaskViewModel.CategoriaErroreSelezionata) &&
+								CompilatoreTaskViewModel.CategoriaErroreSelezionata.ToLower().Contains("attività"))
+				{
+					<InfoBaseAttivita />
+				}
+			</Template>
+		</DxGridLayoutItem>
+
+		<DxGridLayoutItem Row="1" Column="0">
+			<Template>
+				@if (!string.IsNullOrWhiteSpace(CompilatoreTaskViewModel.CategoriaErroreSelezionata) &&
+								CompilatoreTaskViewModel.CategoriaErroreSelezionata.ToLower().Contains("quantità"))
+				{
+					<AvanzamentoAttivitaView />
+				}
+			</Template>
+		</DxGridLayoutItem>
+
+		<DxGridLayoutItem Row="0" Column="0">
+			<Template>
+				@if (!string.IsNullOrWhiteSpace(CompilatoreTaskViewModel.CategoriaErroreSelezionata) &&
+								CompilatoreTaskViewModel.CategoriaErroreSelezionata.ToLower().Contains("operatore"))
+				{
+					<InfoTaskOperatore />
+				}
+			</Template>
+		</DxGridLayoutItem>
+
+		<DxGridLayoutItem Row="2" Column="0">
+			<Template>
+				<div class="d-flex justify-content-center align-items-center h-100 testo-medio mt-2">
+					<label>DESCRIZIONE ERRORE</label>
+				</div>
+			</Template>
+		</DxGridLayoutItem>
+
+		<DxGridLayoutItem Row="3" Column="0">
+			<Template>
+				<DxMemo @bind-Text="@CompilatoreTaskViewModel.Note"
+						NullText="Inserisci la descrizione dell'errore"
+						BindValueMode="BindValueMode.OnInput"
+						Rows="3"
+						Enabled="@CompilatoreTaskViewModel.IsDescrizioneErroreAttiva"
+						CssClass="mt-2" />
+			</Template>
+		</DxGridLayoutItem>
+	</Items>
+</DxGridLayout>
+
+@code {
+	protected override void OnInitialized()
+	{
+		CompilatoreTaskViewModel.NotifyStateChanged += CompilatoreTaskViewModel_NotifyStateChanged;
+		base.OnInitialized();
+	}
+
+	private async void CompilatoreTaskViewModel_NotifyStateChanged() => await InvokeAsync(StateHasChanged);
+}

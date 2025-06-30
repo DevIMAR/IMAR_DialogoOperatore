@@ -1,0 +1,132 @@
+﻿@using IMAR_DialogoOperatore.ViewModels
+
+@inject InfoTaskOperatoreViewModel InfoTaskOperatoreViewModel
+
+<DxGridLayout>
+	<Rows>
+		<DxGridLayoutRow Height="auto" />
+		<DxGridLayoutRow Height="auto" />
+		<DxGridLayoutRow Height="auto" />
+		<DxGridLayoutRow Height="auto" />
+		<DxGridLayoutRow Height="auto" />
+		<DxGridLayoutRow Height="auto" />
+	</Rows>
+
+	<Columns>
+		<DxGridLayoutColumn />
+		<DxGridLayoutColumn />
+		<DxGridLayoutColumn />
+		<DxGridLayoutColumn />
+		<DxGridLayoutColumn />
+		<DxGridLayoutColumn />
+		<DxGridLayoutColumn />
+		<DxGridLayoutColumn />
+		<DxGridLayoutColumn />
+		<DxGridLayoutColumn />
+		<DxGridLayoutColumn />
+		<DxGridLayoutColumn />
+	</Columns>
+
+	<Items>
+		<DxGridLayoutItem Row="0" 
+						  Column="0" ColumnSpan="8">
+			<Template>
+				<div class="d-flex justify-content-center align-items-center h-100 testo-medio mt-2">
+					<label>OPERATORE</label>
+				</div>
+			</Template>
+		</DxGridLayoutItem>
+
+		<DxGridLayoutItem Row="0" 
+						  Column="8" ColumnSpan="4">
+			<Template>
+				<div class="d-flex justify-content-center align-items-center h-100 testo-medio mt-2">
+					<label>BADGE</label>
+				</div>
+			</Template>
+		</DxGridLayoutItem>
+
+		<DxGridLayoutItem Row="1" 
+						  Column="0" ColumnSpan="8">
+			<Template>
+				<DxTextBox Text="@InfoTaskOperatoreViewModel.NomeCognomeOperatore"
+						   Enabled="false"
+						   CssClass="mt-2" />
+			</Template>
+		</DxGridLayoutItem>
+
+		<DxGridLayoutItem Row="1" 
+						  Column="8" ColumnSpan="4">
+			<Template>
+				<DxSpinEdit Value="@InfoTaskOperatoreViewModel.BadgeOperatore"
+							Enabled="false"
+							ShowSpinButtons="false"
+							CssClass="mt-2" />
+			</Template>
+		</DxGridLayoutItem>
+
+		<DxGridLayoutItem Row="2" 
+						  Column="0" ColumnSpan="12">
+			<Template>
+				<div class="d-flex justify-content-center align-items-center h-100 testo-medio mt-2">
+					<label>TIPOLOGIA</label>
+				</div>
+			</Template>
+		</DxGridLayoutItem>
+
+		<DxGridLayoutItem Row="3" 
+						  Column="0" ColumnSpan="12">
+			<Template>
+				<DxComboBox Data="@InfoTaskOperatoreViewModel.TipologieTimbraturaErrata"
+							@bind-Value="@InfoTaskOperatoreViewModel.TipologiaTimbraturaErrataSelezionata"
+							CssClass="mt-2" />
+			</Template>
+		</DxGridLayoutItem>
+
+		<DxGridLayoutItem Row="4"
+						  Column="0" ColumnSpan="6">
+			<Template>
+				<div class="d-flex justify-content-center align-items-center h-100 testo-medio mt-2">
+					<label>ORARIO DA CORREGGERE</label>
+				</div>
+			</Template>
+		</DxGridLayoutItem>
+
+		<DxGridLayoutItem Row="4"
+						  Column="6" ColumnSpan="6">
+			<Template>
+				<div class="d-flex justify-content-center align-items-center h-100 testo-medio mt-2">
+					<label>ORARIO DA DICHIARARE</label>
+				</div>
+			</Template>
+		</DxGridLayoutItem>
+
+		<DxGridLayoutItem Row="5"
+						  Column="0" ColumnSpan="6">
+			<Template>
+				<DxMaskedInput @bind-Value="@InfoTaskOperatoreViewModel.OrarioDaCorreggere"
+							   Mask="@TimeSpanMask.GeneralShortFormat"
+							   CssClass="dxbl-text-edit mt-2" />
+			</Template>
+		</DxGridLayoutItem>
+
+		<DxGridLayoutItem Row="5"
+						  Column="6" ColumnSpan="6">
+			<Template>
+				<DxMaskedInput @bind-Value="@InfoTaskOperatoreViewModel.OrarioDaDichiarare"
+							   Mask="@TimeSpanMask.GeneralShortFormat"
+							   CssClass="dxbl-text-edit mt-2" />
+			</Template>
+		</DxGridLayoutItem>
+	</Items>
+</DxGridLayout>
+
+@code {
+	protected override void OnInitialized()
+	{
+		InfoTaskOperatoreViewModel.NotifyStateChanged += InfoTaskOperatoreViewModel_NotifyStateChanged;
+		base.OnInitialized();
+	}
+
+	private async void InfoTaskOperatoreViewModel_NotifyStateChanged() => await InvokeAsync(StateHasChanged);
+}

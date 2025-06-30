@@ -64,9 +64,12 @@ namespace IMAR_DialogoOperatore.ViewModels
 			_avanzamentoObserver = avanzamentoObserver;
 
 			QuantitaProdotta = 0;
-			QuantitaScartata = 0;
+			_avanzamentoObserver.QuantitaProdotta = 0;
+            QuantitaScartata = 0;
+			_avanzamentoObserver.QuantitaScartata = 0;
 
-			_dialogoOperatoreObserver.OnAttivitaSelezionataChanged += AttivitaStore_OnAttivitaSelezionataChanged;
+
+            _dialogoOperatoreObserver.OnAttivitaSelezionataChanged += AttivitaStore_OnAttivitaSelezionataChanged;
             _dialogoOperatoreObserver.OnIsDettaglioAttivitaOpenChanged += DialogoOperatoreObserver_OnIsDettaglioAttivitaOpenChanged;
 
 			_avanzamentoObserver.OnQuantitaProdottaChanged += AvanzamentoStore_OnQuantitaChanged;
@@ -76,7 +79,9 @@ namespace IMAR_DialogoOperatore.ViewModels
         private void DialogoOperatoreObserver_OnIsDettaglioAttivitaOpenChanged()
         {
             QuantitaProdotta = 0;
+            _avanzamentoObserver.QuantitaProdotta = 0;
             QuantitaScartata = 0;
+            _avanzamentoObserver.QuantitaScartata = 0;
         }
 
         private void AvanzamentoStore_OnQuantitaChanged()

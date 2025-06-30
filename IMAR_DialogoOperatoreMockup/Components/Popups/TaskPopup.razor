@@ -1,5 +1,6 @@
 ﻿@using IMAR_DialogoOperatore.Application
 @using IMAR_DialogoOperatore.Application.Interfaces.Utilities
+@using IMAR_DialogoOperatore.Components.SubComponents
 @using IMAR_DialogoOperatore.Interfaces.Observers
 @using IMAR_DialogoOperatore.ViewModels;
 
@@ -23,35 +24,36 @@
 		<DxGridLayout>
 			<Rows>
 				<DxGridLayoutRow Height="auto" />
-				<DxGridLayoutRow />
+				<DxGridLayoutRow Height="auto" />
+				<DxGridLayoutRow Height="auto" />
 			</Rows>
 
 			<Columns>
+				<DxGridLayoutColumn Width="5%" />
 				<DxGridLayoutColumn />
-				<DxGridLayoutColumn />
+				<DxGridLayoutColumn Width="5%" />
 			</Columns>
 
 			<Items>
-				<DxGridLayoutItem Row="0" Column="0"
-								  CssClass="m-1">
+				<DxGridLayoutItem Row="0" Column="1">
 					<Template>
-						<label>Categoria errore</label>
-						<DxComboBox Data="@TaskPopupViewModel.CategorieErrori" 
-									@bind-Value="@TaskPopupViewModel.CategoriaErroreSelezionata"
-									CssClass="mt-1" />
+						<div class="d-flex justify-content-center align-items-center h-100 testo-medio mt-2">
+							<label>CATEGORIA ERRORE</label>
+						</div>
 					</Template>
 				</DxGridLayoutItem>
 
-				<DxGridLayoutItem Row="1" 
-								  Column="0" ColumnSpan="2"
-								  CssClass="m-1">
+				<DxGridLayoutItem Row="1" Column="1">
 					<Template>
-						<label>Descrizione errore</label>
-						<DxMemo @bind-Text="@TaskPopupViewModel.TaskAsana.Html_notes" 
-								NullText="Inserisci la descrizione dell'errore"
-								Rows="10"
-								CssClass="mt-1" 
-								Enabled="@TaskPopupViewModel.IsDescrizioneErroreAttiva" />
+						<DxComboBox Data="@TaskPopupViewModel.CategorieErrori"
+									@bind-Value="@TaskPopupViewModel.CategoriaErroreSelezionata"
+									CssClass="mt-2" />
+					</Template>
+				</DxGridLayoutItem>
+
+				<DxGridLayoutItem Row="2" Column="1">
+					<Template>
+						<CompilatoreTask />
 					</Template>
 				</DxGridLayoutItem>
 			</Items>
@@ -66,7 +68,7 @@
 				  CssClass="d-flex justify-content-center align-items-center conferma-dettagli" />
 
 		<DxButton Text="Conferma"
-				  Click="@TaskPopupViewModel.InviaTaskCommand.Execute"
+				  Click="@ConfermaHandler"
 				  Enabled="TaskPopupViewModel.InviaTaskCommand.CanExecute(null)"
 				  RenderStyle="ButtonRenderStyle.Warning"
 				  CssClass="d-flex justify-content-center align-items-center conferma-dettagli" />
@@ -91,12 +93,23 @@
 	private bool isRestartTimerActive()
 	{
 		return AutoLogoutUtility.IsActive &&
-			   DialogoOperatoreObserver.OperatoreSelezionato != null &&
-			   DialogoOperatoreObserver.OperatoreSelezionato.Stato != Costanti.ASSENTE &&
-			   DialogoOperatoreObserver.OperatoreSelezionato.Stato != Costanti.IN_PAUSA;
+						DialogoOperatoreObserver.OperatoreSelezionato != null &&
+						DialogoOperatoreObserver.OperatoreSelezionato.Stato != Costanti.ASSENTE &&
+						DialogoOperatoreObserver.OperatoreSelezionato.Stato != Costanti.IN_PAUSA;
 	}
 
-	void AnnullaHandler()
+	private void AnnullaHandler()
+	{
+		ChiudiPopup();
+	}
+
+	private void ConfermaHandler()
+	{
+		TaskPopupViewModel.InviaTaskCommand.Execute(null);
+		ChiudiPopup();
+	}
+
+	private void ChiudiPopup()
 	{
 		TaskPopupViewModel.Visible = false;
 	}

@@ -15,10 +15,6 @@
     --dxbl-grid-selection-color: black;
 }
 
-.dxbl-text-edit {
-    --dxbl-text-edit-focus-border-color: #fd7e14;
-}
-
 .dxbl-checkbox {
     --dxbl-checkbox-switch-checked-bg: #fd7e14;
     --dxbl-checkbox-switch-checked-hover-bg: #ffc08b;
@@ -29,6 +25,7 @@
 }
 
 .dxbl-text-edit {
+    --dxbl-text-edit-focus-border-color: #fd7e14;
     --dxbl-text-edit-padding-x: 0.35vw;
     --dxbl-text-edit-padding-y: 0dvh;
     --dxbl-text-edit-font-size: 1.668dvh;

@@ -3,13 +3,12 @@
 
 @inject AvanzamentoAttivitaViewModel AvanzamentoAttivitaViewModel
 
-<DxGridLayout CssClass="h-100 testo-medio">
+<DxGridLayout CssClass="testo-medio">
 	<Rows>
-		<DxGridLayoutRow />
-		<DxGridLayoutRow />
-		<DxGridLayoutRow />
-		<DxGridLayoutRow />
+		<DxGridLayoutRow Height="auto" />
+		<DxGridLayoutRow Height="auto" />
 	</Rows>
+
 	<Columns>
 		<DxGridLayoutColumn />
 		<DxGridLayoutColumn />
@@ -22,62 +21,62 @@
 	</Columns>
 
 	<Items>
-		<DxGridLayoutItem Row="1"
+		<DxGridLayoutItem Row="0"
 						  Column="0" ColumnSpan="2">
 			<Template>
-				<div class="d-flex justify-content-center align-items-center h-100">
+				<div class="d-flex justify-content-center align-items-center h-100 mt-2">
 					<label>Qt. PRODOTTA</label>
 				</div>
 			</Template>
 		</DxGridLayoutItem>
 
-		<DxGridLayoutItem Row="1"
+		<DxGridLayoutItem Row="0"
 						  Column="3" ColumnSpan="2">
 			<Template>
-				<div class="d-flex justify-content-center align-items-center h-100">
+				<div class="d-flex justify-content-center align-items-center h-100 mt-2">
 					<label>Qt. SCARTATA</label>
 				</div>
 			</Template>
 		</DxGridLayoutItem>
 
-		<DxGridLayoutItem Row="1"
+		<DxGridLayoutItem Row="0"
 						  Column="6" ColumnSpan="2">
 			<Template>
-				<div class="d-flex justify-content-center align-items-center h-100">
+				<div class="d-flex justify-content-center align-items-center h-100 mt-2">
 					FASE COMPLETATA
 				</div>
 			</Template>
 		</DxGridLayoutItem>
 
-		<DxGridLayoutItem Row="2"
+		<DxGridLayoutItem Row="1"
 						  Column="0" ColumnSpan="2">
 			<Template>
 				<DxSpinEdit @bind-Value="@(AvanzamentoAttivitaViewModel.QuantitaProdotta)"
 							BindValueMode="BindValueMode.OnInput"
 							ShowSpinButtons="false"
 							AllowMouseWheel="false"
-							CssClass="dxbl-text-edit"
+							CssClass="dxbl-text-edit mt-2"
 							@ref="Prodotta"
 							@onkeydown="HandleProdottaKeyPress"
 							@onclick="@(() => Click.InvokeAsync())" />
 			</Template>
 		</DxGridLayoutItem>
 
-		<DxGridLayoutItem Row="2"
+		<DxGridLayoutItem Row="1"
 						  Column="3" ColumnSpan="2">
 			<Template>
 				<DxSpinEdit @bind-Value="@(AvanzamentoAttivitaViewModel.QuantitaScartata)"
 							BindValueMode="BindValueMode.OnInput"
 							ShowSpinButtons="false"
 							AllowMouseWheel="false"
-							CssClass="dxbl-text-edit"
+							CssClass="dxbl-text-edit mt-2"
 							@ref="Scartata"
 							@onkeydown="HandleScartataKeyPress"
 							@onclick="@(() => Click.InvokeAsync())" />
 			</Template>
 		</DxGridLayoutItem>
 
-		<DxGridLayoutItem Row="2"
+		<DxGridLayoutItem Row="1"
 						  Column="6" ColumnSpan="2">
 			<Template>
 				<DxCheckBox CheckType="CheckType.Switch"
@@ -86,7 +85,8 @@
 							SizeMode="SizeMode.Large"
 							@ref="Saldo"
 							@onkeydown="HandleSaldoKeyPress"
-							@onclick="@(() => Click.InvokeAsync())" />
+							@onclick="@(() => Click.InvokeAsync())"
+							CssClass="mt-1" />
 			</Template>
 		</DxGridLayoutItem>
 	</Items>
@@ -94,7 +94,8 @@
 
 @code {
 	[Parameter] public EventCallback DatiAvanzamentoInseriti { get; set; }
-	[Parameter] public EventCallback Click { get; set; }
+	
+	public EventCallback Click { get; set; }
 
 	public DxSpinEdit<uint?> Prodotta { get; set; }
 

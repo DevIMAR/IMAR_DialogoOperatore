@@ -1,39 +1,45 @@
-﻿using IMAR_DialogoOperatore.Application.Interfaces.Clients;
+﻿using IMAR_DialogoOperatore.Application;
+using IMAR_DialogoOperatore.Application.Interfaces.Clients;
+using IMAR_DialogoOperatore.Interfaces.Helpers;
 using IMAR_DialogoOperatore.Interfaces.Observers;
-using IMAR_DialogoOperatore.ViewModels;
 
 namespace IMAR_DialogoOperatore.Commands
 {
     public class InviaTaskCommand : CommandBase
     {
-        private readonly TaskPopupViewModel _taskPopupViewModel;
         private readonly IImarApiClient _imarApiClient;
-        private readonly IDialogoOperatoreObserver _dialogoOperatoreObserver;
+        private readonly ITaskCompilerHelper _taskCompilerHelper;
+        private readonly ITaskCompilerObserver _taskCompilerObserver;
 
         public InviaTaskCommand(
-            TaskPopupViewModel taskPopupViewModel,
             IImarApiClient imarApiClient,
-            IDialogoOperatoreObserver dialogoOperatoreObserver)
+            ITaskCompilerHelper taskCompilerHelper,
+            ITaskCompilerObserver taskCompilerObserver)
         {
-            _taskPopupViewModel = taskPopupViewModel;
             _imarApiClient = imarApiClient;
-            _dialogoOperatoreObserver = dialogoOperatoreObserver;
+            _taskCompilerHelper = taskCompilerHelper;
+            _taskCompilerObserver = taskCompilerObserver;
+
+            _taskCompilerObserver.OnCategoriaErroreSelezionataChanged += CanExecuteEvaluator;
+            _taskCompilerObserver.OnNoteChanged += CanExecuteEvaluator;
+        }
+
+        private void CanExecuteEvaluator()
+        {
+            CanExecute(null);
         }
 
         public override bool CanExecute(object? parameter)
         {
-            return _taskPopupViewModel.CategoriaErroreSelezionata != null &&
-                   !string.IsNullOrWhiteSpace(_taskPopupViewModel.TaskAsana.Html_notes); 
+            return _taskCompilerObserver.CategoriaErroreSelezionata != null &&
+                   !(_taskCompilerObserver.CategoriaErroreSelezionata == Costanti.TASK_CHIUSURA_A_SALDO_ERRATA &&
+                   string.IsNullOrWhiteSpace(_taskCompilerObserver.Note)); 
         }
 
         public override async void Execute(object? parameter)
         {
-            string firmaOperatore = _dialogoOperatoreObserver.OperatoreSelezionato.Nome + " " + _dialogoOperatoreObserver.OperatoreSelezionato.Cognome;
-            _taskPopupViewModel.TaskAsana.Html_notes += "\n\n" + firmaOperatore;
-
-            string feedback = await _imarApiClient.SendTaskAsana(_taskPopupViewModel.TaskAsana, "server@imarsrl.com");
-
-            _taskPopupViewModel.Visible = false;
+            _taskCompilerHelper.CompilaTaskAsana();
+            string feedback = await _imarApiClient.SendTaskAsana(_taskCompilerHelper.TaskAsana, "luca.marangoni@imarsrl.com");
         }
     }
 }
