@@ -14,7 +14,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.JMes
         private const string DIAOPE_LOGIN_PATH = "base/appLogin?app=imarConnect-DiaOpe&key=";
         private const string JMES_LOGIN_TOKEN = "1hWP47cnCCmH9Ob5WxFttYl2FP4O5lvqPfWIHJm9dnfN4Jx2OJQcn296rRxVZ4FEuPqAYy6PJx09bKl1qHgEqN6LM";
         private const string DIAOPE_LOGIN_TOKEN = "ekmeJ216zWHSdHXuT2kxTqp6l3aWL2WUEKaODo57TzC5inv4I1FbQ5UNioMaOFg8b3f31WHl2FUWJ7AEUz5VhTfQDbljBFB3sadY";
-        private const string TOKEN = "B02F752B0299BD1B5C35B82823B53185";
+        private const string TOKEN = "DC2602DE0A1B7785C1F8A9F2562EF7D2";
         private const string WIZARD_WORK_PATH = "spec/sys/wzd/start";
         private const string QUERY_WORK_PATH = "spec/sys/qry/exec";
         private const string GET_QUERY_ID_PATH = "spec/sys/qry/byName";
