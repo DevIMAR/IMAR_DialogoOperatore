@@ -14,7 +14,6 @@ namespace IMAR_DialogoOperatore.Infrastructure.JMes
         private const string DIAOPE_LOGIN_PATH = "base/appLogin?app=imarConnect-DiaOpe&key=";
         private const string JMES_LOGIN_TOKEN = "1hWP47cnCCmH9Ob5WxFttYl2FP4O5lvqPfWIHJm9dnfN4Jx2OJQcn296rRxVZ4FEuPqAYy6PJx09bKl1qHgEqN6LM";
         private const string DIAOPE_LOGIN_TOKEN = "ekmeJ216zWHSdHXuT2kxTqp6l3aWL2WUEKaODo57TzC5inv4I1FbQ5UNioMaOFg8b3f31WHl2FUWJ7AEUz5VhTfQDbljBFB3sadY";
-        private const string TOKEN = "DC2602DE0A1B7785C1F8A9F2562EF7D2";
         private const string WIZARD_WORK_PATH = "spec/sys/wzd/start";
         private const string QUERY_WORK_PATH = "spec/sys/qry/exec";
         private const string GET_QUERY_ID_PATH = "spec/sys/qry/byName";
@@ -65,18 +64,36 @@ namespace IMAR_DialogoOperatore.Infrastructure.JMes
 
         private int? GetQueryId(string queryName)
         {
-            var urlStartWork = SERVER + GET_QUERY_ID_PATH + "/" + queryName + "?token=" + TOKEN;
+            try
+            {
+                var urlStartWork = SERVER + GET_QUERY_ID_PATH + "/" + queryName + "?token=" + GetToken();
 
-            var result = _diaopeClient.GetAsync(urlStartWork).GetAwaiter().GetResult();
+                var result = _diaopeClient.GetAsync(urlStartWork).GetAwaiter().GetResult();
+                var jsonData = result.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+                var json = JObject.Parse(jsonData);
+
+                return json["result"]?.ToObject<int>();
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        private string? GetToken()
+        {
+            string urlGetToken = SERVER + DIAOPE_LOGIN_PATH + DIAOPE_LOGIN_TOKEN;
+
+            var result = _diaopeClient.GetAsync(urlGetToken).GetAwaiter().GetResult();
             var jsonData = result.Content.ReadAsStringAsync().GetAwaiter().GetResult();
             var json = JObject.Parse(jsonData);
 
-            return json["result"]?.ToObject<int>();
+            return json["result"]?.ToObject<string>();
         }
 
         private JObject GetQueryResults(int? queryId)
         {
-            var urlStartWork = SERVER + QUERY_WORK_PATH + "/" + queryId + "?token=" + TOKEN;
+            var urlStartWork = SERVER + QUERY_WORK_PATH + "/" + queryId + "?token=" + GetToken();
 
             var emptyContent = new StringContent("{}", Encoding.UTF8, "application/json");
 
@@ -89,7 +106,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.JMes
 
         private JObject VirtualQueryResults(int? queryId)
         {
-            var urlStartWork = SERVER + QUERY_WORK_PATH + "/" + queryId + "?token=" + TOKEN;
+            var urlStartWork = SERVER + QUERY_WORK_PATH + "/" + queryId + "?token=" + GetToken();
 
             var entity = new
             {

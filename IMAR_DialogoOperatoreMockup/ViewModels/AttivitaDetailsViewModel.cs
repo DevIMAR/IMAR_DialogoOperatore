@@ -70,7 +70,10 @@ namespace IMAR_DialogoOperatore.ViewModels
 
         private void DialogoOperatoreObserver_OnIsDettaglioAttivitaOpenChanged()
         {
-            _autoLogoutUtility.StartLogoutTimer(300);
+			if (_dialogoOperatoreObserver.IsDettaglioAttivitaOpen)
+	            _autoLogoutUtility.StartLogoutTimer(300);
+            else
+                _autoLogoutUtility.StartLogoutTimer(30);
         }
 
         private void DialogoOperatoreStore_OnAttivitaSelezionataChanged()
