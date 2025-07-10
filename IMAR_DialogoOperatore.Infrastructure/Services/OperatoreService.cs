@@ -9,29 +9,29 @@ using System.Globalization;
 namespace IMAR_DialogoOperatore.Infrastructure.Services
 {
     public class OperatoreService : IOperatoriService
-	{
-		private readonly ISynergyJmesUoW _synergyJmesUoW;
-		private readonly IJmesApiClient _jmesApiClient;
+    {
+        private readonly ISynergyJmesUoW _synergyJmesUoW;
+        private readonly IJmesApiClient _jmesApiClient;
 
-		private readonly IAttivitaService _attivitaService;
-		private readonly IMacchinaService _macchinaService;
+        private readonly IAttivitaService _attivitaService;
+        private readonly IMacchinaService _macchinaService;
 
         public Operatore Operatore { get; set; }
 
-		public OperatoreService(
-			ISynergyJmesUoW synergyJmesUoW,
-			IJmesApiClient jmesApiClient,
-			IAttivitaService attivitaService,
-			IMacchinaService macchinaService)
-		{
-			_synergyJmesUoW = synergyJmesUoW;
-			_jmesApiClient = jmesApiClient;
+        public OperatoreService(
+            ISynergyJmesUoW synergyJmesUoW,
+            IJmesApiClient jmesApiClient,
+            IAttivitaService attivitaService,
+            IMacchinaService macchinaService)
+        {
+            _synergyJmesUoW = synergyJmesUoW;
+            _jmesApiClient = jmesApiClient;
 
-			_attivitaService = attivitaService;
-			_macchinaService = macchinaService;
-		}
+            _attivitaService = attivitaService;
+            _macchinaService = macchinaService;
+        }
 
-		public Operatore? OttieniOperatore(int? badge)
+        public Operatore? OttieniOperatore(int? badge)
         {
             if (badge == null)
                 return null;
@@ -39,8 +39,10 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
             string format = "yyyyMMddHHmmss";
             CultureInfo provider = CultureInfo.InvariantCulture;
 
-            IList<mesOpeClk>? ingressiUscite = _jmesApiClient.ChiamaQueryGetJmes<mesOpeClk>();
-            IList<stdTblResBrk>? iniziFiniPause = _jmesApiClient.ChiamaQueryGetJmes<stdTblResBrk>();
+            IList<mesOpeClk>? ingressiUscite;
+            IList<stdTblResBrk>? iniziFiniPause;
+
+            GetTimbratureOperatore(out ingressiUscite, out iniziFiniPause);
 
             AngRes? risorsa = _synergyJmesUoW.AngRes.Get(x => !string.IsNullOrEmpty(x.ResNam + x.ResSur))
                                                     .ToList()
@@ -68,6 +70,12 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
             return Operatore;
         }
 
+        public void GetTimbratureOperatore(out IList<mesOpeClk>? ingressiUscite, out IList<stdTblResBrk>? iniziFiniPause)
+        {
+            ingressiUscite = _jmesApiClient.ChiamaQueryGetJmes<mesOpeClk>();
+            iniziFiniPause = _jmesApiClient.ChiamaQueryGetJmes<stdTblResBrk>();
+        }
+
         private void AssegnaMacchinaAdOperatore()
         {
             Attivita? attivitaDirettaApertaDaOperatore = Operatore.AttivitaAperte.FirstOrDefault(x => !x.Bolla.Contains("AI"));
@@ -78,28 +86,28 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
         }
 
         private string GetStatus()
-		{
-			if (Operatore.Uscita >= Operatore.Ingresso)
-				return Costanti.ASSENTE;
+        {
+            if (Operatore.Uscita >= Operatore.Ingresso)
+                return Costanti.ASSENTE;
 
-			if (Operatore.InizioPausa > Operatore.Ingresso && Operatore.InizioPausa >= Operatore.FinePausa)
-				return Costanti.IN_PAUSA;
+            if (Operatore.InizioPausa > Operatore.Ingresso && Operatore.InizioPausa >= Operatore.FinePausa)
+                return Costanti.IN_PAUSA;
 
-			return Costanti.PRESENTE;
-		}
+            return Costanti.PRESENTE;
+        }
 
-		public string? RimuoviAttivitaDaOperatore(Operatore operatore, Attivita attivitaDaRimuovere, int? quantitaProdotta, int? quantitaScartata, bool isSospeso = false, bool? isAttrezzaggio = null)
-		{
-			if (isAttrezzaggio == null)
-				isAttrezzaggio = attivitaDaRimuovere.Causale == Costanti.IN_ATTREZZAGGIO;
+        public string? RimuoviAttivitaDaOperatore(Operatore operatore, Attivita attivitaDaRimuovere, int? quantitaProdotta, int? quantitaScartata, bool isSospeso = false, bool? isAttrezzaggio = null)
+        {
+            if (isAttrezzaggio == null)
+                isAttrezzaggio = attivitaDaRimuovere.Causale == Costanti.IN_ATTREZZAGGIO;
 
             string? errore = null;
 
-            if (isSospeso)
-			{
-                errore = _jmesApiClient.RegistrazioneOperazioneSuDb(() => _jmesApiClient.MesSuspensionStart(operatore.Badge, attivitaDaRimuovere.Macchina.CodiceJMes));
-				return errore;
-			}
+            //if (isSospeso)
+            //{
+            //  errore = _jmesApiClient.RegistrazioneOperazioneSuDb(() => _jmesApiClient.MesSuspensionStart(operatore.Badge, attivitaDaRimuovere.Macchina.CodiceJMes));
+            //	return errore;
+            //}
 
             if (isAttrezzaggio == true)
             {
@@ -119,13 +127,13 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
             return errore;
         }
 
-		public string? AggiungiAttivitaAdOperatore(bool isAttrezzaggio, Operatore operatore, Attivita attivitaDaAggiungere, bool isAttivitaIndiretta)
+        public string? AggiungiAttivitaAdOperatore(bool isAttrezzaggio, Operatore operatore, Attivita attivitaDaAggiungere, bool isAttivitaIndiretta)
         {
-			if (attivitaDaAggiungere == null)
+            if (attivitaDaAggiungere == null)
                 return "Nessuna attività da aprire selezionata";
 
-			string? errore;
-			bool isCambioCausaleApertura = _attivitaService.ConfrontaCausaliAttivita(operatore.AttivitaAperte, attivitaDaAggiungere.Bolla, attivitaDaAggiungere.Causale);
+            string? errore;
+            bool isCambioCausaleApertura = _attivitaService.ConfrontaCausaliAttivita(operatore.AttivitaAperte, attivitaDaAggiungere.Bolla, attivitaDaAggiungere.Causale);
 
             if (isAttrezzaggio)
             {
@@ -138,7 +146,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
                 errore = GestisciAperturaLavoro(operatore, attivitaDaAggiungere, isCambioCausaleApertura, isAttivitaIndiretta);
 
             if (errore != null)
-				return errore;
+                return errore;
 
             return null;
         }
@@ -156,9 +164,9 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
                     Attivita AttivitaOperatoreDaRimuovere = operatore.AttivitaAperte.Single(x => x.Bolla == attivitaDaAggiungere.Bolla);
                     errore = RimuoviAttivitaDaOperatore(operatore, AttivitaOperatoreDaRimuovere, null, null, isAttrezzaggio: true);
 
-					if (errore != null)
-						return errore;
-				}
+                    if (errore != null)
+                        return errore;
+                }
 
                 errore = _jmesApiClient.RegistrazioneOperazioneSuDb(() => _jmesApiClient.MesWorkStart(operatore, attivitaDaAggiungere.Bolla));
             }

@@ -30,5 +30,10 @@
         public const string TASK_CHIUSURA_A_SALDO_ERRATA = "Chiusura a saldo attività errata";
 		public const string TASK_TIMBRATURA_ERRATA = "Timbratura operatore errata";
 		public const string TASK_ALTRO = "Altro";
+
+		public const string INIZIO_PAUSA = "Inizio Pausa";
+		public const string FINE_PAUSA = "Fine Pausa";
+		public const string INGRESSO = "Ingresso";
+		public const string USCITA = "Uscita";
 	}
 }
