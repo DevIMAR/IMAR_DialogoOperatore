@@ -64,8 +64,8 @@ namespace EsportatoreTimbratureTeamSystem.Services
             IEnumerable<decimal> idOperatori = operatori.Select(x => x.Uid).ToList();
             var res = _synergyJmesUoW.TblResBrk.Get().ToList();
 
-            return res.Where(x => x.TssStr >= ieri &&
-                                  x.TssEnd <= oggiAlle6 &&
+            return res.Where(x => GetEffectiveInizioPausa(x) >= ieri &&
+                                  GetEffectiveFinePausa(x) <= oggiAlle6 &&
                                   idOperatori.Contains(x.ResUid));
         }
 
@@ -80,8 +80,8 @@ namespace EsportatoreTimbratureTeamSystem.Services
             var res = _synergyJmesUoW.TblResClk.Get()
                                             .ToList();
 
-            return res.Where(x => x.ClkInnTss >= ieri &&
-                                  x.ClkOutTss <= oggiAlle6 &&
+            return res.Where(x => GetEffectiveIngress(x) >= ieri &&
+                                  GetEffectiveUscita(x) <= oggiAlle6 &&
                                   idOperatori.Contains(x.ResUid));
         }
 
@@ -114,64 +114,108 @@ namespace EsportatoreTimbratureTeamSystem.Services
             IEnumerable<AngRes> operatori,
             IEnumerable<TblResClk> ingressiUscite)
         {
+            return ingressiUscite
+                .Where(r => GetEffectiveIngress(r).HasValue || GetEffectiveUscita(r).HasValue)
+                .GroupBy(r => r.ResUid)
+                .SelectMany(group => ProcessOperatoreTimbrature(group, operatori))
+                .ToList();
+        }
+
+        private IEnumerable<Timbratura> ProcessOperatoreTimbrature(
+            IGrouping<decimal, TblResClk> group,
+            IEnumerable<AngRes> operatori)
+        {
             var result = new List<Timbratura>();
-            var grouped = ingressiUscite
-                .Where(r => r.ClkInnTss.HasValue || r.ClkOutTss.HasValue)
-                .GroupBy(r => r.ResUid);
+            var badge = operatori.Single(x => x.Uid == group.Key).ResCod;
+            var ordered = group.OrderBy(r => GetEffectiveIngress(r) ?? GetEffectiveUscita(r)).ToList();
 
-            foreach (var group in grouped)
+            for (int i = 0; i < ordered.Count; i++)
             {
-                var badge = operatori.Single(x => x.Uid == group.Key).ResCod;
-                var ordered = group
-                    .OrderBy(r => r.ClkInnTss ?? r.ClkOutTss)
-                    .ToList();
+                var current = ordered[i];
+                var ingresso = GetEffectiveIngress(current);
+                var uscita = GetEffectiveUscita(current);
 
-                for (int i = 0; i < ordered.Count; i++)
+                if (uscita.HasValue &&
+                    IsLateNightExit(uscita.Value) &&
+                    HasQuickNextDayRestart(ordered, i, uscita.Value, current.ResUid))
                 {
-                    var current = ordered[i];
-                    var ingresso = current.ClkInnTss;
-                    var uscita = current.ClkOutTss;
-
-                    if (uscita.HasValue
-                        && IsLateNightExit(uscita.Value)
-                        && HasQuickRestart(ordered, i, uscita.Value, current.ResUid))
-                    {
-                        i++;
-                        continue;
-                    }
-
-                    if (ingresso.HasValue)
-                        result.Add(new Timbratura{
-                            BadgeOperatore = badge, 
-                            Causale = Costanti.INGRESSO, 
-                            Timestamp = ingresso.Value 
-                        });
-
-                    if (uscita.HasValue)
-                        result.Add(new Timbratura
-                        {
-                            BadgeOperatore = badge,
-                            Causale = Costanti.USCITA,
-                            Timestamp = uscita.Value
-                        });
+                    result.AddRange(HandleQuickRestartCase(current, ordered[i + 1], badge));
+                    i++;
+                }
+                else
+                {
+                    result.AddRange(ProcessTimbratureRecord(current, badge));
                 }
             }
 
             return result;
         }
-        private bool IsLateNightExit(DateTime timestamp) => timestamp.TimeOfDay >= new TimeSpan(23, 50, 0)
-                                                            && timestamp.TimeOfDay <= new TimeSpan(23, 59, 59);
-        private bool HasQuickRestart(List<TblResClk> records, int index, DateTime exitTime, decimal resUid)
+
+        private IEnumerable<Timbratura> ProcessTimbratureRecord(TblResClk record, string badge)
         {
-            if (index + 1 >= records.Count()) 
+            var result = new List<Timbratura>();
+
+            var ingresso = GetEffectiveIngress(record);
+            var uscita = GetEffectiveUscita(record);
+
+            if (ingresso.HasValue)
+                result.Add(AddTimbratura(badge, Costanti.INGRESSO, ingresso.Value));
+
+            if (uscita.HasValue)
+                result.Add(AddTimbratura(badge, Costanti.USCITA, uscita.Value));
+
+            return result;
+        }
+
+        private IEnumerable<Timbratura> HandleQuickRestartCase(TblResClk current, TblResClk next, string badge)
+        {
+            var result = new List<Timbratura>();
+
+            var ingresso = GetEffectiveIngress(current);
+            var uscita = GetEffectiveUscita(next);
+
+            if (ingresso.HasValue)
+                result.Add(AddTimbratura(badge, Costanti.INGRESSO, ingresso.Value));
+
+            if (uscita.HasValue)
+                result.Add(AddTimbratura(badge, Costanti.USCITA, uscita.Value));
+
+            return result;
+        }
+
+        private Timbratura AddTimbratura(string badge, string causale, DateTime timestamp)
+        {
+            return new Timbratura
+            {
+                BadgeOperatore = badge,
+                Causale = causale,
+                Timestamp = timestamp
+            };
+        }
+
+        private bool IsLateNightExit(DateTime timestamp) =>
+            timestamp.TimeOfDay >= new TimeSpan(23, 50, 0) &&
+            timestamp.TimeOfDay <= new TimeSpan(23, 59, 59);
+
+        private bool HasQuickNextDayRestart(List<TblResClk> records, int index, DateTime exitTime, decimal resUid)
+        {
+            if (index + 1 >= records.Count)
                 return false;
 
             var next = records[index + 1];
+            var nextIngresso = GetEffectiveIngress(next);
+
             return next.ResUid == resUid
-                && next.ClkInnTss.HasValue
-                && next.ClkInnTss.Value > exitTime
-                && next.ClkInnTss.Value <= exitTime.AddMinutes(10);
+                && nextIngresso.HasValue
+                && nextIngresso.Value > exitTime
+                && nextIngresso.Value.Date > exitTime.Date
+                && nextIngresso.Value <= exitTime.AddMinutes(10);
         }
 
+        private DateTime? GetEffectiveIngress(TblResClk record) => record.EdtInnTss ?? record.ClkInnTss;
+        private DateTime? GetEffectiveUscita(TblResClk record) => record.EdtOutTss ?? record.ClkOutTss;
+
+        private DateTime? GetEffectiveInizioPausa(TblResBrk record) => record.EdtTssStr ?? record.TssStr;
+        private DateTime? GetEffectiveFinePausa(TblResBrk record) => record.EdtTssEnd ?? record.TssEnd;
     }
 }
