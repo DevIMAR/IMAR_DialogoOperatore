@@ -95,10 +95,10 @@ namespace EsportatoreTimbratureTeamSystem.Services
                 {
                     BadgeOperatore = operatori.Single(x => x.Uid == pausa.ResUid).ResCod,
                     Causale = Costanti.INIZIO_PAUSA,
-                    Timestamp = pausa.TssStr
+                    Timestamp = (DateTime)GetEffectiveInizioPausa(pausa)
                 });
 
-                if (pausa.TssEnd is DateTime timestampFinePausa)
+                if (GetEffectiveFinePausa(pausa) is DateTime timestampFinePausa)
                     timbraturePause.Add(new Timbratura
                     {
                         BadgeOperatore = operatori.Single(x => x.Uid == pausa.ResUid).ResCod,
