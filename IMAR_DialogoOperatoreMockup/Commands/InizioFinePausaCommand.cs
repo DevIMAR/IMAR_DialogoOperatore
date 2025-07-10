@@ -82,7 +82,7 @@ namespace IMAR_DialogoOperatore.Commands
         {
             _dialogoOperatoreObserver.IsUscita = true;
 
-            await AvanzaAttivitaOperatore(_dialogoOperatoreObserver.OperatoreSelezionato);
+            await AvanzaAttivitaOperatore();
 
             if (_dialogoOperatoreObserver.IsOperazioneAnnullata)
             {
@@ -101,9 +101,10 @@ namespace IMAR_DialogoOperatore.Commands
             _autoLogoutUtility.StartLogoutTimer(3);
         }
 
-        private async Task AvanzaAttivitaOperatore(IOperatoreViewModel operatore)
+        private async Task AvanzaAttivitaOperatore()
         {
             IAttivitaViewModel attivita;
+            IOperatoreViewModel operatore = _dialogoOperatoreObserver.OperatoreSelezionato;
 
             for (int i = 0; i < operatore.AttivitaAperte.Count; i++)
             {

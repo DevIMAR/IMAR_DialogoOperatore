@@ -231,6 +231,7 @@ namespace IMAR_DialogoOperatore.Services
                 attivitaIndirette.Add(new Attivita
                 {
                     Bolla = stdMesIndTsk.ID_Ind3463,
+                    DescrizioneArticolo = "FASE INDIRETTA",
                     DescrizioneFase = stdMesIndTsk.ID_Ind3464
                 });
             }

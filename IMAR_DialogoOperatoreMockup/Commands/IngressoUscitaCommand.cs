@@ -118,6 +118,25 @@ namespace IMAR_DialogoOperatore.Commands
             }
         }
 
+        private async Task AvanzaAttivitaOperatore()
+        {
+            IAttivitaViewModel attivita;
+            IOperatoreViewModel operatore = _dialogoOperatoreObserver.OperatoreSelezionato;
+
+            for (int i = 0; i < operatore.AttivitaAperte.Count; i++)
+            {
+                attivita = new AttivitaViewModel(operatore.AttivitaAperte[i]);
+
+                if (attivita.Causale == Costanti.IN_ATTREZZAGGIO)
+                    continue;
+
+                await _interruzioneAttivitaHelper.GestisciInterruzioneAttivita(attivita, false);
+
+                if (_dialogoOperatoreObserver.IsOperazioneAnnullata)
+                    break;
+            }
+        }
+
         public override void Dispose()
         {
             _autoLogoutUtility.OnLogoutTriggered -= AutoLogoutUtility_OnLogoutTriggered;
