@@ -326,7 +326,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.JMes
             return result;
         }
 
-        public HttpResponseMessage MesEquipStart(string badge, string bolla, int codiceMacchinaGalileo)
+        public HttpResponseMessage MesEquipStart(Operatore operatore, string bolla)
         {
             string wizardPath = "?wzdCod=MesEquipStart";
 
@@ -337,9 +337,9 @@ namespace IMAR_DialogoOperatore.Infrastructure.JMes
                     paramsIO = new
                     {
                         qck = true,
-                        clkBdgCod = badge,
+                        clkBdgCod = operatore.Badge,
                         notCod = bolla,
-                        clkMacUid = codiceMacchinaGalileo
+                        clkMacUid = operatore.MacchinaAssegnata.CodiceJMes
                     }
                 }
             };

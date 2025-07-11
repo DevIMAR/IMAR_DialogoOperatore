@@ -15,7 +15,7 @@ namespace IMAR_DialogoOperatore.Commands
         private readonly IDialogoOperatoreObserver _dialogoOperatoreObserver;
         private readonly IInterruzioneAttivitaHelper _interruzioneAttivitaHelper;
         private readonly IJmesApiClient _jmesApiClient;
-        private readonly IOperatoriService _operatoriService;
+        private readonly IOperatoreService _operatoriService;
         private readonly IAutoLogoutUtility _autoLogoutUtility;
 
         public InizioFinePausaCommand(
@@ -24,7 +24,7 @@ namespace IMAR_DialogoOperatore.Commands
             IInterruzioneAttivitaHelper interruzioneLavoroUtility,
             IJmesApiClient jmesApiClient,
             IAttivitaService attivitaService,
-            IOperatoriService operatoriService,
+            IOperatoreService operatoriService,
             IAutoLogoutUtility autoLogoutUtility)
         {
             _infoOperatoreViewModel = infoOperatoreViewModel;

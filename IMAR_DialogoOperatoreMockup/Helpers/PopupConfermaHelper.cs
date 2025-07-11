@@ -9,17 +9,20 @@ namespace IMAR_DialogoOperatore.Helpers
     public class PopupConfermaHelper : IPopupConfermaHelper
     {
         private readonly IAttivitaService _attivitaService;
+        private readonly IOperatoreService _operatoreService;
         private readonly IDialogoOperatoreObserver _dialogoOperatoreObserver;
         private readonly ICercaAttivitaObserver _cercaAttivitaObserver;
         private readonly IAvanzamentoObserver _avanzamentoObserver;
 
         public PopupConfermaHelper(
             IAttivitaService attivitaService,
+            IOperatoreService operatoreService,
             IDialogoOperatoreObserver dialogoOperatoreObserver,
             ICercaAttivitaObserver cercaAttivitaObserver,
             IAvanzamentoObserver avanzamentoObserver)
         {
             _attivitaService = attivitaService;
+            _operatoreService = operatoreService;
             _dialogoOperatoreObserver = dialogoOperatoreObserver;
             _cercaAttivitaObserver = cercaAttivitaObserver;
             _avanzamentoObserver = avanzamentoObserver;
@@ -110,18 +113,10 @@ namespace IMAR_DialogoOperatore.Helpers
         {
             Attivita? attivitaFasePrecedente = GetAttivitaFasePrecedente();
 
-            if (attivitaFasePrecedente == null || attivitaFasePrecedente.QuantitaProdotta != 0)
+            if (attivitaFasePrecedente == null || attivitaFasePrecedente.QuantitaProdottaContabilizzata + attivitaFasePrecedente.QuantitaProdottaNonContabilizzata != 0)
                 return string.Empty;
 
             return "La fase precedente a quella in lavorazione ha prodotto " + attivitaFasePrecedente.QuantitaProdotta + " pezzi.\n";
-        }
-
-        private string GestisciLavoroApertoDaAltri()
-        {
-            if (!_dialogoOperatoreObserver.AttivitaSelezionata.Causale.Equals(Costanti.IN_LAVORO))
-                return string.Empty;
-
-            return "Questa fase è già in lavorazione.\n";
         }
 
         private Attivita? GetAttivitaFasePrecedente()
@@ -153,6 +148,25 @@ namespace IMAR_DialogoOperatore.Helpers
             }
 
             return -1;
+        }
+
+        private string GestisciLavoroApertoDaAltri()
+        {
+            string messaggioAttivitaAperta = "Questa fase è già in lavorazione da:\n";
+
+            IList<string>? idJmesOperatoriConStessaBollaAperta = _attivitaService.GetIdOperatoriConBollaAperta(_dialogoOperatoreObserver.AttivitaSelezionata.Bolla);
+            if (idJmesOperatoriConStessaBollaAperta.Count == 0)
+                return string.Empty;
+
+            Operatore operatoreConAttivitaAperta;
+            foreach (string idJmesOperatore in idJmesOperatoriConStessaBollaAperta)
+            {
+                operatoreConAttivitaAperta = _operatoreService.GetOperatoreDaIdJMes(idJmesOperatore);
+
+                messaggioAttivitaAperta += $"- {operatoreConAttivitaAperta.Nome} {operatoreConAttivitaAperta.Cognome} ({operatoreConAttivitaAperta.Badge})\n";
+            }
+
+            return messaggioAttivitaAperta;
         }
 
         private string GestisciAvanzamentoOChiusuraLavoro()

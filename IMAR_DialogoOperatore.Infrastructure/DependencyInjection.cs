@@ -35,7 +35,7 @@ namespace IMAR_DialogoOperatore.Infrastructure
 
 			services.AddScoped<IAttivitaService, AttivitaService>();
 			services.AddScoped<IMorpheusApiService, MorpheusApiService>();
-			services.AddScoped<IOperatoriService, OperatoreService>();
+			services.AddScoped<IOperatoreService, OperatoreService>();
 			services.AddScoped<IMacchinaService, MacchinaService>();
 			services.AddScoped<ISegnalazioniDifformitaService, SegnalazioniDifformitaService>();
 

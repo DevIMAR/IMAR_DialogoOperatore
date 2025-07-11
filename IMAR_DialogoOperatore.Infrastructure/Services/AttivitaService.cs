@@ -117,13 +117,18 @@ namespace IMAR_DialogoOperatore.Services
             if (attivitaOperatore == null && attivitaIndiretteOperatore == null)
                 return new List<Attivita>();
 
-            IList<mesDiaOpe>? attivitaAperte = _jmesApiClient.ChiamaQueryGetJmes<mesDiaOpe>();
+            IList<mesDiaOpe>? attivitaAperte = GetAttivitaAperte();
             if (attivitaAperte == null)
                 return new List<Attivita>();
 
             IList<Attivita> attivitaOperatoreAperte = GetAttivitaOperatoreAperte(attivitaOperatore, attivitaAperte, attivitaIndiretteOperatore);
 
             return attivitaOperatoreAperte;
+        }
+
+        public IList<mesDiaOpe>? GetAttivitaAperte()
+        {
+            return _jmesApiClient.ChiamaQueryGetJmes<mesDiaOpe>();
         }
 
         private IList<mesEvtOpe>? OttieniTutteAttivitaOperatore(string badgeOperatore)
@@ -237,6 +242,22 @@ namespace IMAR_DialogoOperatore.Services
             }
 
             return attivitaIndirette;
+        }
+
+        public List<string>? GetIdOperatoriConBollaAperta(string bolla)
+        {
+            IList<mesDiaOpe> attivitaAperte = GetAttivitaAperte();
+            IList<mesRcpActOpe>? riepilogoAttivitaOperatore = _jmesApiClient.ChiamaQueryGetJmes<mesRcpActOpe>();
+
+            return attivitaAperte
+                   .Join(riepilogoAttivitaOperatore,
+                         aa => aa.ID_Det3350,
+                         ao => ao.ID_EvtDetLst3309,
+                         (aa, ao) => new { aa.ID_Det3350, ao.ID_EvtOpe3279 })?
+                   .Where(x => x.ID_Det3350 == bolla)
+                   .Distinct()
+                   .Select(x => x.ID_EvtOpe3279.ToString())
+                   .ToList();
         }
     }
 }

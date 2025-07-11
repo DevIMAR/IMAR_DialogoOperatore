@@ -8,7 +8,7 @@ using System.Globalization;
 
 namespace IMAR_DialogoOperatore.Infrastructure.Services
 {
-    public class OperatoreService : IOperatoriService
+    public class OperatoreService : IOperatoreService
     {
         private readonly ISynergyJmesUoW _synergyJmesUoW;
         private readonly IJmesApiClient _jmesApiClient;
@@ -50,24 +50,30 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
             if (risorsa == null)
                 return null;
 
-            Operatore = new Operatore
-            {
-                Badge = risorsa.ResCod.TrimStart('0'),
-                Nome = risorsa.ResNam,
-                Cognome = risorsa.ResSur,
-                Ingresso = DateTime.ParseExact(ingressiUscite.Where(x => x.ID_AngRes368 == risorsa.ResCod).Select(x => x.ID_ClkRes2365).Max() ?? "19000101000000", format, provider),
-                Uscita = DateTime.ParseExact(ingressiUscite.Where(x => x.ID_AngRes368 == risorsa.ResCod).Select(x => x.ID_ClkRes2366).Max() ?? "19000101000000", format, provider),
-                InizioPausa = DateTime.ParseExact(iniziFiniPause.Where(x => x.ID_Res368 == risorsa.ResCod).Select(x => x.ID_ResBrk2426).Max() ?? "19000101000000", format, provider),
-                FinePausa = DateTime.ParseExact(iniziFiniPause.Where(x => x.ID_Res368 == risorsa.ResCod).Select(x => x.ID_ResBrk2427).Max() ?? "19000101000000", format, provider),
-                AttivitaAperte = _attivitaService.OttieniAttivitaOperatore(risorsa.ResCod),
-                IdJMes = (int)risorsa.Uid
-            };
+            Operatore = GetOperatoreFromAngRes(risorsa);
+
+            Operatore.Ingresso = DateTime.ParseExact(ingressiUscite.Where(x => x.ID_AngRes368 == risorsa.ResCod).Select(x => x.ID_ClkRes2365).Max() ?? "19000101000000", format, provider);
+            Operatore.Uscita = DateTime.ParseExact(ingressiUscite.Where(x => x.ID_AngRes368 == risorsa.ResCod).Select(x => x.ID_ClkRes2366).Max() ?? "19000101000000", format, provider);
+            Operatore.InizioPausa = DateTime.ParseExact(iniziFiniPause.Where(x => x.ID_Res368 == risorsa.ResCod).Select(x => x.ID_ResBrk2426).Max() ?? "19000101000000", format, provider);
+            Operatore.FinePausa = DateTime.ParseExact(iniziFiniPause.Where(x => x.ID_Res368 == risorsa.ResCod).Select(x => x.ID_ResBrk2427).Max() ?? "19000101000000", format, provider);
+            Operatore.AttivitaAperte = _attivitaService.OttieniAttivitaOperatore(risorsa.ResCod);
 
             AssegnaMacchinaAdOperatore();
 
             Operatore.Stato = GetStatus();
 
             return Operatore;
+        }
+
+        private Operatore GetOperatoreFromAngRes(AngRes risorsa)
+        {
+            return new Operatore
+            {
+                Badge = risorsa.ResCod.TrimStart('0'),
+                Nome = risorsa.ResNam,
+                Cognome = risorsa.ResSur,
+                IdJMes = (int)risorsa.Uid
+            };
         }
 
         public void GetTimbratureOperatore(out IList<mesOpeClk>? ingressiUscite, out IList<stdTblResBrk>? iniziFiniPause)
@@ -140,7 +146,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
                 if (isCambioCausaleApertura)
                     return "Non è possibile aprire l'attrezzaggio di una fase se se ne è già aperto il lavoro!";
 
-                errore = _jmesApiClient.RegistrazioneOperazioneSuDb(() => _jmesApiClient.MesEquipStart(operatore.Badge, attivitaDaAggiungere.Bolla, attivitaDaAggiungere.Macchina.CodiceJMes));
+                errore = _jmesApiClient.RegistrazioneOperazioneSuDb(() => _jmesApiClient.MesEquipStart(operatore, attivitaDaAggiungere.Bolla));
             }
             else
                 errore = GestisciAperturaLavoro(operatore, attivitaDaAggiungere, isCambioCausaleApertura, isAttivitaIndiretta);
@@ -172,6 +178,12 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
             }
 
             return errore;
+        }
+
+        public Operatore GetOperatoreDaIdJMes(string idJMesOperatore)
+        {
+            AngRes res = _synergyJmesUoW.AngRes.Get(x => x.Uid == decimal.Parse(idJMesOperatore)).Single();
+            return GetOperatoreFromAngRes(res);
         }
     }
 }

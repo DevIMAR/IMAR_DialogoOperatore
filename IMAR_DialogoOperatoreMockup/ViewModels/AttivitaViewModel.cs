@@ -8,16 +8,6 @@ namespace IMAR_DialogoOperatore.ViewModels
 		private readonly Attivita? _attivita;
 
 		private string _causale;
-
-		public string Causale
-		{
-			get { return _causale; }
-			set
-			{
-				_causale = value;
-				OnNotifyStateChanged();
-			}
-		}
 		public string? Bolla => _attivita?.Bolla;
 		public string? Odp => _attivita?.Odp;
 		public string? Articolo => _attivita?.Articolo;
@@ -35,6 +25,16 @@ namespace IMAR_DialogoOperatore.ViewModels
 		public string SaldoAcconto { get; set; }
 		public double? CodiceJMes => _attivita?.CodiceJMes;
 		public Macchina? Macchina => _attivita?.Macchina;
+
+		public string Causale
+		{
+			get { return _causale; }
+			set
+			{
+				_causale = value;
+				OnNotifyStateChanged();
+			}
+		}
 
 
         public AttivitaViewModel(Attivita? attivita)

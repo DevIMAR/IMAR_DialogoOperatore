@@ -12,7 +12,7 @@ namespace IMAR_DialogoOperatore.Helpers
     public class ConfermaOperazioneHelper : IConfermaOperazioneHelper
 	{
 		private readonly AttivitaGridViewModel _attivitaGridViewModel;
-		private readonly IOperatoriService _operatoriService;
+		private readonly IOperatoreService _operatoriService;
 		private readonly IAttivitaService _attivitaService;
 		private readonly IDialogoOperatoreObserver _dialogoOperatoreObserver;
 		private readonly IAvanzamentoObserver _avanzamentoObserver;
@@ -22,7 +22,7 @@ namespace IMAR_DialogoOperatore.Helpers
 
 		public ConfermaOperazioneHelper(
 			AttivitaGridViewModel attivitaGridViewModel,
-			IOperatoriService operatoriService,
+			IOperatoreService operatoriService,
 			IAttivitaService attivitaService,
 			IDialogoOperatoreObserver dialogoOperatoreObserver,
 			IAvanzamentoObserver avanzamentoObserver,

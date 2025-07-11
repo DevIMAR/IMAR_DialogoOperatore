@@ -10,7 +10,7 @@ namespace IMAR_DialogoOperatore.ViewModels
     public class InfoOperatoreViewModel : ViewModelBase
     {
         private readonly IDialogoOperatoreObserver _dialogoOperatoreObserver;
-        private readonly IOperatoriService _operatoriService;
+        private readonly IOperatoreService _operatoriService;
         private readonly IAutoLogoutUtility _autoLogoutUtility;
 
         private int? _badge;
@@ -53,7 +53,7 @@ namespace IMAR_DialogoOperatore.ViewModels
 
         public InfoOperatoreViewModel(
             IDialogoOperatoreObserver dialogoOperatoreStore,
-            IOperatoriService operatoriService,
+            IOperatoreService operatoriService,
             IAutoLogoutUtility autoLogoutUtility)
         {
             _dialogoOperatoreObserver = dialogoOperatoreStore;

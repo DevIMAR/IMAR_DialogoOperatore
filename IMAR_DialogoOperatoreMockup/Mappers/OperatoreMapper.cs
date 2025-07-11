@@ -7,10 +7,10 @@ namespace IMAR_DialogoOperatore.Mappers
 {
     public class OperatoreMapper : IOperatoreMapper
 	{
-		private readonly IOperatoriService _operatoriService;
+		private readonly IOperatoreService _operatoriService;
 
 		public OperatoreMapper(
-            IOperatoriService operatoriService)
+            IOperatoreService operatoriService)
 		{
             _operatoriService = operatoriService;
 		}
