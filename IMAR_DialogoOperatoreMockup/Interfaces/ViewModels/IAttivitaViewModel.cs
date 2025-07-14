@@ -22,5 +22,6 @@ namespace IMAR_DialogoOperatore.Interfaces.ViewModels
         string SaldoAcconto { get; set; }
         double? CodiceJMes { get; }
         Macchina? Macchina { get; }
+        string CausaleEstesa { get; }
     }
 }

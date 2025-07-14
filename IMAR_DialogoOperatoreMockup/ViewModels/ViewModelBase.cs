@@ -2,7 +2,7 @@
 {
 	public class ViewModelBase : IDisposable
 	{
-		public void OnNotifyStateChanged()
+        public void OnNotifyStateChanged()
 		{
 			NotifyStateChanged?.Invoke();
 		}

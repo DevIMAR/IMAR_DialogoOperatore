@@ -16,12 +16,6 @@
 			@ref="Grid"
 			id="grid-id">
 		<Columns>
-			<DxGridDataColumn FieldName="@(nameof(AttivitaViewModel.Causale))"
-							  Caption=" "
-							  TextAlignment="GridTextAlignment.Center"
-							  Width="3%">
-			</DxGridDataColumn>
-
 			<DxGridDataColumn FieldName="@(nameof(AttivitaViewModel.Odp))"
 							  Caption="Odp"
 							  TextAlignment="GridTextAlignment.Left"
@@ -57,9 +51,9 @@
 			</DxGridDataColumn>
 
 			<DxGridDataColumn FieldName="@(nameof(AttivitaViewModel.DescrizioneArticolo))"
-							  Caption="Desc. Articolo"
+							  Caption="Descrizione Articolo"
 							  TextAlignment="GridTextAlignment.Left"
-							  Width="31%">
+							  Width="28%">
 			</DxGridDataColumn>
 
 			<DxGridDataColumn FieldName="@(nameof(AttivitaViewModel.Fase))"
@@ -70,9 +64,15 @@
 			</DxGridDataColumn>
 
 			<DxGridDataColumn FieldName="@(nameof(AttivitaViewModel.DescrizioneFase))"
-							  Caption="Desc. Fase"
+							  Caption="Descrizione Fase"
 							  TextAlignment="GridTextAlignment.Left"
-							  Width="31%">
+							  Width="28%">
+			</DxGridDataColumn>
+
+			<DxGridDataColumn FieldName="@(nameof(AttivitaViewModel.CausaleEstesa))"
+							  Caption="Stato lavorazione"
+							  TextAlignment="GridTextAlignment.Left"
+							  Width="9%">
 			</DxGridDataColumn>
 
 			<DxGridDataColumn FieldName="@(nameof(AttivitaViewModel.QuantitaProdotta))"

@@ -4,7 +4,9 @@ using IMAR_DialogoOperatore.Application.Interfaces.Utilities;
 using IMAR_DialogoOperatore.Interfaces.Helpers;
 using IMAR_DialogoOperatore.Interfaces.Observers;
 using IMAR_DialogoOperatore.Interfaces.ViewModels;
+using IMAR_DialogoOperatore.Utilities;
 using IMAR_DialogoOperatore.ViewModels;
+using Newtonsoft.Json.Linq;
 
 namespace IMAR_DialogoOperatore.Commands
 {
@@ -15,19 +17,22 @@ namespace IMAR_DialogoOperatore.Commands
         private readonly IInterruzioneAttivitaHelper _interruzioneAttivitaHelper;
 		private readonly IJmesApiClient _jmesApiClient;
         private readonly IAutoLogoutUtility _autoLogoutUtility;
+        private readonly ToastDisplayerUtility _toastDisplayerUtility;
 
-		public IngressoUscitaCommand(
+        public IngressoUscitaCommand(
 			InfoOperatoreViewModel infoOperatoreViewModel,
 			IDialogoOperatoreObserver dialogoOperatoreObserver,
 			IInterruzioneAttivitaHelper interruzioneLavoroHelper,
 			IJmesApiClient jmesApiClient,
-            IAutoLogoutUtility autoLogoutUtility)
+            IAutoLogoutUtility autoLogoutUtility,
+            ToastDisplayerUtility toastDisplayerUtility)
         {
 			_infoOperatoreViewModel = infoOperatoreViewModel;
             _dialogoOperatoreObserver = dialogoOperatoreObserver;
 			_interruzioneAttivitaHelper = interruzioneLavoroHelper;
 			_jmesApiClient = jmesApiClient;
             _autoLogoutUtility = autoLogoutUtility;
+            _toastDisplayerUtility = toastDisplayerUtility;
 
             _autoLogoutUtility.OnLogoutTriggered += AutoLogoutUtility_OnLogoutTriggered;
         }
@@ -65,6 +70,8 @@ namespace IMAR_DialogoOperatore.Commands
             _dialogoOperatoreObserver.IsLoaderVisibile = false;
 
             _dialogoOperatoreObserver.OperatoreSelezionato.Stato = Costanti.PRESENTE;
+
+            _toastDisplayerUtility.ShowGreenToast("Entrata", $"Benvenuto {_dialogoOperatoreObserver.OperatoreSelezionato.Nome}!");
         }
 
         private async Task EffettuaUscitaOperatore()
@@ -87,6 +94,8 @@ namespace IMAR_DialogoOperatore.Commands
             _dialogoOperatoreObserver.IsLoaderVisibile = false;
 
             _dialogoOperatoreObserver.OperatoreSelezionato.Stato = Costanti.ASSENTE;
+
+            _toastDisplayerUtility.ShowRedToast("Uscita", $"Arrivederci {_dialogoOperatoreObserver.OperatoreSelezionato.Nome}!");
 
             _autoLogoutUtility.StartLogoutTimer(3);
         }

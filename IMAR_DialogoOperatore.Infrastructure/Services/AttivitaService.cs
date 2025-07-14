@@ -1,9 +1,9 @@
 ﻿using IMAR_DialogoOperatore.Application;
 using IMAR_DialogoOperatore.Application.Interfaces.Clients;
-using IMAR_DialogoOperatore.Application.Interfaces.Mappers;
 using IMAR_DialogoOperatore.Application.Interfaces.Services.Activities;
 using IMAR_DialogoOperatore.Application.Interfaces.Utilities;
 using IMAR_DialogoOperatore.Domain.Models;
+using IMAR_DialogoOperatore.Infrastructure.Mappers;
 using IMAR_DialogoOperatore.Infrastructure.Services;
 
 namespace IMAR_DialogoOperatore.Services
@@ -13,22 +13,18 @@ namespace IMAR_DialogoOperatore.Services
         private readonly IMacchinaService _macchinaService;
         private readonly IJmesApiClient _jmesApiClient;
         private readonly IJMesApiClientErrorUtility _jMesApiClientErrorUtility;
-        private readonly IStatoAttivitaMapper _statoAttivitaMapper;
         private readonly CaricamentoAttivitaInBackgroundService _caricamentoAttivitaInBackroundService;
 
         public AttivitaService(
             IMacchinaService macchinaService,
             IJmesApiClient jmesApiClient,
             IJMesApiClientErrorUtility jMesApiClientErrorUtility,
-            IStatoAttivitaMapper statoAttivitaMapper,
             CaricamentoAttivitaInBackgroundService caricamentoAttivitaInBackroundService)
         {
             _macchinaService = macchinaService;
 
             _jmesApiClient = jmesApiClient;
             _jMesApiClientErrorUtility = jMesApiClientErrorUtility;
-
-            _statoAttivitaMapper = statoAttivitaMapper;
 
             _caricamentoAttivitaInBackroundService = caricamentoAttivitaInBackroundService;
         }
@@ -179,7 +175,8 @@ namespace IMAR_DialogoOperatore.Services
                                                             {
                                                                 Bolla = aa.ID_Det3350,
                                                                 CodiceJMes = aa.ID_Det3348,
-                                                                Causale = _statoAttivitaMapper.FromJMesStatus(aa.ID_Sts3130)
+                                                                CausaleEstesa = aa.ID_Sts3130,
+                                                                Causale = StatoAttivitaMapper.FromJMesStatus(aa.ID_Sts3130)
                                                             })
                                                     .Where(x => x.Causale == Costanti.IN_LAVORO ||
                                                                 x.Causale == Costanti.IN_ATTREZZAGGIO ||
@@ -192,6 +189,7 @@ namespace IMAR_DialogoOperatore.Services
                                              aoa => aoa.Bolla,
                                              (a, aoa) =>
                                              {
+                                                 a.CausaleEstesa = aoa.CausaleEstesa;
                                                  a.Causale = aoa.Causale;
                                                  a.CodiceJMes = aoa.CodiceJMes;
                                                  return a;
@@ -212,10 +210,8 @@ namespace IMAR_DialogoOperatore.Services
                                                                 Bolla = aa.ID_Det3350,
                                                                 DescrizioneFase = aa.ID_Det3356,
                                                                 CodiceJMes = aa.ID_Det3348,
-                                                                Causale = _statoAttivitaMapper.FromJMesStatus(aa.ID_Sts3130),
-
-                                                                //Placeholder
-                                                                SaldoAcconto = "A"
+                                                                CausaleEstesa = aa.ID_Sts3130,
+                                                                Causale = StatoAttivitaMapper.FromJMesStatus(aa.ID_Sts3130)
                                                             })
                                                     .Where(x => x.Causale == Costanti.IN_LAVORO ||
                                                                 x.Causale == Costanti.IN_ATTREZZAGGIO ||

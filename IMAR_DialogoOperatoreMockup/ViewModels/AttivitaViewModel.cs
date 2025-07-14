@@ -1,4 +1,5 @@
 ﻿using IMAR_DialogoOperatore.Domain.Models;
+using IMAR_DialogoOperatore.Infrastructure.Mappers;
 using IMAR_DialogoOperatore.Interfaces.ViewModels;
 
 namespace IMAR_DialogoOperatore.ViewModels
@@ -25,8 +26,10 @@ namespace IMAR_DialogoOperatore.ViewModels
 		public string SaldoAcconto { get; set; }
 		public double? CodiceJMes => _attivita?.CodiceJMes;
 		public Macchina? Macchina => _attivita?.Macchina;
+		public string CausaleEstesa => _attivita?.CausaleEstesa;
 
-		public string Causale
+
+        public string Causale
 		{
 			get { return _causale; }
 			set

@@ -1,11 +1,10 @@
 ﻿using IMAR_DialogoOperatore.Application;
-using IMAR_DialogoOperatore.Application.Interfaces.Mappers;
 
 namespace IMAR_DialogoOperatore.Infrastructure.Mappers
 {
-    public class StatoAttivitaMapper : IStatoAttivitaMapper
+    public static class StatoAttivitaMapper
     {
-        public string FromJMesStatus(string statoJmes)
+        public static string FromJMesStatus(string statoJmes)
         {
             switch (statoJmes)
             {

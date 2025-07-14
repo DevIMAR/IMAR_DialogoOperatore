@@ -3,6 +3,7 @@
 	public class Attivita
 	{
 		public string Causale { get; set; }
+		public string CausaleEstesa { get; set; }
 		public string Bolla { get; set; }
 		public string Odp { get; set; }
 		public string Articolo { get; set; }

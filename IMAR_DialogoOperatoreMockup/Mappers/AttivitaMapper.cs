@@ -12,6 +12,7 @@ namespace IMAR_DialogoOperatore.Mappers
 			return new Attivita
 			{
                 Causale = attivitaViewModel.Causale,
+                CausaleEstesa = attivitaViewModel.CausaleEstesa,
                 Bolla = attivitaViewModel.Bolla,
                 Odp = attivitaViewModel.Odp,
                 Articolo = attivitaViewModel.Articolo,

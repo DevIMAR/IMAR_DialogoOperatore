@@ -5,6 +5,7 @@ using IMAR_DialogoOperatore.Application.Interfaces.Utilities;
 using IMAR_DialogoOperatore.Interfaces.Helpers;
 using IMAR_DialogoOperatore.Interfaces.Observers;
 using IMAR_DialogoOperatore.Interfaces.ViewModels;
+using IMAR_DialogoOperatore.Utilities;
 using IMAR_DialogoOperatore.ViewModels;
 
 namespace IMAR_DialogoOperatore.Commands
@@ -17,6 +18,7 @@ namespace IMAR_DialogoOperatore.Commands
         private readonly IJmesApiClient _jmesApiClient;
         private readonly IOperatoreService _operatoriService;
         private readonly IAutoLogoutUtility _autoLogoutUtility;
+        private readonly ToastDisplayerUtility _toastDisplayerUtility;
 
         public InizioFinePausaCommand(
             InfoOperatoreViewModel infoOperatoreViewModel,
@@ -25,7 +27,8 @@ namespace IMAR_DialogoOperatore.Commands
             IJmesApiClient jmesApiClient,
             IAttivitaService attivitaService,
             IOperatoreService operatoriService,
-            IAutoLogoutUtility autoLogoutUtility)
+            IAutoLogoutUtility autoLogoutUtility,
+            ToastDisplayerUtility toastDisplayerUtility)
         {
             _infoOperatoreViewModel = infoOperatoreViewModel;
             _dialogoOperatoreObserver = dialogoOperatoreObserver;
@@ -33,6 +36,7 @@ namespace IMAR_DialogoOperatore.Commands
             _jmesApiClient = jmesApiClient;
             _operatoriService = operatoriService;
             _autoLogoutUtility = autoLogoutUtility;
+            _toastDisplayerUtility = toastDisplayerUtility;
 
             _autoLogoutUtility.OnLogoutTriggered += AutoLogoutUtility_OnLogoutTriggered;
         }
@@ -71,11 +75,11 @@ namespace IMAR_DialogoOperatore.Commands
             _dialogoOperatoreObserver.IsLoaderVisibile = true;
             await Task.Delay(1);
             _jmesApiClient.MesBreakEnd(_dialogoOperatoreObserver.OperatoreSelezionato.Badge.ToString());
+            _dialogoOperatoreObserver.OperatoreSelezionato = new OperatoreViewModel(_operatoriService.OttieniOperatore(_dialogoOperatoreObserver.OperatoreSelezionato.Badge));
             _dialogoOperatoreObserver.IsLoaderVisibile = false;
 
             _dialogoOperatoreObserver.OperatoreSelezionato.Stato = Costanti.PRESENTE;
-
-            _dialogoOperatoreObserver.OperatoreSelezionato = new OperatoreViewModel(_operatoriService.OttieniOperatore(_dialogoOperatoreObserver.OperatoreSelezionato.Badge));
+            _toastDisplayerUtility.ShowGreenToast("Rientro", $"Bentornato {_dialogoOperatoreObserver.OperatoreSelezionato.Nome}!");
         }
 
         private async Task InizioPausa()
@@ -93,10 +97,11 @@ namespace IMAR_DialogoOperatore.Commands
             _dialogoOperatoreObserver.IsLoaderVisibile = true;
             await Task.Delay(1);
             _jmesApiClient.MesBreakStart(_dialogoOperatoreObserver.OperatoreSelezionato.Badge.ToString());
+            _dialogoOperatoreObserver.OperatoreSelezionato = new OperatoreViewModel(_operatoriService.OttieniOperatore(_dialogoOperatoreObserver.OperatoreSelezionato.Badge));
             _dialogoOperatoreObserver.IsLoaderVisibile = false;
 
-            _dialogoOperatoreObserver.OperatoreSelezionato = new OperatoreViewModel(_operatoriService.OttieniOperatore(_dialogoOperatoreObserver.OperatoreSelezionato.Badge));
             _dialogoOperatoreObserver.OperatoreSelezionato.Stato = Costanti.IN_PAUSA;
+            _toastDisplayerUtility.ShowYellowToast("Pausa", $"Buona pausa {_dialogoOperatoreObserver.OperatoreSelezionato.Nome}!");
 
             _autoLogoutUtility.StartLogoutTimer(3);
         }
