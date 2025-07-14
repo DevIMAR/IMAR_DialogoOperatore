@@ -45,7 +45,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
         public Macchina? GetMacchinaFittiziaByFirstAttivitaAperta(Attivita attivitaAperta, int idJMesOperatore)
         {
             mesEvtToEndMac? macchinaFittiziaConAttivitaOperatoreAperta = _jmesApiClient.ChiamaQueryGetJmes<mesEvtToEndMac>()?
-                                                                                       .SingleOrDefault(x => x.ID_Det3350.Trim() == attivitaAperta.Bolla.ToString() && 
+                                                                                       .FirstOrDefault(x => x.ID_Det3350.Trim() == attivitaAperta.Bolla.ToString() && 
                                                                                                              x.ID_Evt3245 == idJMesOperatore);
             if (macchinaFittiziaConAttivitaOperatoreAperta == null)
                 return null;
