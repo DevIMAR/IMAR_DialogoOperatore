@@ -9,12 +9,15 @@ namespace IMAR_DialogoOperatore.ViewModels
         private readonly IDialogoOperatoreObserver _dialogoOperatoreObserver;
 
         public ICommand ShowTaskPopupCommand { get; }
+        public ICommand ShowEntrateUscitePauseCommand { get; }
 
         public HeaderToolbarViewModel(
             ShowTaskPopupCommand showTaskPopupCommand,
+            ShowEntrateUscitePauseCommand showEntrateUscitePauseCommand,
             IDialogoOperatoreObserver dialogoOperatoreObserver)
         {
             ShowTaskPopupCommand = showTaskPopupCommand;
+            ShowEntrateUscitePauseCommand = showEntrateUscitePauseCommand;
             _dialogoOperatoreObserver = dialogoOperatoreObserver;
 
             _dialogoOperatoreObserver.OnOperatoreSelezionatoChanged += DialogoOperatoreObserver_OnOperatoreSelezionatoChanged;

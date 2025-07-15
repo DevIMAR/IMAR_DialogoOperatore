@@ -48,8 +48,10 @@ namespace IMAR_DialogoOperatore
 			services.AddScoped<InfoOperatoreViewModel>();
 			services.AddScoped<InfoTaskOperatoreViewModel>();
 			services.AddScoped<PopupDiConfermaViewModel>();
+			services.AddScoped<PopupTimbratureViewModel>();
 			services.AddScoped<PulsantieraGeneraleViewModel>();
 			services.AddScoped<TaskPopupViewModel>();
+			services.AddScoped<TimbratureGridViewModel>();
 
 			services.AddScoped<AnnullaOperazioneCommand>();
 			services.AddScoped<AvanzamentoCommand>();
@@ -63,6 +65,7 @@ namespace IMAR_DialogoOperatore
 			services.AddScoped<InviaTaskCommand>();
 			services.AddScoped<MostraIndiretteCommand>();
 			services.AddScoped<RispostaPopupDiConfermaCommand>();
+			services.AddScoped<ShowEntrateUscitePauseCommand>();
 			services.AddScoped<ShowTaskPopupCommand>();
 
 			return services;

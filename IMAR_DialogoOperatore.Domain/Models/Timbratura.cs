@@ -1,4 +1,4 @@
-﻿namespace EsportatoreTimbratureTeamSystem
+﻿namespace IMAR_DialogoOperatore.Domain.Models
 {
     public class Timbratura
     {

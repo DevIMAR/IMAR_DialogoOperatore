@@ -22,6 +22,15 @@
     background-color: currentColor;
 }
 
+.icon-timer {
+    width: 28px;
+    height:24px;
+    mask: url('/images/icons/timer.svg') no-repeat center;
+    -webkit-mask: url('/images/icons/timer.svg') no-repeat center;
+    mask-size: 100% 100%;
+    background-color: currentColor;
+}
+
 .conferma-dettagli {
     margin-left: 3px;
     padding-top: 3% !important;

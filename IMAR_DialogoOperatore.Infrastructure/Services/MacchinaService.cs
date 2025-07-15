@@ -62,7 +62,9 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
         {
             IEnumerable<AngRes> macchineFittizie = _synergyJmesUoW.AngRes.Get(x => x.ResDsc.Contains("FITTIZIA"));
 
-            IEnumerable<mesEvtToEndMac>? macchineFittizieConAttivitaAperte = _jmesApiClient.ChiamaQueryGetJmes<mesEvtToEndMac>()?.Where(x => x.ID_Mac371.Contains("FITTIZIA"));
+            IEnumerable<mesEvtToEndMac>? macchineFittizieConAttivitaAperte = _jmesApiClient.ChiamaQueryGetJmes<mesEvtToEndMac>()?
+                                                                                           .Where(x => x.ID_Mac371.Contains("FITTIZIA") &&
+                                                                                                       string.IsNullOrWhiteSpace(x.ID_Evt3248));
             if (macchineFittizieConAttivitaAperte == null || !macchineFittizieConAttivitaAperte.Any())
                 return new Macchina
                 {

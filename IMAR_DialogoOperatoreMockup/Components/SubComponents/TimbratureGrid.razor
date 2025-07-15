@@ -1,0 +1,31 @@
+﻿@using IMAR_DialogoOperatore.Domain.Models
+@using IMAR_DialogoOperatore.ViewModels
+
+@inject TimbratureGridViewModel TimbratureGridViewModel
+
+<DxGrid @bind-Data="@TimbratureGridViewModel.TimbratureOperatore"
+		AllowSort="false"
+		AllowSelectRowByClick="false">
+	<Columns>
+		<DxGridDataColumn FieldName="@nameof(Timbratura.Causale)"
+						  Caption="Tipo timbratura"
+						  TextAlignment="GridTextAlignment.Left" />
+
+		<DxGridDataColumn FieldName="@nameof(Timbratura.Timestamp)"
+						  Caption="Data e ora"
+						  TextAlignment="GridTextAlignment.Left" 
+						  DisplayFormat="g"
+						  SortIndex="0"/>
+	</Columns>
+</DxGrid>
+
+@code {
+	protected override void OnInitialized()
+	{
+		base.OnInitialized();
+
+		TimbratureGridViewModel.NotifyStateChanged += TimbratureGridViewModel_NotifyStateChanged;
+	}
+
+	private void TimbratureGridViewModel_NotifyStateChanged() => InvokeAsync(StateHasChanged);
+}

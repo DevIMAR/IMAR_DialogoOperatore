@@ -38,6 +38,7 @@ namespace IMAR_DialogoOperatore.Infrastructure
 			services.AddScoped<IOperatoreService, OperatoreService>();
 			services.AddScoped<IMacchinaService, MacchinaService>();
 			services.AddScoped<ISegnalazioniDifformitaService, SegnalazioniDifformitaService>();
+			services.AddScoped<ITimbratureService, TimbratureService>();
 
 			services.AddScoped<IImarApiClient, ImarApiClient>();
 			services.AddScoped<IJmesApiClient, JmesApiClient>();

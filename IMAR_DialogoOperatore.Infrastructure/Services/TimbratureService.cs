@@ -1,10 +1,12 @@
 ﻿using IMAR_DialogoOperatore.Application;
+using IMAR_DialogoOperatore.Application.Interfaces.Services.Activities;
 using IMAR_DialogoOperatore.Application.Interfaces.UoW;
 using IMAR_DialogoOperatore.Domain.Entities.JMES;
+using IMAR_DialogoOperatore.Domain.Models;
 
-namespace EsportatoreTimbratureTeamSystem.Services
+namespace IMAR_DialogoOperatore.Infrastructure.Services
 {
-    public class TimbratureService
+    public class TimbratureService : ITimbratureService
     {
         private readonly ISynergyJmesUoW _synergyJmesUoW;
 
@@ -14,15 +16,74 @@ namespace EsportatoreTimbratureTeamSystem.Services
             _synergyJmesUoW = synergyJmesUoW;
         }
 
-        public List<Timbratura> GetTimbrature()
+        public List<Timbratura> GetTimbratureOperatore(string badgeOperatore)
+        {
+            List<Timbratura> timbrature = new List<Timbratura>();
+            List<Timbratura> timbraturePause = new List<Timbratura>();
+            List<Timbratura> timbratureIngressiUscite = new List<Timbratura>();
+
+            AngRes operatore = GetIdOperatori().SingleOrDefault(o => o.ResCod == badgeOperatore.PadLeft(4, '0'));
+            List<TblResBrk> pause = GetPauseOperatoreDiOggi(operatore).ToList();
+            List<TblResClk> ingressiUscite = GetIngressiUsciteOperatoreDiOggi(operatore).ToList();
+
+            Task taskPause = Task.Run(() =>
+            {
+                timbraturePause = GetTimbraturePause(new List<AngRes> { operatore }, pause);
+            });
+
+            Task taskIngressiUscite = Task.Run(() =>
+            {
+                timbratureIngressiUscite = GetTimbratureIngressiUscite(new List<AngRes> { operatore }, ingressiUscite);
+            });
+
+            Task.WaitAll(taskPause, taskIngressiUscite);
+
+            timbrature.AddRange(timbraturePause);
+            timbrature.AddRange(timbratureIngressiUscite);
+
+            return timbrature;
+        }
+
+        private IEnumerable<TblResBrk> GetPauseOperatoreDiOggi(AngRes? operatore)
+        {
+            DateTime oggi = DateTime.Today;
+            DateTime inizioTurnoNotturnoDiOggi = oggi.AddHours(21);
+            DateTime inizioTurnoNotturnoDiIeri = inizioTurnoNotturnoDiOggi.AddDays(-1);
+
+            decimal idOperatore = operatore.Uid;
+            var res = _synergyJmesUoW.TblResBrk.Get().ToList();
+
+            return res.Where(x => GetEffectiveInizioPausa(x) >= inizioTurnoNotturnoDiIeri &&
+                                  GetEffectiveFinePausa(x) <= inizioTurnoNotturnoDiOggi &&
+                                  x.ResUid.Equals(idOperatore));
+        }
+
+        private IEnumerable<TblResClk> GetIngressiUsciteOperatoreDiOggi(AngRes? operatore)
+        {
+            DateTime oggi = DateTime.Today;
+            DateTime inizioTurnoNotturnoDiOggi = oggi.AddHours(21).AddMinutes(15);
+            DateTime inizioTurnoNotturnoDiIeri = inizioTurnoNotturnoDiOggi.AddDays(-1).AddMinutes(-30);
+
+            decimal idOperatore = operatore.Uid;
+
+            var res = _synergyJmesUoW.TblResClk.Get()
+                                            .ToList();
+
+            return res.Where(x => GetEffectiveIngress(x) >= inizioTurnoNotturnoDiIeri &&
+                                  (GetEffectiveUscita(x) <= inizioTurnoNotturnoDiOggi || 
+                                    GetEffectiveUscita(x) == null) &&
+                                  x.ResUid.Equals(idOperatore));
+        }
+
+        public List<Timbratura> GetTimbratureOperatoriDiIeri()
         {
             List<Timbratura> timbrature = new List<Timbratura>();
             List<Timbratura> timbraturePause = new List<Timbratura>();
             List<Timbratura> timbratureIngressiUscite = new List<Timbratura>();
 
             List<AngRes> operatori = GetIdOperatori().ToList();
-            List<TblResBrk> pause = GetPause(operatori).ToList();
-            List<TblResClk> ingressiUscite = GetIngressiUscite(operatori).ToList();
+            List<TblResBrk> pause = GetPauseDiIeri(operatori).ToList();
+            List<TblResClk> ingressiUscite = GetIngressiUsciteDiIeri(operatori).ToList();
 
             Task taskPause = Task.Run(() =>
             {
@@ -55,7 +116,7 @@ namespace EsportatoreTimbratureTeamSystem.Services
                                   !x.ResCod.Contains('@'));
         }
 
-        private IEnumerable<TblResBrk> GetPause(IEnumerable<AngRes> operatori)
+        private IEnumerable<TblResBrk> GetPauseDiIeri(IEnumerable<AngRes> operatori)
         {
             DateTime oggi = DateTime.Today;
             DateTime ieri = oggi.AddDays(-1);
@@ -69,7 +130,7 @@ namespace EsportatoreTimbratureTeamSystem.Services
                                   idOperatori.Contains(x.ResUid));
         }
 
-        private IEnumerable<TblResClk> GetIngressiUscite(IEnumerable<AngRes> operatori)
+        private IEnumerable<TblResClk> GetIngressiUsciteDiIeri(IEnumerable<AngRes> operatori)
         {
             DateTime oggi = DateTime.Today;
             DateTime ieri = oggi.AddDays(-1);
@@ -110,9 +171,7 @@ namespace EsportatoreTimbratureTeamSystem.Services
             return timbraturePause;
         }
 
-        private List<Timbratura> GetTimbratureIngressiUscite(
-            IEnumerable<AngRes> operatori,
-            IEnumerable<TblResClk> ingressiUscite)
+        private List<Timbratura> GetTimbratureIngressiUscite(IEnumerable<AngRes> operatori, IEnumerable<TblResClk> ingressiUscite)
         {
             return ingressiUscite
                 .Where(r => GetEffectiveIngress(r).HasValue || GetEffectiveUscita(r).HasValue)

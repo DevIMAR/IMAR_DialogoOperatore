@@ -1,0 +1,36 @@
+<svg width="110" height="110" viewBox="0 0 110 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+	<!-- Corpo del cronometro -->
+	<circle cx="60" cy="60" r="45" stroke="currentColor" stroke-width="6" fill="none"/>
+
+	<!-- Pulsante superiore del cronometro -->
+	<rect x="52" y="10" width="16" height="6" rx="2" fill="currentColor"/>
+
+	<!-- Lancetta dei minuti (lunga, verticale) -->
+	<line x1="60" y1="60" x2="60" y2="25"
+		  stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+
+	<!-- Lancetta delle ore (più corta, orizzontale) -->
+	<line x1="60" y1="60" x2="75" y2="60"
+		  stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+
+	<!-- Trattini ogni 5 minuti -->
+	<g stroke="currentColor" stroke-width="3">
+		<!-- Trattini cardinali -->
+		<line x1="60" y1="15" x2="60" y2="25"/>
+		<line x1="60" y1="105" x2="60" y2="95"/>
+		<line x1="15" y1="60" x2="25" y2="60"/>
+		<line x1="105" y1="60" x2="95" y2="60"/>
+
+		<!-- Trattini diagonali -->
+		<line x1="30" y1="30" x2="34" y2="34"/>
+		<line x1="90" y1="30" x2="86" y2="34"/>
+		<line x1="30" y1="90" x2="34" y2="86"/>
+		<line x1="90" y1="90" x2="86" y2="86"/>
+
+		<!-- Trattini quasi verticali -->
+		<line x1="44" y1="16" x2="46" y2="21"/>
+		<line x1="76" y1="16" x2="74" y2="21"/>
+		<line x1="44" y1="104" x2="46" y2="99"/>
+		<line x1="76" y1="104" x2="74" y2="99"/>
+	</g>
+</svg>

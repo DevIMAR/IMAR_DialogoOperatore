@@ -1,6 +1,7 @@
 ﻿using EsportatoreTimbratureTeamSystem.Services;
 using IMAR_DialogoOperatore.Application;
 using IMAR_DialogoOperatore.Infrastructure;
+using IMAR_DialogoOperatore.Infrastructure.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -17,7 +18,6 @@ var host = Host.CreateDefaultBuilder(args).
                     services.AddApplicationServices();
                     services.AddInfrastructureServices();
 
-                    services.AddScoped<TimbratureService>();
                     services.AddScoped<EncodingService>();
                     services.AddScoped<FileExportService>();
                 })
@@ -28,6 +28,6 @@ var timbratureService = scope.ServiceProvider.GetRequiredService<TimbratureServi
 var encodingService = scope.ServiceProvider.GetRequiredService<EncodingService>();
 var fileExportService = scope.ServiceProvider.GetRequiredService<FileExportService>();
 
-var timbrature = timbratureService.GetTimbrature();
+var timbrature = timbratureService.GetTimbratureOperatoriDiIeri();
 string timbratureCodificate = encodingService.GetTimbratureCodificate(timbrature);
 fileExportService.Export(timbratureCodificate);

@@ -1,4 +1,5 @@
 ﻿using IMAR_DialogoOperatore.Application;
+using IMAR_DialogoOperatore.Domain.Models;
 
 namespace EsportatoreTimbratureTeamSystem.Services
 {
