@@ -19,6 +19,7 @@
 		public const string ACCONTO = "A";
 		public const string ATTIVITA_COMPLETATA = "(S) ATTIVITA CHIUSA";
 		public const string ATTIVITA_NON_COMPLETATA = "(A) ATTIVITA APERTA";
+		public const string FASE_INDIRETTA = "FASE INDIRETTA";
 
 		public const string JMES_IN_ATTREZZAGGIO = "In attrezzaggio";
 		public const string JMES_IN_LAVORO = "In lavoro";

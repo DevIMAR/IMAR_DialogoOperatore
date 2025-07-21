@@ -6,101 +6,136 @@
 		   CssClass="mb-1">
 	<Items>
 		<DxToolbarItem CssClass="bottoniera-inferiore"
+					   style="border-color: green"
 					   Click="@(() => PulsantieraGeneraleViewModel.IngressoUscitaCommand.Execute(null))"
 					   Enabled="@PulsantieraGeneraleViewModel.IngressoUscitaCommand.CanExecute(null)"
 					   Visible="@PulsantieraGeneraleViewModel.IsAssente">
-			<div>
-				<p>(E)</p>
-				<p>Entrata</p>
+			<div style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
+				<i class="icon icon-login icon-verde" style="font-size:60px; margin-bottom:4px;"></i>
+				<div style="text-align:center; font-size:20px; line-height:1.2; font-weight: bold">
+					<p style="margin:0;">Entrata</p>
+					<p style="margin:0;">(E)</p>
+				</div>
 			</div>
 		</DxToolbarItem>
 
 		<DxToolbarItem CssClass="bottoniera-inferiore"
+					   style="border-color: darkred"
 					   Click="@PulsantieraGeneraleViewModel.IngressoUscitaCommand.Execute"
 					   Enabled="@PulsantieraGeneraleViewModel.IngressoUscitaCommand.CanExecute(null)"
 					   Visible="@(!PulsantieraGeneraleViewModel.IsAssente)">
-			<div>
-				<p>(U)</p>
-				<p>Uscita</p>
+			<div style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
+				<i class="icon icon-logout icon-rosso" style="font-size:60px; margin-bottom:4px;"></i>
+				<div style="text-align:center; font-size:20px; line-height:1.2; font-weight: bold">
+					<p style="margin:0;">Uscita</p>
+					<p style="margin:0;">(U)</p>
+				</div>
 			</div>
 		</DxToolbarItem>
 
 		<DxToolbarItem CssClass="bottoniera-inferiore"
+					   style="border-color: limegreen"
 					   Click="@PulsantieraGeneraleViewModel.InizioLavoroCommand.Execute"
 					   Enabled="@PulsantieraGeneraleViewModel.InizioLavoroCommand.CanExecute(null)">
-			<div>
-				<p>(F2)</p>
-				<p>Inizio</p>
-				<p>Lavoro</p>
+			<div style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
+				<i class="icon icon-hammerAdd icon-lime" style="font-size:60px; margin-bottom:4px;"></i>
+				<div style="text-align:center; font-size:20px; line-height:1.2; font-weight: bold">
+					<p style="margin:0;">Inizio lavoro</p>
+					<p style="margin:0;">(F2)</p>
+				</div>
 			</div>
 		</DxToolbarItem>
 
 		<DxToolbarItem CssClass="bottoniera-inferiore"
+					   style="border-color: dodgerblue"
 					   Click="@PulsantieraGeneraleViewModel.FineLavoroCommand.Execute"
 					   Enabled="@PulsantieraGeneraleViewModel.FineLavoroCommand.CanExecute(null)">
-			<div>
-				<p>(Z)</p>
-				<p>Fine</p>
-				<p>Lavoro</p>
+			<div style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
+				<i class="icon icon-hammerDone icon-blu" style="font-size:60px; margin-bottom:4px;"></i>
+				<div style="text-align:center; font-size:20px; line-height:1.2; font-weight: bold">
+					<p style="margin:0;">Fine lavoro</p>
+					<p style="margin:0;">(Z)</p>
+				</div>
 			</div>
 		</DxToolbarItem>
 
 		<DxToolbarItem CssClass="bottoniera-inferiore"
+					   style="border-color: royalblue"
 					   Click="@PulsantieraGeneraleViewModel.AvanzamentoCommand.Execute"
 					   Enabled="@PulsantieraGeneraleViewModel.AvanzamentoCommand.CanExecute(null)">
-			<div>
-				<p>(F4)</p>
-				<p>Avanzamento</p>
+			<div style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
+				<i class="icon icon-advance icon-grigioBlu" style="font-size:60px; margin-bottom:4px;"></i>
+				<div style="text-align:center; font-size:20px; line-height:1.2; font-weight: bold">
+					<p style="margin:0;">Avanzamento</p>
+					<p style="margin:0;">(F4)</p>
+				</div>
 			</div>
 		</DxToolbarItem>
 
 		<DxToolbarItem CssClass="bottoniera-inferiore"
+					   style="border-color: gold"
 					   Click="@PulsantieraGeneraleViewModel.InizioFinePausaCommand.Execute"
 					   Enabled="@PulsantieraGeneraleViewModel.InizioFinePausaCommand.CanExecute(!PulsantieraGeneraleViewModel.IsInPausa)">
-			<div>
-				<p>(F8)</p>
-				<p>Inizio</p>
-				<p>Pausa</p>
+			<div style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
+				<i class="icon icon-coffee icon-giallo" style="font-size:60px; margin-bottom:4px;"></i>
+				<div style="text-align:center; font-size:20px; line-height:1.2; font-weight: bold">
+					<p style="margin:0;">Inizio pausa</p>
+					<p style="margin:0;">(F8)</p>
+				</div>
 			</div>
 		</DxToolbarItem>
 
 		<DxToolbarItem CssClass="bottoniera-inferiore"
+					   style="border-color: gold"
 					   Click="@PulsantieraGeneraleViewModel.InizioFinePausaCommand.Execute"
 					   Enabled="@PulsantieraGeneraleViewModel.InizioFinePausaCommand.CanExecute(PulsantieraGeneraleViewModel.IsInPausa)">
-			<div>
-				<p>(C)</p>
-				<p>Fine</p>
-				<p>Pausa</p>
+			<div style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
+				<i class="icon icon-coffeeEmpty icon-giallo" style="font-size:60px; margin-bottom:4px;"></i>
+				<div style="text-align:center; font-size:20px; line-height:1.2; font-weight: bold">
+					<p style="margin:0;">Fine pausa</p>
+					<p style="margin:0;">(C)</p>
+				</div>
 			</div>
 		</DxToolbarItem>
 
 		<DxToolbarItem CssClass="bottoniera-inferiore"
+					   style="border-color: limegreen"
 					   Click="@PulsantieraGeneraleViewModel.InizioAttrezzaggioCommand.Execute"
 					   Enabled="@PulsantieraGeneraleViewModel.InizioAttrezzaggioCommand.CanExecute(null)">
-			<div>
-				<p>(B)</p>
-				<p>Inizio</p>
-				<p>Attrezzaggio</p>
+			<div style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
+				<i class="icon icon-wrenchAdd icon-lime" style="font-size:60px; margin-bottom:4px;"></i>
+				<div style="text-align:center; font-size:20px; line-height:1.2; font-weight: bold">
+					<p style="margin:0;">Inizio</p>
+					<p style="margin:0;">Attrezzaggio</p>
+					<p style="margin:0;">(B)</p>
+				</div>
 			</div>
 		</DxToolbarItem>
 
 		<DxToolbarItem CssClass="bottoniera-inferiore"
+					   style="border-color: dodgerblue"
 					   Click="@PulsantieraGeneraleViewModel.FineAttrezzaggioCommand.Execute"
 					   Enabled="@PulsantieraGeneraleViewModel.FineAttrezzaggioCommand.CanExecute(null)">
-			<div>
-				<p>(M)</p>
-				<p>Fine</p>
-				<p>Attrezzaggio</p>
+			<div style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
+				<i class="icon icon-wrenchDone icon-blu" style="font-size:60px; margin-bottom:4px;"></i>
+				<div style="text-align:center; font-size:20px; line-height:1.2; font-weight: bold">
+					<p style="margin:0;">Fine</p>
+					<p style="margin:0;">Attrezzaggio</p>
+					<p style="margin:0;">(M)</p>
+				</div>
 			</div>
 		</DxToolbarItem>
 
 		<DxToolbarItem CssClass="bottoniera-inferiore"
+					   style="border-color: peru"
 					   Click="@PulsantieraGeneraleViewModel.AnnulaOperazioneCommand.Execute"
-					   Enabled="@PulsantieraGeneraleViewModel.AnnulaOperazioneCommand.CanExecute(null)" >
-			<div>
-				<p>(Esc)</p>
-				<p>Annulla</p>
-				<p>Operazione</p>
+					   Enabled="@PulsantieraGeneraleViewModel.AnnulaOperazioneCommand.CanExecute(null)">
+			<div style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
+				<i class="icon icon-cancel icon-arancione" style="font-size:60px; margin-bottom:4px;"></i>
+				<div style="text-align:center; font-size:20px; line-height:1.2; font-weight: bold">
+					<p style="margin:0;">Annulla</p>
+					<p style="margin:0;">(Esc)</p>
+				</div>
 			</div>
 		</DxToolbarItem>
 	</Items>

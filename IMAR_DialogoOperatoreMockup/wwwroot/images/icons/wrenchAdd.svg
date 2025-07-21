@@ -1,0 +1,19 @@
+<svg width="55" height="55" viewBox="0 0 55 55" fill="none" xmlns="http://www.w3.org/2000/svg">
+	<!-- Estremo superiore -->
+	<path d="M10 5 H15 L20 10 V15 M15 20 H10 L5 15 V10 L8 13 A5 5 0 0 0 13 8 L10 5"
+		  stroke="currentColor" stroke-width="1" stroke-linecap="round"/>
+
+	<!-- Manico -->
+	<line x1="15" y1="20" x2="33" y2="38"
+		  stroke="currentColor" stroke-width="1" stroke-linecap="round"/>
+	
+	<line x1="20" y1="15" x2="38" y2="33"
+		  stroke="currentColor" stroke-width="1" stroke-linecap="round" />
+
+	<!--Più-->
+	<line x1="35" y1="42.5" x2="50" y2="42.5" 
+		  stroke="currentColor" stroke-width="4" stroke-linecap="round" />
+	
+	<line x1="42.5" y1="35" x2="42.5" y2="50" 
+		  stroke="currentColor" stroke-width="4" stroke-linecap="round" />
+</svg>

@@ -2,7 +2,6 @@
 	<!-- Corpo del cronometro -->
 	<circle cx="60" cy="60" r="45" stroke="currentColor" stroke-width="6" fill="none"/>
 
-	<!-- Pulsante superiore del cronometro -->
 	<rect x="52" y="10" width="16" height="6" rx="2" fill="currentColor"/>
 
 	<!-- Lancetta dei minuti (lunga, verticale) -->

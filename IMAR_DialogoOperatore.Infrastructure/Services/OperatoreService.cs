@@ -159,25 +159,36 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
 
         private string? GestisciAperturaLavoro(Operatore operatore, Attivita attivitaDaAggiungere, bool isCambioCausaleApertura, bool isAttivitaIndiretta)
         {
-            string? errore;
+            string? errore = null;
 
             if (isAttivitaIndiretta)
                 errore = _jmesApiClient.RegistrazioneOperazioneSuDb(() => _jmesApiClient.MesWorkStartIndiretta(operatore.Badge, attivitaDaAggiungere.Bolla));
             else
-            {
-                if (isCambioCausaleApertura)
-                {
-                    Attivita AttivitaOperatoreDaRimuovere = operatore.AttivitaAperte.Single(x => x.Bolla == attivitaDaAggiungere.Bolla);
-                    errore = RimuoviAttivitaDaOperatore(operatore, AttivitaOperatoreDaRimuovere, null, null, isAttrezzaggio: true);
-
-                    if (errore != null)
-                        return errore;
-                }
-
-                errore = _jmesApiClient.RegistrazioneOperazioneSuDb(() => _jmesApiClient.MesWorkStart(operatore, attivitaDaAggiungere.Bolla));
-            }
+                errore = GestisciAperturaAttivitaDiretta(operatore, attivitaDaAggiungere, isCambioCausaleApertura);
 
             return errore;
+        }
+
+        private string? GestisciAperturaAttivitaDiretta(Operatore operatore, Attivita attivitaDaAggiungere, bool isCambioCausaleApertura)
+        {
+            string? errore = null;
+
+            if (isCambioCausaleApertura)
+            {
+                errore = GestisciCambioCausale(operatore, attivitaDaAggiungere, isCambioCausaleApertura);
+                if (errore != null)
+                    return errore;
+            }
+
+            errore = _jmesApiClient.RegistrazioneOperazioneSuDb(() => _jmesApiClient.MesWorkStart(operatore, attivitaDaAggiungere.Bolla));
+
+            return errore;
+        }
+
+        private string? GestisciCambioCausale(Operatore operatore, Attivita attivitaDaAggiungere, bool isCambioCausaleApertura)
+        {
+            Attivita AttivitaOperatoreDaRimuovere = operatore.AttivitaAperte.Single(x => x.Bolla == attivitaDaAggiungere.Bolla);
+            return RimuoviAttivitaDaOperatore(operatore, AttivitaOperatoreDaRimuovere, null, null, isAttrezzaggio: true);
         }
 
         public Operatore GetOperatoreDaIdJMes(string idJMesOperatore)

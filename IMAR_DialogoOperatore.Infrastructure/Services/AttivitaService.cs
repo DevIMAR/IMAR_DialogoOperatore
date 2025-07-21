@@ -209,6 +209,7 @@ namespace IMAR_DialogoOperatore.Services
                                                             (aa, ao) => new Attivita
                                                             {
                                                                 Bolla = aa.ID_Det3350,
+                                                                DescrizioneArticolo = Costanti.FASE_INDIRETTA,
                                                                 DescrizioneFase = aa.ID_Det3356,
                                                                 CodiceJMes = aa.ID_Det3348,
                                                                 CausaleEstesa = aa.ID_Sts3130,
@@ -234,7 +235,7 @@ namespace IMAR_DialogoOperatore.Services
                 attivitaIndirette.Add(new Attivita
                 {
                     Bolla = stdMesIndTsk.ID_Ind3463,
-                    DescrizioneArticolo = "FASE INDIRETTA",
+                    DescrizioneArticolo = Costanti.FASE_INDIRETTA,
                     DescrizioneFase = stdMesIndTsk.ID_Ind3464
                 });
             }

@@ -1,12 +1,12 @@
 ﻿using IMAR_DialogoOperatore.Application;
 using IMAR_DialogoOperatore.Application.Interfaces.Clients;
 using IMAR_DialogoOperatore.Application.Interfaces.Utilities;
+using IMAR_DialogoOperatore.Domain.Models;
 using IMAR_DialogoOperatore.Interfaces.Helpers;
 using IMAR_DialogoOperatore.Interfaces.Observers;
 using IMAR_DialogoOperatore.Interfaces.ViewModels;
 using IMAR_DialogoOperatore.Utilities;
 using IMAR_DialogoOperatore.ViewModels;
-using Newtonsoft.Json.Linq;
 
 namespace IMAR_DialogoOperatore.Commands
 {
@@ -65,6 +65,8 @@ namespace IMAR_DialogoOperatore.Commands
             _dialogoOperatoreObserver.IsLoaderVisibile = true;
             await Task.Delay(1);
 
+            //RiaperturaAttivitaSospese();
+
             _jmesApiClient.MesAutoClock(_dialogoOperatoreObserver.OperatoreSelezionato.Badge.ToString(), true);
 
             _dialogoOperatoreObserver.IsLoaderVisibile = false;
@@ -74,11 +76,18 @@ namespace IMAR_DialogoOperatore.Commands
             _toastDisplayerUtility.ShowGreenToast("Entrata", $"Benvenuto {_dialogoOperatoreObserver.OperatoreSelezionato.Nome}!");
         }
 
+        private void RiaperturaAttivitaSospese()
+        {
+            IOperatoreViewModel operatore = _dialogoOperatoreObserver.OperatoreSelezionato;
+            foreach (Attivita attivita in operatore.AttivitaAperte)
+                _jmesApiClient.MesWorkResume(operatore.Badge.ToString(), attivita);
+        }
+
         private async Task EffettuaUscitaOperatore()
         {
             _dialogoOperatoreObserver.IsUscita = true;
 
-            await ChiudiAttivitaOperatore();
+            await AvanzaAttivitaOperatore();
 
             if (_dialogoOperatoreObserver.IsOperazioneAnnullata)
             {

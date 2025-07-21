@@ -1,0 +1,22 @@
+<svg width="55" height="55" viewBox="0 0 55 55" fill="none" xmlns="http://www.w3.org/2000/svg">
+	<!--Testa-->
+	<path d="M5 20 L10 15 A30 30 0 0 1 30 5 L10 25 Z"
+		  stroke="currentColor" stroke-width="1" stroke-linecap="round" />
+	
+	<line x1="10" y1="15" x2="15" y2="20" 
+		  stroke="currentColor" stroke-width="1" stroke-linecap="round" />
+	
+	<!--Manico-->
+	<line x1="17" y1="18" x2="34" y2="36"
+		  stroke="currentColor" stroke-width="1" stroke-linecap="round" />
+	
+	<line x1="22" y1="13" x2="39" y2="30"
+		  stroke="currentColor" stroke-width="1" stroke-linecap="round" />
+
+	<!--Spunta-->
+	<line x1="35" y1="42.5" x2="40" y2="50"
+		  stroke="currentColor" stroke-width="4" stroke-linecap="round" />
+
+	<line x1="40" y1="50" x2="50" y2="35"
+		  stroke="currentColor" stroke-width="4" stroke-linecap="round" />
+</svg>

@@ -9,8 +9,32 @@
     background-position: center center;
 }
 
-.icon-search {
-    background-image: url("../images/icons/search.svg");
+.icon-verde {
+    color: green;
+}
+
+.icon-rosso {
+    color: darkred;
+}
+
+.icon-arancione {
+    color: peru;
+}
+
+.icon-giallo {
+    color: gold;
+}
+
+.icon-lime {
+    color: limegreen;
+}
+
+.icon-blu {
+    color: dodgerblue;
+}
+
+.icon-grigioBlu {
+    color: royalblue;
 }
 
 .icon-sendWarning {
@@ -27,6 +51,96 @@
     height:24px;
     mask: url('/images/icons/timer.svg') no-repeat center;
     -webkit-mask: url('/images/icons/timer.svg') no-repeat center;
+    mask-size: 100% 100%;
+    background-color: currentColor;
+}
+
+.icon-login {
+    width: 50px;
+    height: 60px;
+    mask: url('/images/icons/login.svg') no-repeat center;
+    -webkit-mask: url('/images/icons/login.svg') no-repeat center;
+    mask-size: 100% 100%;
+    background-color: currentColor;
+}
+
+.icon-logout {
+    width: 50px;
+    height: 60px;
+    mask: url('/images/icons/logout.svg') no-repeat center;
+    -webkit-mask: url('/images/icons/logout.svg') no-repeat center;
+    mask-size: 100% 100%;
+    background-color: currentColor;
+}
+
+.icon-coffee {
+    width: 55px;
+    height: 55px;
+    mask: url('/images/icons/coffee.svg') no-repeat center;
+    -webkit-mask: url('/images/icons/coffee.svg') no-repeat center;
+    mask-size: 100% 100%;
+    background-color: currentColor;
+}
+
+.icon-coffeeEmpty {
+    width: 55px;
+    height: 55px;
+    mask: url('/images/icons/coffeeEmpty.svg') no-repeat center;
+    -webkit-mask: url('/images/icons/coffeeEmpty.svg') no-repeat center;
+    mask-size: 100% 100%;
+    background-color: currentColor;
+}
+
+.icon-cancel {
+    width: 55px;
+    height: 55px;
+    mask: url('/images/icons/cancel.svg') no-repeat center;
+    -webkit-mask: url('/images/icons/cancel.svg') no-repeat center;
+    mask-size: 100% 100%;
+    background-color: currentColor;
+}
+
+.icon-wrenchAdd {
+    width: 55px;
+    height: 55px;
+    mask: url('/images/icons/wrenchAdd.svg') no-repeat center;
+    -webkit-mask: url('/images/icons/wrenchAdd.svg') no-repeat center;
+    mask-size: 100% 100%;
+    background-color: currentColor;
+}
+
+.icon-wrenchDone {
+    width: 55px;
+    height: 55px;
+    mask: url('/images/icons/wrenchDone.svg') no-repeat center;
+    -webkit-mask: url('/images/icons/wrenchDone.svg') no-repeat center;
+    mask-size: 100% 100%;
+    background-color: currentColor;
+}
+
+.icon-hammerAdd {
+    width: 55px;
+    height: 55px;
+    mask: url('/images/icons/hammerAdd.svg') no-repeat center;
+    -webkit-mask: url('/images/icons/hammerAdd.svg') no-repeat center;
+    mask-size: 100% 100%;
+    background-color: currentColor;
+}
+
+.icon-hammerDone {
+    width: 55px;
+    height: 55px;
+    mask: url('/images/icons/hammerDone.svg') no-repeat center;
+    -webkit-mask: url('/images/icons/hammerDone.svg') no-repeat center;
+    mask-size: 100% 100%;
+    background-color: currentColor;
+}
+
+.icon-advance {
+    width: 55px;
+    height: 55px;
+    mask: url('/images/icons/advance.svg') no-repeat center;
+    -webkit-mask: url('/images/icons/advance.svg') no-repeat center;
     mask-size: 100% 100%;
     background-color: currentColor;
 }
@@ -64,8 +178,10 @@ mt-2 {
 
 .bottoniera-inferiore {
     margin-right: 5px !important;
+    height: 9vW !important;
     width: 9vw !important;
     background-color: #2d2d2d !important;
+    border-width: 4px;
 }
 
     .bottoniera-inferiore:disabled {

@@ -5,7 +5,10 @@
 
 <DxGrid @bind-Data="@TimbratureGridViewModel.TimbratureOperatore"
 		AllowSort="false"
-		AllowSelectRowByClick="false">
+		AllowSelectRowByClick="false"
+		CustomSummary="OnCustomSummary"
+		CustomizeSummaryDisplayText="OnCustomizeSummaryText"
+		@ref="Grid">
 	<Columns>
 		<DxGridDataColumn FieldName="@nameof(Timbratura.Causale)"
 						  Caption="Tipo timbratura"
@@ -13,13 +16,24 @@
 
 		<DxGridDataColumn FieldName="@nameof(Timbratura.Timestamp)"
 						  Caption="Data e ora"
-						  TextAlignment="GridTextAlignment.Left" 
+						  TextAlignment="GridTextAlignment.Left"
 						  DisplayFormat="g"
-						  SortIndex="0"/>
+						  SortIndex="0" />
+
+		<DxGridDataColumn FieldName="Timestamp" Caption=""
+						  Visible="false" />
 	</Columns>
+
+	<TotalSummary>
+		<DxGridSummaryItem SummaryType="GridSummaryItemType.Custom"
+						   FieldName="Timestamp"
+						   Name="PauseSummary" />
+	</TotalSummary>
 </DxGrid>
 
 @code {
+	DxGrid Grid { get; set; }
+
 	protected override void OnInitialized()
 	{
 		base.OnInitialized();
@@ -28,4 +42,34 @@
 	}
 
 	private void TimbratureGridViewModel_NotifyStateChanged() => InvokeAsync(StateHasChanged);
+
+	void OnCustomSummary(GridCustomSummaryEventArgs e)
+	{
+		if (e.Item.Name != "PauseSummary") return;
+
+		switch (e.SummaryStage)
+		{
+			case GridCustomSummaryStage.Start:
+				e.TotalValue = TimeSpan.Zero;
+				break;
+			case GridCustomSummaryStage.Calculate:
+				var t = (Timbratura)e.DataItem;
+				if (t.Causale == "Inizio Pausa")
+					e.TotalValue = ((TimeSpan)e.TotalValue).Add(TimeSpan.FromTicks(-t.Timestamp.Ticks));
+				else if (t.Causale == "Fine Pausa")
+					e.TotalValue = ((TimeSpan)e.TotalValue).Add(TimeSpan.FromTicks(t.Timestamp.Ticks));
+				break;
+			case GridCustomSummaryStage.Finalize:
+				break;
+		}
+	}
+
+	void OnCustomizeSummaryText(GridCustomizeSummaryDisplayTextEventArgs e)
+	{
+		if (e.Item.Name == "PauseSummary")
+		{
+			var ts = (TimeSpan)e.Value;
+			e.DisplayText = $"Tempo trascorso in pausa: {ts:hh\\:mm}";
+		}
+	}
 }
