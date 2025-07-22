@@ -12,6 +12,7 @@
 	<Columns>
 		<DxGridLayoutColumn />
 		<DxGridLayoutColumn Width="auto" />
+		<DxGridLayoutColumn />
 	</Columns>
 
 	<Items>
@@ -23,19 +24,27 @@
 
 		<DxGridLayoutItem Row="1" Column="1">
 			<Template>
-				<DxButton RenderStyle="ButtonRenderStyle.Warning"
-						  RenderStyleMode="ButtonRenderStyleMode.Outline"
-						  IconCssClass="icon icon-timer" 
-						  Click="@HeaderToolbarViewModel.ShowEntrateUscitePauseCommand.Execute"
-						  Enabled="@HeaderToolbarViewModel.ShowEntrateUscitePauseCommand.CanExecute(null)"
-						  title="Mostra timbrature" />
+				<Clock />
+			</Template>
+		</DxGridLayoutItem>
 
-				@* <DxButton RenderStyle="ButtonRenderStyle.Warning"
-						  RenderStyleMode="ButtonRenderStyleMode.Outline"
-						  IconCssClass="icon icon-sendWarning" 
-						  Click="@(() => HeaderToolbarViewModel.ShowTaskPopupCommand.Execute(true))"
-						  Enabled="@HeaderToolbarViewModel.ShowTaskPopupCommand.CanExecute(null)"
-						  title="Invio notifica errore" /> *@
+		<DxGridLayoutItem Row="1" Column="2">
+			<Template>
+				<div style="display: flex; justify-content: flex-end; align-items: center;">
+					<DxButton RenderStyle="ButtonRenderStyle.Warning"
+							  RenderStyleMode="ButtonRenderStyleMode.Outline"
+							  IconCssClass="icon icon-timer" 
+							  Click="@HeaderToolbarViewModel.ShowEntrateUscitePauseCommand.Execute"
+							  Enabled="@HeaderToolbarViewModel.ShowEntrateUscitePauseCommand.CanExecute(null)"
+							  title="Mostra timbrature" />
+
+					@* <DxButton RenderStyle="ButtonRenderStyle.Warning"
+							  RenderStyleMode="ButtonRenderStyleMode.Outline"
+							  IconCssClass="icon icon-sendWarning" 
+							  Click="@(() => HeaderToolbarViewModel.ShowTaskPopupCommand.Execute(true))"
+							  Enabled="@HeaderToolbarViewModel.ShowTaskPopupCommand.CanExecute(null)"
+							  title="Invio notifica errore" /> *@
+				</div>
 			</Template>
 		</DxGridLayoutItem>
 	</Items>

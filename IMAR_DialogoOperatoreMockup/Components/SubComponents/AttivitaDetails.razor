@@ -7,7 +7,7 @@
 @inject IDialogoOperatoreObserver DialogoOperatoreObserver
 @inject IJSRuntime JSRuntime
 
-<DxGridLayout CssClass="testo-medio">
+<DxGridLayout CssClass="testo-piccolo">
 	<Rows>
 		<DxGridLayoutRow Height="auto" />
 		<DxGridLayoutRow Height="auto" />
@@ -62,7 +62,7 @@
 		<DxGridLayoutItem Row="1"
 						  Column="6" ColumnSpan="5">
 			<Template>
-				<div class="d-flex h-100 testo-medio mt-2">
+				<div class="d-flex h-100 testo-piccolo mt-2">
 					<label>Qt. RESIDUA: @AttivitaDetailsViewModel.QuantitaResidua</label>
 				</div>
 			</Template>
@@ -71,7 +71,7 @@
 		<DxGridLayoutItem Row="2"
 						  Column="6" ColumnSpan="5">
 			<Template>
-				<div class="d-flex h-100 testo-medio">
+				<div class="d-flex h-100 testo-piccolo">
 					<label>Qt. SCARTATA TOTALE: @AttivitaDetailsViewModel.QuantitaScartataTotale</label>
 				</div>
 			</Template>
@@ -80,7 +80,7 @@
 		<DxGridLayoutItem Row="3"
 						  Column="6" ColumnSpan="5">
 			<Template>
-				<div class="d-flex h-100 testo-medio">
+				<div class="d-flex h-100 testo-piccolo">
 					<label>@AttivitaDetailsViewModel.StatoAttivita</label>
 				</div>
 			</Template>
@@ -99,7 +99,7 @@
 						  Column="1" ColumnSpan="10"
 						  Visible="@AttivitaDetailsViewModel.IsFineAttrezzaggio">
 			<Template>
-				<div class="d-flex justify-content-center align-items-center h-100 testo-medio">
+				<div class="d-flex justify-content-center align-items-center h-100 testo-piccolo">
 					<label>APRI COME LAVORO</label>
 				</div>
 			</Template>
@@ -114,7 +114,7 @@
 							LabelPosition="LabelPosition.Left"
 							Alignment="CheckBoxContentAlignment.Center"
 							SizeMode="SizeMode.Large"
-							CssClass="testo-medio"
+							CssClass="testo-piccolo"
 							@ref="@InizioLavoro"
 							@onkeydown="HandleInizioLavoroKeyPress" />
 			</Template>
@@ -124,7 +124,7 @@
 						  Column="1" ColumnSpan="10"
 						  Visible="@AttivitaDetailsViewModel.IsFineAttivitaInUscita">
 			<Template>
-				<div class="d-flex justify-content-center align-items-center h-100 testo-medio">
+				<div class="d-flex justify-content-center align-items-center h-100 testo-piccolo">
 					<label>ATTIVA RIAPERTURA AUTOMATICA</label>
 				</div>
 			</Template>
@@ -139,7 +139,7 @@
 							LabelPosition="LabelPosition.Left"
 							Alignment="CheckBoxContentAlignment.Center"
 							SizeMode="SizeMode.Large"
-							CssClass="testo-medio"
+							CssClass="testo-piccolo"
 							@ref="@Riapertura"
 							@onkeydown="HandleRiaperturaKeyPress" />
 			</Template>

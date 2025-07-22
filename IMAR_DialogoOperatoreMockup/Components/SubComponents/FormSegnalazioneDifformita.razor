@@ -5,7 +5,7 @@
 
 @if (FormSegnalazioneDifformitaViewModel.QuantitaScartata > 0)
 {
-	<DxGridLayout CssClass="testo-medio">
+	<DxGridLayout CssClass="testo-piccolo">
 		<Rows>
 			<DxGridLayoutRow />
 			<DxGridLayoutRow />
@@ -40,7 +40,7 @@
 			<DxGridLayoutItem Row="1"
 							  Column="0" ColumnSpan="3">
 				<Template>
-					<div class="d-flex align-items-center h-100 testo-medio">
+					<div class="d-flex align-items-center h-100 testo-piccolo">
 						<label>BOLLA: @FormSegnalazioneDifformitaViewModel.Bolla</label>
 					</div>
 				</Template>
@@ -49,7 +49,7 @@
 			<DxGridLayoutItem Row="1"
 							  Column="4" ColumnSpan="3">
 				<Template>
-					<div class="d-flex align-items-center h-100 testo-medio">
+					<div class="d-flex align-items-center h-100 testo-piccolo">
 						<label>ODP: @FormSegnalazioneDifformitaViewModel.Odp</label>
 					</div>
 				</Template>
@@ -58,7 +58,7 @@
 			<DxGridLayoutItem Row="2"
 							  Column="0" ColumnSpan="3">
 				<Template>
-					<div class="d-flex align-items-center h-100 testo-medio">
+					<div class="d-flex align-items-center h-100 testo-piccolo">
 						<label>FASE: @FormSegnalazioneDifformitaViewModel.Fase</label>
 					</div>
 				</Template>
@@ -67,7 +67,7 @@
 			<DxGridLayoutItem Row="2"
 							  Column="4" ColumnSpan="8">
 				<Template>
-					<div class="d-flex align-items-center h-100 testo-medio">
+					<div class="d-flex align-items-center h-100 testo-piccolo">
 						<label>DESCRIZIONE FASE: @FormSegnalazioneDifformitaViewModel.DescrizioneFase</label>
 					</div>
 				</Template>

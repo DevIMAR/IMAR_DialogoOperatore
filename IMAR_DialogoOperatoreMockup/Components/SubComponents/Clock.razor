@@ -1,0 +1,33 @@
+﻿<h3 style="font-family: monospace; text-align:center;"
+    class="testo-piu-grande">
+    @CurrentTime
+</h3>
+
+@code {
+    private string CurrentTime = string.Empty;
+    private Timer? timer;
+
+    protected override void OnInitialized()
+    {
+        CurrentTime = DateTime.Now.ToString("HH:mm:ss");
+
+        var now = DateTime.Now;
+        var msToNextSecond = 1000 - now.Millisecond;
+
+        Task.Delay(msToNextSecond).ContinueWith(_ =>
+        {
+            timer = new Timer(UpdateTime, null, 0, 1000);
+        });
+    }
+
+    private void UpdateTime(object? state)
+    {
+        CurrentTime = DateTime.Now.ToString("HH:mm:ss");
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        timer?.Dispose();
+    }
+}

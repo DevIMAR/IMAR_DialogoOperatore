@@ -12,7 +12,8 @@
 					   Visible="@PulsantieraGeneraleViewModel.IsAssente">
 			<div style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
 				<i class="icon icon-login icon-verde" style="font-size:60px; margin-bottom:4px;"></i>
-				<div style="text-align:center; font-size:20px; line-height:1.2; font-weight: bold">
+				<div style="text-align:center; line-height:1.2; font-weight: bold"
+					 class="testo-medio">
 					<p style="margin:0;">Entrata</p>
 					<p style="margin:0;">(E)</p>
 				</div>
@@ -26,7 +27,8 @@
 					   Visible="@(!PulsantieraGeneraleViewModel.IsAssente)">
 			<div style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
 				<i class="icon icon-logout icon-rosso" style="font-size:60px; margin-bottom:4px;"></i>
-				<div style="text-align:center; font-size:20px; line-height:1.2; font-weight: bold">
+				<div style="text-align:center; line-height:1.2; font-weight: bold"
+					 class="testo-medio">
 					<p style="margin:0;">Uscita</p>
 					<p style="margin:0;">(U)</p>
 				</div>
@@ -39,7 +41,8 @@
 					   Enabled="@PulsantieraGeneraleViewModel.InizioLavoroCommand.CanExecute(null)">
 			<div style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
 				<i class="icon icon-hammerAdd icon-lime" style="font-size:60px; margin-bottom:4px;"></i>
-				<div style="text-align:center; font-size:20px; line-height:1.2; font-weight: bold">
+				<div style="text-align:center; line-height:1.2; font-weight: bold"
+					 class="testo-medio">
 					<p style="margin:0;">Inizio lavoro</p>
 					<p style="margin:0;">(F2)</p>
 				</div>
@@ -52,7 +55,8 @@
 					   Enabled="@PulsantieraGeneraleViewModel.FineLavoroCommand.CanExecute(null)">
 			<div style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
 				<i class="icon icon-hammerDone icon-blu" style="font-size:60px; margin-bottom:4px;"></i>
-				<div style="text-align:center; font-size:20px; line-height:1.2; font-weight: bold">
+				<div style="text-align:center; line-height:1.2; font-weight: bold"
+					 class="testo-medio">
 					<p style="margin:0;">Fine lavoro</p>
 					<p style="margin:0;">(Z)</p>
 				</div>
@@ -65,7 +69,8 @@
 					   Enabled="@PulsantieraGeneraleViewModel.AvanzamentoCommand.CanExecute(null)">
 			<div style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
 				<i class="icon icon-advance icon-grigioBlu" style="font-size:60px; margin-bottom:4px;"></i>
-				<div style="text-align:center; font-size:20px; line-height:1.2; font-weight: bold">
+				<div style="text-align:center; line-height:1.2; font-weight: bold"
+					 class="testo-medio">
 					<p style="margin:0;">Avanzamento</p>
 					<p style="margin:0;">(F4)</p>
 				</div>
@@ -78,7 +83,8 @@
 					   Enabled="@PulsantieraGeneraleViewModel.InizioFinePausaCommand.CanExecute(!PulsantieraGeneraleViewModel.IsInPausa)">
 			<div style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
 				<i class="icon icon-coffee icon-giallo" style="font-size:60px; margin-bottom:4px;"></i>
-				<div style="text-align:center; font-size:20px; line-height:1.2; font-weight: bold">
+				<div style="text-align:center; line-height:1.2; font-weight: bold"
+					 class="testo-medio">
 					<p style="margin:0;">Inizio pausa</p>
 					<p style="margin:0;">(F8)</p>
 				</div>
@@ -91,7 +97,8 @@
 					   Enabled="@PulsantieraGeneraleViewModel.InizioFinePausaCommand.CanExecute(PulsantieraGeneraleViewModel.IsInPausa)">
 			<div style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
 				<i class="icon icon-coffeeEmpty icon-giallo" style="font-size:60px; margin-bottom:4px;"></i>
-				<div style="text-align:center; font-size:20px; line-height:1.2; font-weight: bold">
+				<div style="text-align:center; line-height:1.2; font-weight: bold"
+					 class="testo-medio">
 					<p style="margin:0;">Fine pausa</p>
 					<p style="margin:0;">(C)</p>
 				</div>
@@ -104,7 +111,8 @@
 					   Enabled="@PulsantieraGeneraleViewModel.InizioAttrezzaggioCommand.CanExecute(null)">
 			<div style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
 				<i class="icon icon-wrenchAdd icon-lime" style="font-size:60px; margin-bottom:4px;"></i>
-				<div style="text-align:center; font-size:20px; line-height:1.2; font-weight: bold">
+				<div style="text-align:center; line-height:1.2; font-weight: bold"
+					 class="testo-medio">
 					<p style="margin:0;">Inizio</p>
 					<p style="margin:0;">Attrezzaggio</p>
 					<p style="margin:0;">(B)</p>
@@ -118,7 +126,8 @@
 					   Enabled="@PulsantieraGeneraleViewModel.FineAttrezzaggioCommand.CanExecute(null)">
 			<div style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
 				<i class="icon icon-wrenchDone icon-blu" style="font-size:60px; margin-bottom:4px;"></i>
-				<div style="text-align:center; font-size:20px; line-height:1.2; font-weight: bold">
+				<div style="text-align:center; line-height:1.2; font-weight: bold"
+					 class="testo-medio">
 					<p style="margin:0;">Fine</p>
 					<p style="margin:0;">Attrezzaggio</p>
 					<p style="margin:0;">(M)</p>
@@ -132,7 +141,8 @@
 					   Enabled="@PulsantieraGeneraleViewModel.AnnulaOperazioneCommand.CanExecute(null)">
 			<div style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
 				<i class="icon icon-cancel icon-arancione" style="font-size:60px; margin-bottom:4px;"></i>
-				<div style="text-align:center; font-size:20px; line-height:1.2; font-weight: bold">
+				<div style="text-align:center; line-height:1.2; font-weight: bold"
+					 class="testo-medio">
 					<p style="margin:0;">Annulla</p>
 					<p style="margin:0;">(Esc)</p>
 				</div>
