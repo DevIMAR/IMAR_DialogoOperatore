@@ -1,5 +1,6 @@
 ﻿using IMAR_DialogoOperatore.Application;
 using IMAR_DialogoOperatore.Application.Interfaces.Clients;
+using IMAR_DialogoOperatore.Application.Interfaces.Repositories;
 using IMAR_DialogoOperatore.Application.Interfaces.Services.Activities;
 using IMAR_DialogoOperatore.Application.Interfaces.UoW;
 using IMAR_DialogoOperatore.Application.Interfaces.Utilities;
@@ -16,13 +17,15 @@ namespace IMAR_DialogoOperatore.Services
         private readonly IJMesApiClientErrorUtility _jMesApiClientErrorUtility;
         private readonly CaricamentoAttivitaInBackgroundService _caricamentoAttivitaInBackroundService;
         private readonly ISynergyJmesUoW _synergyJmesUoW;
+        private readonly IAs400Repository _as400Repository;
 
         public AttivitaService(
             IMacchinaService macchinaService,
             IJmesApiClient jmesApiClient,
             IJMesApiClientErrorUtility jMesApiClientErrorUtility,
             CaricamentoAttivitaInBackgroundService caricamentoAttivitaInBackroundService,
-            ISynergyJmesUoW synergyJmesUoW)
+            ISynergyJmesUoW synergyJmesUoW,
+            IAs400Repository as400Repository)
         {
             _macchinaService = macchinaService;
 
@@ -31,6 +34,7 @@ namespace IMAR_DialogoOperatore.Services
 
             _caricamentoAttivitaInBackroundService = caricamentoAttivitaInBackroundService;
 
+            _as400Repository = as400Repository;
             _synergyJmesUoW = synergyJmesUoW;
         }
 
@@ -85,8 +89,29 @@ namespace IMAR_DialogoOperatore.Services
 
         private Attivita? OttieniAttivitaApertaDaBolla(string bolla)
         {
-            return _caricamentoAttivitaInBackroundService.GetAttivitaAperte()
+            Attivita? attivitaTrovata = _caricamentoAttivitaInBackroundService.GetAttivitaAperte()
                                                     .SingleOrDefault(x => x.Bolla == bolla);
+
+            if (attivitaTrovata == null)
+                attivitaTrovata = _as400Repository.ExecuteQuery<Attivita>(@"SELECT
+                                                                            NRBLCI AS BOLLA, ORPRCI AS ODP, CDARCI AS ARTICOLO, trim(DSARMA) AS DESCRIZIONEARTICOLO, 
+                                                                            CDFACI AS FASE, DSFACI AS DESCRIZIONEFASE, PF2.QORDCI AS QUANTITAORDINE, 
+                                                                            COALESCE(SUM(jf.QTVERJM), 0) AS QUANTITAPRODOTTANONCONTABILIZZATA, 
+                                                                            pf2.QPROCI AS QUANTITAPRODOTTACONTABILIZZATA,
+                                                                            COALESCE(SUM(jf.QTSCAJM), 0) AS QUNATITASCARTATANONCONTABILIZZATA, 
+                                                                            pf2.QSCACI AS QUANTITASCARTATACONTABILIZZATA,
+                                                                            COALESCE(SUM(jf.QTNCOJM), 0) AS QTANONCONFORMENONCONTABILIZZATA,
+                                                                            pf2.QRESCI AS QTANONCONFORMECONTABILIZZATA,
+                                                                            CASE WHEN MAX(SAACCJM) IS NULL THEN max(TIRECI) ELSE  MAX(SAACCJM) end AS SALDOACCONTO
+                                                                            FROM IMA90DAT.PCIMP00F pf2 
+                                                                            JOIN IMA90DAT.MGART00F mf ON pf2.CDARCI = mf.CDARMA 
+                                                                            LEFT JOIN IMA90DAT.JMRILM00F jf ON NRBLCI = NRTSKJM AND jf.QCONTJM = ''
+                                                                            WHERE NRBLCI = '" + bolla + @"'
+                                                                            GROUP BY NRBLCI, ORPRCI, CDARCI, DSARMA, CDFACI, DSFACI,
+                                                                                    pf2.QORDCI, pf2.QPROCI, pf2.QSCACI, pf2.QRESCI")
+                                                  .SingleOrDefault();
+                                                                            
+            return attivitaTrovata;
         }
 
         public IEnumerable<Attivita> GetAttivitaPerOdp(string odp)
@@ -94,7 +119,25 @@ namespace IMAR_DialogoOperatore.Services
             IEnumerable<Attivita> attivitaFiltrate = _caricamentoAttivitaInBackroundService.GetAttivitaAperte()
                                                                 .Where(x => x.Odp == odp);
 
-            return attivitaFiltrate;
+            if (attivitaFiltrate == null || attivitaFiltrate.Count() == 0)
+                attivitaFiltrate = _as400Repository.ExecuteQuery<Attivita>(@"SELECT
+                                                                            NRBLCI AS BOLLA, ORPRCI AS ODP, CDARCI AS ARTICOLO, trim(DSARMA) AS DESCRIZIONEARTICOLO, 
+                                                                            CDFACI AS FASE, DSFACI AS DESCRIZIONEFASE, PF2.QORDCI AS QUANTITAORDINE, 
+                                                                            COALESCE(SUM(jf.QTVERJM), 0) AS QUANTITAPRODOTTANONCONTABILIZZATA, 
+                                                                            pf2.QPROCI AS QUANTITAPRODOTTACONTABILIZZATA,
+                                                                            COALESCE(SUM(jf.QTSCAJM), 0) AS QUNATITASCARTATANONCONTABILIZZATA, 
+                                                                            pf2.QSCACI AS QUANTITASCARTATACONTABILIZZATA,
+                                                                            COALESCE(SUM(jf.QTNCOJM), 0) AS QTANONCONFORMENONCONTABILIZZATA,
+                                                                            pf2.QRESCI AS QTANONCONFORMECONTABILIZZATA,
+                                                                            CASE WHEN MAX(SAACCJM) IS NULL THEN max(TIRECI) ELSE  MAX(SAACCJM) end AS SALDOACCONTO
+                                                                            FROM IMA90DAT.PCIMP00F pf2 
+                                                                            JOIN IMA90DAT.MGART00F mf ON pf2.CDARCI = mf.CDARMA 
+                                                                            LEFT JOIN IMA90DAT.JMRILM00F jf ON NRBLCI = NRTSKJM AND jf.QCONTJM = ''
+                                                                            WHERE ORPRCI = '" + odp + @"'
+                                                                            GROUP BY NRBLCI, ORPRCI, CDARCI, DSARMA, CDFACI, DSFACI,
+                                                                                    pf2.QORDCI, pf2.QPROCI, pf2.QSCACI, pf2.QRESCI");
+
+            return attivitaFiltrate.OrderBy(x => x.Bolla);
         }
 
         public string? AvanzaAttivita(Operatore operatore, Attivita attivitaDaAvanzare, int quantitaProdotta, int quantitaScartata)
@@ -123,23 +166,12 @@ namespace IMAR_DialogoOperatore.Services
 
             IList<Attivita> attivitaOperatoreAperte = GetAttivitaOperatoreAperte(operatore, attivitaAperte, attivitaIndiretteOperatore);
 
-            return attivitaOperatoreAperte;
+            return attivitaOperatoreAperte.OrderBy(x => x.Bolla).ToList();
         }
 
         public IList<mesDiaOpe>? GetAttivitaAperte()
         {
             return _jmesApiClient.ChiamaQueryGetJmes<mesDiaOpe>();
-        }
-
-        private IList<mesEvtOpe>? OttieniTutteAttivitaOperatore(string badgeOperatore)
-        {
-            IList<mesEvtOpe>? attivitaOperatore = _jmesApiClient.ChiamaQueryGetJmes<mesEvtOpe>();
-            if (attivitaOperatore == null)
-                return null;
-
-            attivitaOperatore = attivitaOperatore.Where(x => x.ID_Res368.TrimStart('0') == badgeOperatore.TrimStart('0')).ToList(); //ID_Res368 è il badge operatore nella query di SanMarco
-
-            return attivitaOperatore;
         }
 
         private IList<mesTskForOpe>? OttieniAttivitaIndiretteOperatore(string badgeOperatore)
@@ -204,41 +236,6 @@ namespace IMAR_DialogoOperatore.Services
                                                  a.CodiceJMes = aoa.CodiceJMes;
                                                  a.InizioAttivita = aoa.InizioAttivita;
                                                  a.FineAttivita = aoa.FineAttivita;
-                                                 return a;
-                                             })
-                                       .ToList();
-
-            return attivita;
-        }
-
-        private List<Attivita> OttieniAttivitaOperatoreAperte(IList<mesEvtOpe> attivitaOperatore, IList<mesDiaOpe> attivitaAperte)
-        {
-            IEnumerable<Attivita> attivitaOperatoreAperte = attivitaAperte
-                                                    .Join(attivitaOperatore,
-                                                            aa => aa.ID_Evt3240,
-                                                            ao => ao.ID_Ope3278,
-                                                            (aa, ao) => new Attivita
-                                                            {
-                                                                Bolla = aa.ID_Det3350,
-                                                                CodiceJMes = aa.ID_Det3348,
-                                                                CausaleEstesa = aa.ID_Sts3130,
-                                                                Causale = StatoAttivitaMapper.FromJMesStatus(aa.ID_Sts3130),
-                                                                SaldoAcconto = "A"
-                                                            })
-                                                    .Where(x => x.Causale == Costanti.IN_LAVORO ||
-                                                                x.Causale == Costanti.IN_ATTREZZAGGIO ||
-                                                                x.Causale == Costanti.LAVORO_SOSPESO ||
-                                                                x.Causale == Costanti.ATTREZZAGGIO_SOSPESO);
-
-            List<Attivita> attivita = _caricamentoAttivitaInBackroundService.GetAttivitaAperte()
-                                       .Join(attivitaOperatoreAperte,
-                                             a => a.Bolla,
-                                             aoa => aoa.Bolla,
-                                             (a, aoa) =>
-                                             {
-                                                 a.CausaleEstesa = aoa.CausaleEstesa;
-                                                 a.Causale = aoa.Causale;
-                                                 a.CodiceJMes = aoa.CodiceJMes;
                                                  return a;
                                              })
                                        .ToList();
@@ -325,6 +322,7 @@ namespace IMAR_DialogoOperatore.Services
                                                                                        (x, memd) =>
                                                                                        new Attivita
                                                                                        {
+                                                                                           CodiceJMes = (double?)x.me.Uid,
                                                                                            CausaleEstesa = StatoAttivitaMapper.FromJMesCodeExtended(x.me.EvtTypUid),
                                                                                            Bolla = x.med.DocCod,
                                                                                            Odp = x.med.PrdOrdCod,

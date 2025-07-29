@@ -35,9 +35,14 @@ namespace IMAR_DialogoOperatore.Helpers
             InizializzaCampi();
 
             if (_taskCompilerObserver.EventoSelezionato != null)
-                TaskAsana.Html_notes = "Bolla: " + _taskCompilerObserver.EventoSelezionato.Bolla + "\n" +
+            {
+                if (_taskCompilerObserver.EventoSelezionato.CodiceJMes != null)
+                    TaskAsana.Html_notes += "Id: " + _taskCompilerObserver.EventoSelezionato.CodiceJMes + "\n";
+
+                TaskAsana.Html_notes += "Bolla: " + _taskCompilerObserver.EventoSelezionato.Bolla + "\n" +
                                        "Odp: " + _taskCompilerObserver.EventoSelezionato.Odp + "\n" +
                                        "Fase: " + _taskCompilerObserver.EventoSelezionato.Fase + "\n";
+            }
 
             switch (_taskCompilerObserver.CategoriaErroreSelezionata)
             {
@@ -56,12 +61,10 @@ namespace IMAR_DialogoOperatore.Helpers
 
                 case Costanti.TASK_TIMBRATURA_ERRATA:
                     TaskAsana.Name = "Richiesta modifica ORARIO TIMBRATURA errata";
-                    TaskAsana.Html_notes = "Operatore: " + _infoTaskOperatoreViewModel.NomeCognomeOperatore + "\n" +
+                    TaskAsana.Html_notes += "Operatore: " + _infoTaskOperatoreViewModel.NomeCognomeOperatore + "\n" +
                                            "Causale: " + _taskCompilerObserver.EventoSelezionato.CausaleEstesa + "\n" +
-                                           "Quantità prodotta: " + _taskCompilerObserver.EventoSelezionato.QuantitaProdotta + "\n" +
-                                           "Quantità scartata: " + _taskCompilerObserver.EventoSelezionato.QuantitaScartata + "\n" +
                                            "Orario da correggere: " + _taskCompilerObserver.EventoSelezionato.Timestamp + "\n" +
-                                           "Nuovo orario: " + _infoTaskOperatoreViewModel.OraDaDichiarare + ":" + _infoTaskOperatoreViewModel.MinutoDaDichiarare + "\n";
+                                           "Nuovo orario: " + _infoTaskOperatoreViewModel.OraDaDichiarare.ToString().PadLeft(2, '0') + ":" + _infoTaskOperatoreViewModel.MinutoDaDichiarare.ToString().PadLeft(2, '0') + "\n";
                     break;
 
                 case Costanti.TASK_ALTRO:
@@ -79,6 +82,7 @@ namespace IMAR_DialogoOperatore.Helpers
             string firmaOperatore = _dialogoOperatoreObserver.OperatoreSelezionato.Nome + " " + _dialogoOperatoreObserver.OperatoreSelezionato.Cognome;
             TaskAsana.Html_notes += "\n\n" + firmaOperatore;
         }
+
         private void InizializzaCampi()
         {
             TaskAsana = new TaskAsana()
@@ -87,7 +91,8 @@ namespace IMAR_DialogoOperatore.Helpers
                 Projects = new List<string>() { "1210581212376329" },
                 Followers = new List<string>(),
                 Tags = new List<string>(),
-                Assignee = "federico.crescenzi@imarsrl.com" //"produzione@imarsrl.com"
+                Assignee = "federico.crescenzi@imarsrl.com", //"produzione@imarsrl.com"
+                Html_notes = string.Empty
             };
         }
     }

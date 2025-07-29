@@ -48,6 +48,7 @@ namespace IMAR_DialogoOperatore.Mappers
         {
             TimbraturaAttivitaViewModel temp = new TimbraturaAttivitaViewModel
             {
+                CodiceJMes = attivita.CodiceJMes,
                 Causale = attivita.Causale,
                 CausaleEstesa = attivita.CausaleEstesa,
                 Fase = attivita.Fase,

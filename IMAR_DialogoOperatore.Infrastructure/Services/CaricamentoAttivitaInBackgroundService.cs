@@ -119,7 +119,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
             _lock.EnterReadLock();
             try
             {
-                return _attivitaAperte?.OrderBy(x => x.Bolla).ToList() ?? new List<Attivita>();
+                return _attivitaAperte?.ToList() ?? new List<Attivita>();
             }
             finally
             {

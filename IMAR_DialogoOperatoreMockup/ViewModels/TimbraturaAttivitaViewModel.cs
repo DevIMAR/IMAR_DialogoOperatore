@@ -4,6 +4,7 @@ namespace IMAR_DialogoOperatore.ViewModels
 {
     public class TimbraturaAttivitaViewModel : ITimbraturaAttivitaViewModel
     {
+        public double? CodiceJMes {  get; set; }
         public string Causale { get; set; }
         public string CausaleEstesa { get; set; }
         public string? Bolla { get; set; }

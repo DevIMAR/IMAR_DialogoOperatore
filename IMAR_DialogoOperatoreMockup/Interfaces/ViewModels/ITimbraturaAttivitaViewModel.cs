@@ -2,6 +2,7 @@
 {
     public interface ITimbraturaAttivitaViewModel
     {
+        double? CodiceJMes { get; set; }
         string Causale { get; set; }
         string CausaleEstesa { get; set; }
         string? Bolla { get; set; }
