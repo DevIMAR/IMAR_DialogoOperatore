@@ -56,7 +56,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
             Operatore.Uscita = DateTime.ParseExact(ingressiUscite.Where(x => x.ID_AngRes368 == risorsa.ResCod).Select(x => x.ID_ClkRes2366).Max() ?? "19000101000000", format, provider);
             Operatore.InizioPausa = DateTime.ParseExact(iniziFiniPause.Where(x => x.ID_Res368 == risorsa.ResCod).Select(x => x.ID_ResBrk2426).Max() ?? "19000101000000", format, provider);
             Operatore.FinePausa = DateTime.ParseExact(iniziFiniPause.Where(x => x.ID_Res368 == risorsa.ResCod).Select(x => x.ID_ResBrk2427).Max() ?? "19000101000000", format, provider);
-            Operatore.AttivitaAperte = _attivitaService.OttieniAttivitaOperatore(risorsa.ResCod);
+            Operatore.AttivitaAperte = _attivitaService.OttieniAttivitaOperatore(Operatore);
 
             AssegnaMacchinaAdOperatore();
 

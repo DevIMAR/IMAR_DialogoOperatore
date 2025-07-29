@@ -1,5 +1,6 @@
 ﻿using IMAR_DialogoOperatore.Application;
 using IMAR_DialogoOperatore.Application.Interfaces.Clients;
+using IMAR_DialogoOperatore.Application.Interfaces.Services.Activities;
 using IMAR_DialogoOperatore.Application.Interfaces.Utilities;
 using IMAR_DialogoOperatore.Domain.Models;
 using IMAR_DialogoOperatore.Interfaces.Helpers;
@@ -18,6 +19,7 @@ namespace IMAR_DialogoOperatore.Commands
 		private readonly IJmesApiClient _jmesApiClient;
         private readonly IAutoLogoutUtility _autoLogoutUtility;
         private readonly ToastDisplayerUtility _toastDisplayerUtility;
+        private readonly IOperatoreService _operatoreService;
 
         public IngressoUscitaCommand(
 			InfoOperatoreViewModel infoOperatoreViewModel,
@@ -25,7 +27,8 @@ namespace IMAR_DialogoOperatore.Commands
 			IInterruzioneAttivitaHelper interruzioneLavoroHelper,
 			IJmesApiClient jmesApiClient,
             IAutoLogoutUtility autoLogoutUtility,
-            ToastDisplayerUtility toastDisplayerUtility)
+            ToastDisplayerUtility toastDisplayerUtility,
+            IOperatoreService operatoreService)
         {
 			_infoOperatoreViewModel = infoOperatoreViewModel;
             _dialogoOperatoreObserver = dialogoOperatoreObserver;
@@ -33,6 +36,7 @@ namespace IMAR_DialogoOperatore.Commands
 			_jmesApiClient = jmesApiClient;
             _autoLogoutUtility = autoLogoutUtility;
             _toastDisplayerUtility = toastDisplayerUtility;
+            _operatoreService = operatoreService;
 
             _autoLogoutUtility.OnLogoutTriggered += AutoLogoutUtility_OnLogoutTriggered;
         }
@@ -65,9 +69,9 @@ namespace IMAR_DialogoOperatore.Commands
             _dialogoOperatoreObserver.IsLoaderVisibile = true;
             await Task.Delay(1);
 
-            //RiaperturaAttivitaSospese();
-
             _jmesApiClient.MesAutoClock(_dialogoOperatoreObserver.OperatoreSelezionato.Badge.ToString(), true);
+
+            AggiornaOperatoreSelezionato();
 
             _dialogoOperatoreObserver.IsLoaderVisibile = false;
 
@@ -76,18 +80,11 @@ namespace IMAR_DialogoOperatore.Commands
             _toastDisplayerUtility.ShowGreenToast("Entrata", $"Benvenuto {_dialogoOperatoreObserver.OperatoreSelezionato.Nome}!");
         }
 
-        private void RiaperturaAttivitaSospese()
-        {
-            IOperatoreViewModel operatore = _dialogoOperatoreObserver.OperatoreSelezionato;
-            foreach (Attivita attivita in operatore.AttivitaAperte)
-                _jmesApiClient.MesWorkResume(operatore.Badge.ToString(), attivita);
-        }
-
         private async Task EffettuaUscitaOperatore()
         {
             _dialogoOperatoreObserver.IsUscita = true;
 
-            await AvanzaAttivitaOperatore();
+            await ChiudiAttivitaOperatore();
 
             if (_dialogoOperatoreObserver.IsOperazioneAnnullata)
             {
@@ -120,9 +117,6 @@ namespace IMAR_DialogoOperatore.Commands
                 {
                     attivita = new AttivitaViewModel(operatore.AttivitaAperte[i]);
 
-                    if (attivita.Causale == Costanti.LAVORO_SOSPESO || attivita.Causale == Costanti.ATTREZZAGGIO_SOSPESO)
-                        continue;
-
                     await _interruzioneAttivitaHelper.GestisciInterruzioneAttivita(attivita, true);
 
                     if (_dialogoOperatoreObserver.IsOperazioneAnnullata)
@@ -136,23 +130,11 @@ namespace IMAR_DialogoOperatore.Commands
             }
         }
 
-        private async Task AvanzaAttivitaOperatore()
+        private void AggiornaOperatoreSelezionato()
         {
-            IAttivitaViewModel attivita;
-            IOperatoreViewModel operatore = _dialogoOperatoreObserver.OperatoreSelezionato;
+            Operatore? operatore = _operatoreService.OttieniOperatore(_dialogoOperatoreObserver.OperatoreSelezionato.Badge);
 
-            for (int i = 0; i < operatore.AttivitaAperte.Count; i++)
-            {
-                attivita = new AttivitaViewModel(operatore.AttivitaAperte[i]);
-
-                if (attivita.Causale == Costanti.IN_ATTREZZAGGIO)
-                    continue;
-
-                await _interruzioneAttivitaHelper.GestisciInterruzioneAttivita(attivita, false);
-
-                if (_dialogoOperatoreObserver.IsOperazioneAnnullata)
-                    break;
-            }
+            _dialogoOperatoreObserver.OperatoreSelezionato = operatore != null ? new OperatoreViewModel(operatore) : null;
         }
 
         public override void Dispose()

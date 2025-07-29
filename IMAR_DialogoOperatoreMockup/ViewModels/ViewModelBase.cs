@@ -1,7 +1,9 @@
-﻿namespace IMAR_DialogoOperatore.ViewModels
+﻿using IMAR_DialogoOperatore.Interfaces.ViewModels;
+
+namespace IMAR_DialogoOperatore.ViewModels
 {
-	public class ViewModelBase : IDisposable
-	{
+	public class ViewModelBase : IDisposable, IViewModelBase
+    {
         public void OnNotifyStateChanged()
 		{
 			NotifyStateChanged?.Invoke();

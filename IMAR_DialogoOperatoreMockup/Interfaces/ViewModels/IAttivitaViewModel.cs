@@ -23,5 +23,7 @@ namespace IMAR_DialogoOperatore.Interfaces.ViewModels
         double? CodiceJMes { get; }
         Macchina? Macchina { get; }
         string CausaleEstesa { get; }
+        DateTime? InizioAttivita { get; }
+        DateTime? FineAttivita { get; }
     }
 }

@@ -93,9 +93,7 @@
 	private bool isRestartTimerActive()
 	{
 		return AutoLogoutUtility.IsActive &&
-						DialogoOperatoreObserver.OperatoreSelezionato != null &&
-						DialogoOperatoreObserver.OperatoreSelezionato.Stato != Costanti.ASSENTE &&
-						DialogoOperatoreObserver.OperatoreSelezionato.Stato != Costanti.IN_PAUSA;
+						DialogoOperatoreObserver.OperatoreSelezionato != null;
 	}
 
 	private void AnnullaHandler()

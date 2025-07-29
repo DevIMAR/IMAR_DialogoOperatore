@@ -6,38 +6,27 @@ namespace IMAR_DialogoOperatore.ViewModels
     {
         private readonly IDialogoOperatoreObserver _dialogoOperatoreObserver;
 
-        private string _tipologiaTimbraturaErrataSelezionata;
-        private TimeSpan _orarioDaCorreggere;
-        private TimeSpan _orarioDaDichiarare;
+        private int _oraDaDichiarare;
+        private int _minutoDaDichiarare;
 
         public string NomeCognomeOperatore => _dialogoOperatoreObserver.OperatoreSelezionato.Nome + " " + _dialogoOperatoreObserver.OperatoreSelezionato.Cognome;
         public int BadgeOperatore => (int)_dialogoOperatoreObserver.OperatoreSelezionato.Badge;
-        public List<string> TipologieTimbraturaErrata => new List<string> { "Entrata", "Uscita", "Inizio pausa", "Fine pausa", "Inizio lavoro", "Fine lavoro", "Inizio attrezzaggio", "Fine attrezzaggio" };
 
-        public string TipologiaTimbraturaErrataSelezionata
+        public int OraDaDichiarare
         {
-            get { return _tipologiaTimbraturaErrataSelezionata; }
-            set 
-            { 
-                _tipologiaTimbraturaErrataSelezionata = value; 
-                OnNotifyStateChanged();
-            }
-        }
-        public TimeSpan OrarioDaCorreggere
-        {
-            get { return _orarioDaCorreggere; }
-            set 
-            { 
-                _orarioDaCorreggere = value; 
-                OnNotifyStateChanged();
-            }
-        }
-        public TimeSpan OrarioDaDichiarare
-        {
-            get { return _orarioDaDichiarare; }
+            get { return _oraDaDichiarare; }
             set 
             {
-                _orarioDaDichiarare = value; 
+                _oraDaDichiarare = value; 
+                OnNotifyStateChanged();
+            }
+        }
+        public int MinutoDaDichiarare
+        {
+            get { return _minutoDaDichiarare; }
+            set 
+            {
+                _minutoDaDichiarare = value; 
                 OnNotifyStateChanged();
             }
         }

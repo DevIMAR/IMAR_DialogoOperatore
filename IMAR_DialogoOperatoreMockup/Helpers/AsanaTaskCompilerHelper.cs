@@ -2,8 +2,9 @@
 using IMAR_DialogoOperatore.Domain.Models;
 using IMAR_DialogoOperatore.Interfaces.Helpers;
 using IMAR_DialogoOperatore.Interfaces.Observers;
+using IMAR_DialogoOperatore.ViewModels;
 
-namespace IMAR_DialogoOperatore.ViewModels
+namespace IMAR_DialogoOperatore.Helpers
 {
     public class AsanaTaskCompilerHelper : ITaskCompilerHelper
     {
@@ -33,48 +34,47 @@ namespace IMAR_DialogoOperatore.ViewModels
         {
             InizializzaCampi();
 
+            if (_taskCompilerObserver.EventoSelezionato != null)
+                TaskAsana.Html_notes = "Bolla: " + _taskCompilerObserver.EventoSelezionato.Bolla + "\n" +
+                                       "Odp: " + _taskCompilerObserver.EventoSelezionato.Odp + "\n" +
+                                       "Fase: " + _taskCompilerObserver.EventoSelezionato.Fase + "\n";
+
             switch (_taskCompilerObserver.CategoriaErroreSelezionata)
             {
                 case Costanti.TASK_QUANTITA_ERRATA:
                     string saldoAcconto = _avanzamentoAttivitaViewModel.IsFaseCompletabile ? "Saldo" : "Acconto";
 
                     TaskAsana.Name = "Richiesta modifica QUANTITà DICHIARATA errata";
-                    TaskAsana.Html_notes = "Bolla: " + _infoBaseAttivitaViewModel.Bolla + "\n" +
-                                           "Odp: " + _infoBaseAttivitaViewModel.Odp + "\n" +
-                                           "Fase: " + _infoBaseAttivitaViewModel.FaseSelezionata + "\n" +
-                                           "Quantità prodotta: " + _avanzamentoAttivitaViewModel.QuantitaProdotta + "\n" +
+                    TaskAsana.Html_notes += "Quantità prodotta: " + _avanzamentoAttivitaViewModel.QuantitaProdotta + "\n" +
                                            "Quantità scartata: " + _avanzamentoAttivitaViewModel.QuantitaScartata + "\n" +
-                                           "Saldo/acconto: " + saldoAcconto + "\n" +
-                                           "Note: " + _taskCompilerObserver.Note + "\n";
+                                           "Saldo/acconto: " + saldoAcconto + "\n";
                     break;
 
                 case Costanti.TASK_CHIUSURA_A_SALDO_ERRATA:
                     TaskAsana.Name = "Richiesta modifica CHIUSURA A SALDO errata";
-                    TaskAsana.Html_notes = "Bolla: " + _infoBaseAttivitaViewModel.Bolla + "\n" +
-                                           "Odp: " + _infoBaseAttivitaViewModel.Odp + "\n" +
-                                           "Fase: " + _infoBaseAttivitaViewModel.FaseSelezionata + "\n" +
-                                           "Note: " + _taskCompilerObserver.Note + "\n";
                     break;
 
                 case Costanti.TASK_TIMBRATURA_ERRATA:
-                    TaskAsana.Name = "Richiesta modifica TIMBRATURA errata";
+                    TaskAsana.Name = "Richiesta modifica ORARIO TIMBRATURA errata";
                     TaskAsana.Html_notes = "Operatore: " + _infoTaskOperatoreViewModel.NomeCognomeOperatore + "\n" +
-                                           "Badge: " + _infoTaskOperatoreViewModel.BadgeOperatore + "\n" +
-                                           "Tipologia timbratura: " + _infoTaskOperatoreViewModel.TipologiaTimbraturaErrataSelezionata + "\n" +
-                                           "Orario da correggere: " + _infoTaskOperatoreViewModel.OrarioDaCorreggere + "\n" +
-                                           "Orario reale: " + _infoTaskOperatoreViewModel.OrarioDaDichiarare + "\n" +
-                                           "Note: " + _taskCompilerObserver.Note + "\n";
+                                           "Causale: " + _taskCompilerObserver.EventoSelezionato.CausaleEstesa + "\n" +
+                                           "Quantità prodotta: " + _taskCompilerObserver.EventoSelezionato.QuantitaProdotta + "\n" +
+                                           "Quantità scartata: " + _taskCompilerObserver.EventoSelezionato.QuantitaScartata + "\n" +
+                                           "Orario da correggere: " + _taskCompilerObserver.EventoSelezionato.Timestamp + "\n" +
+                                           "Nuovo orario: " + _infoTaskOperatoreViewModel.OraDaDichiarare + ":" + _infoTaskOperatoreViewModel.MinutoDaDichiarare + "\n";
                     break;
 
                 case Costanti.TASK_ALTRO:
                     TaskAsana.Name = "Richiesta per altro errore: leggere descrizione";
-                    TaskAsana.Html_notes = "Note: " + _taskCompilerObserver.Note + "\n";
                     break;
 
                 default:
                     TaskAsana.Html_notes = null;
                     break;
             }
+
+            if (TaskAsana.Html_notes != null)
+                    TaskAsana.Html_notes += "Note: " + _taskCompilerObserver.Note + "\n";
 
             string firmaOperatore = _dialogoOperatoreObserver.OperatoreSelezionato.Nome + " " + _dialogoOperatoreObserver.OperatoreSelezionato.Cognome;
             TaskAsana.Html_notes += "\n\n" + firmaOperatore;

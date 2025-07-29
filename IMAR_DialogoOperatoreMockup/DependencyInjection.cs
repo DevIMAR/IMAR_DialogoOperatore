@@ -30,6 +30,7 @@ namespace IMAR_DialogoOperatore
 
 			services.AddScoped<IAttivitaMapper, AttivitaMapper>();
 			services.AddScoped<IOperatoreMapper, OperatoreMapper>();
+			services.AddScoped<ITimbraturaMapper, TimbraturaMapper>();
 
 			services.AddScoped<ToastDisplayerUtility>();
 
@@ -37,6 +38,7 @@ namespace IMAR_DialogoOperatore
 			services.AddScoped<AttivitaGridViewModel>();
 			services.AddScoped<AvanzamentoAttivitaViewModel>();
 			services.AddScoped<CompilatoreTaskViewModel>();
+			services.AddScoped<CronologiaAttivitaGridViewModel>();
 			services.AddScoped<DialogoOperatoreViewModel>();
 			services.AddScoped<DocumentaleViewModel>();
 			services.AddScoped<FasiIndiretteGridViewModel>();

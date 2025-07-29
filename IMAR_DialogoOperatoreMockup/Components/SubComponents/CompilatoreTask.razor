@@ -1,4 +1,5 @@
-﻿@using IMAR_DialogoOperatore.ViewModels
+﻿@using DevExpress.Blazor.Internal
+@using IMAR_DialogoOperatore.ViewModels
 
 @inject CompilatoreTaskViewModel CompilatoreTaskViewModel
 
@@ -11,17 +12,15 @@
 	</Rows>
 
 	<Items>
-		<DxGridLayoutItem Row="0" Column="0">
+		<DxGridLayoutItem Row="0"
+						  CssClass="mt-2">
 			<Template>
-				@if (!string.IsNullOrWhiteSpace(CompilatoreTaskViewModel.CategoriaErroreSelezionata) &&
-								CompilatoreTaskViewModel.CategoriaErroreSelezionata.ToLower().Contains("attività"))
-				{
-					<InfoBaseAttivita />
-				}
+				<CronologiaAttivitaGrid ShowTimbrature="@CompilatoreTaskViewModel.ShowTimbratureInGriglia"
+										@bind-AttivitaSelezionata="@CompilatoreTaskViewModel.EventoSelezionato"/>
 			</Template>
 		</DxGridLayoutItem>
 
-		<DxGridLayoutItem Row="1" Column="0">
+		<DxGridLayoutItem Row="1">
 			<Template>
 				@if (!string.IsNullOrWhiteSpace(CompilatoreTaskViewModel.CategoriaErroreSelezionata) &&
 								CompilatoreTaskViewModel.CategoriaErroreSelezionata.ToLower().Contains("quantità"))
@@ -31,38 +30,41 @@
 			</Template>
 		</DxGridLayoutItem>
 
-		<DxGridLayoutItem Row="0" Column="0">
+		<DxGridLayoutItem Row="1">
 			<Template>
 				@if (!string.IsNullOrWhiteSpace(CompilatoreTaskViewModel.CategoriaErroreSelezionata) &&
 								CompilatoreTaskViewModel.CategoriaErroreSelezionata.ToLower().Contains("operatore"))
 				{
-					<InfoTaskOperatore />
+					<InfoTaskOperatore OrarioAggiunto="@HandleOrarioAggiunto"/>
 				}
 			</Template>
 		</DxGridLayoutItem>
 
-		<DxGridLayoutItem Row="2" Column="0">
+		<DxGridLayoutItem Row="2">
 			<Template>
 				<div class="d-flex justify-content-center align-items-center h-100 testo-piccolo mt-2">
-					<label>DESCRIZIONE ERRORE</label>
+					<label>NOTE/DESCRIZIONE</label>
 				</div>
 			</Template>
 		</DxGridLayoutItem>
 
-		<DxGridLayoutItem Row="3" Column="0">
+		<DxGridLayoutItem Row="3">
 			<Template>
 				<DxMemo @bind-Text="@CompilatoreTaskViewModel.Note"
 						NullText="Inserisci la descrizione dell'errore"
 						BindValueMode="BindValueMode.OnInput"
 						Rows="3"
 						Enabled="@CompilatoreTaskViewModel.IsDescrizioneErroreAttiva"
-						CssClass="mt-2" />
+						CssClass="mt-2"
+						@ref="Note"/>
 			</Template>
 		</DxGridLayoutItem>
 	</Items>
 </DxGridLayout>
 
 @code {
+	private DxMemo Note;
+
 	protected override void OnInitialized()
 	{
 		CompilatoreTaskViewModel.NotifyStateChanged += CompilatoreTaskViewModel_NotifyStateChanged;
@@ -70,4 +72,22 @@
 	}
 
 	private async void CompilatoreTaskViewModel_NotifyStateChanged() => await InvokeAsync(StateHasChanged);
+
+	private async Task SetFocus(IFocusableEditor element)
+	{
+		try
+		{
+			await Task.Delay(10);
+			await element.FocusAsync();
+		}
+		catch
+		{
+
+		}
+	}
+
+	private async Task HandleOrarioAggiunto()
+	{
+		await SetFocus(Note);
+	}
 }

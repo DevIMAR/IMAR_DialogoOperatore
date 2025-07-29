@@ -8,10 +8,13 @@ namespace IMAR_DialogoOperatore.ViewModels
         private readonly ITaskCompilerObserver _taskCompilerObserver;
 
         private string _note;
+        private TimbraturaAttivitaViewModel? _eventoSelezionato;
 
         public string CategoriaErroreSelezionata => _taskCompilerObserver.CategoriaErroreSelezionata;
         public bool IsDescrizioneErroreAttiva => _taskCompilerObserver.CategoriaErroreSelezionata != null &&
                                                  _taskCompilerObserver.CategoriaErroreSelezionata != Costanti.TASK_CHIUSURA_A_SALDO_ERRATA;
+        public bool ShowTimbratureInGriglia => string.IsNullOrWhiteSpace(_taskCompilerObserver.CategoriaErroreSelezionata) ||
+                                                !_taskCompilerObserver.CategoriaErroreSelezionata.ToLower().Contains("attività");
 
         public string Note
         {
@@ -20,6 +23,17 @@ namespace IMAR_DialogoOperatore.ViewModels
             { 
                 _note = value;
                 _taskCompilerObserver.Note = _note;
+
+                OnNotifyStateChanged();
+            }
+        }
+        public TimbraturaAttivitaViewModel? EventoSelezionato
+        {
+            get { return _eventoSelezionato; }
+            set
+            {
+                _eventoSelezionato = value;
+                _taskCompilerObserver.EventoSelezionato = _eventoSelezionato;
 
                 OnNotifyStateChanged();
             }

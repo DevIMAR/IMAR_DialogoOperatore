@@ -18,7 +18,7 @@
                 }
                 else
                 {
-                    action();
+                    CallAction(action);
                 }
             });
         }

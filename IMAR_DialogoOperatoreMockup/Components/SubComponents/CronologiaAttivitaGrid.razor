@@ -1,0 +1,85 @@
+﻿@using IMAR_DialogoOperatore.Interfaces.ViewModels
+@using IMAR_DialogoOperatore.ViewModels
+
+@inject CronologiaAttivitaGridViewModel CronologiaAttivitaGridViewModel
+
+<DxGrid @bind-Data="@CronologiaAttivitaGridViewModel.CronologiaEventi"
+		AllowSort="false"
+		AllowColumnReorder="false"
+		ShowAllRows="true"
+		AllowSelectRowByClick="true"
+		SelectionMode="GridSelectionMode.Single"
+		SelectedDataItem="@AttivitaSelezionata"
+		SelectedDataItemChanged="OnAttivitaSelezionataChanged"
+		style="height: 30dvh;">
+	<Columns>
+		<DxGridDataColumn Caption="Causale"
+						  FieldName="@(nameof(ITimbraturaAttivitaViewModel.CausaleEstesa))" />
+
+		@if (ShowAttivita)
+		{
+			<DxGridDataColumn Caption="Bolla"
+							  FieldName="@(nameof(ITimbraturaAttivitaViewModel.Bolla))"
+							  SortIndex="2" />
+
+			<DxGridDataColumn Caption="Odp"
+							  FieldName="@(nameof(ITimbraturaAttivitaViewModel.Odp))" />
+
+			<DxGridDataColumn Caption="Fase"
+							  FieldName="@(nameof(ITimbraturaAttivitaViewModel.Fase))" />
+
+			<DxGridDataColumn Caption="Prodotta"
+							  FieldName="@(nameof(ITimbraturaAttivitaViewModel.QuantitaProdotta))" />
+
+			<DxGridDataColumn Caption="Scartata"
+							  FieldName="@(nameof(ITimbraturaAttivitaViewModel.QuantitaScartata))" />
+		}
+
+		<DxGridDataColumn Caption="Orario"
+						  FieldName="@(nameof(ITimbraturaAttivitaViewModel.Timestamp))"
+						  DisplayFormat="dd/MM/yy HH:mm:ss tt"
+						  SortIndex="1" />
+	</Columns>
+</DxGrid>
+
+@code {
+	[Parameter] public TimbraturaAttivitaViewModel? AttivitaSelezionata { get; set; } = null;
+	[Parameter] public EventCallback<TimbraturaAttivitaViewModel> AttivitaSelezionataChanged { get; set; }
+	[Parameter] public bool ShowAttivita { get; set; } = true;
+	[Parameter] public bool ShowTimbrature { get; set; } = true;
+
+	protected override void OnInitialized()
+	{
+		base.OnInitialized();
+
+		CronologiaAttivitaGridViewModel.NotifyStateChanged += CronologiaAttivitaGridViewModel_NotifyStateChanged;
+	}
+
+	protected override void OnAfterRender(bool firstRender)
+	{
+		base.OnAfterRender(firstRender);
+
+		if (firstRender)
+			CaricaEventi();
+	}
+
+	private void CronologiaAttivitaGridViewModel_NotifyStateChanged() => InvokeAsync(StateHasChanged);
+
+	private void OnAttivitaSelezionataChanged(object nuovaTimbraturaAttivitaViewModel)
+	{
+		AttivitaSelezionata = (TimbraturaAttivitaViewModel?)nuovaTimbraturaAttivitaViewModel;
+		AttivitaSelezionataChanged.InvokeAsync(AttivitaSelezionata);
+	}
+
+	private void CaricaEventi()
+	{
+		if (ShowAttivita && ShowTimbrature)
+			CronologiaAttivitaGridViewModel.GetCronologiaEventi();
+
+		else if (ShowAttivita)
+			CronologiaAttivitaGridViewModel.GetCronologiaAttivita();
+
+		else if (ShowTimbrature)
+			CronologiaAttivitaGridViewModel.GetCronologiaTimbrature();
+	}
+}

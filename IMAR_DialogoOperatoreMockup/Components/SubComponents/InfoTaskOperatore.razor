@@ -1,24 +1,10 @@
-﻿@using IMAR_DialogoOperatore.ViewModels
+﻿@using DevExpress.Blazor.Internal
+@using IMAR_DialogoOperatore.ViewModels
 
 @inject InfoTaskOperatoreViewModel InfoTaskOperatoreViewModel
 
 <DxGridLayout>
-	<Rows>
-		<DxGridLayoutRow Height="auto" />
-		<DxGridLayoutRow Height="auto" />
-		<DxGridLayoutRow Height="auto" />
-		<DxGridLayoutRow Height="auto" />
-		<DxGridLayoutRow Height="auto" />
-		<DxGridLayoutRow Height="auto" />
-	</Rows>
-
 	<Columns>
-		<DxGridLayoutColumn />
-		<DxGridLayoutColumn />
-		<DxGridLayoutColumn />
-		<DxGridLayoutColumn />
-		<DxGridLayoutColumn />
-		<DxGridLayoutColumn />
 		<DxGridLayoutColumn />
 		<DxGridLayoutColumn />
 		<DxGridLayoutColumn />
@@ -28,100 +14,56 @@
 	</Columns>
 
 	<Items>
-		<DxGridLayoutItem Row="0" 
-						  Column="0" ColumnSpan="8">
+		<DxGridLayoutItem Column="0" ColumnSpan="3">
 			<Template>
-				<div class="d-flex justify-content-center align-items-center h-100 testo-piccolo mt-2">
-					<label>OPERATORE</label>
+				<div class="d-flex align-items-center h-100 testo-piccolo mt-2">
+					<label>ORARIO DA DICHIARARE (hh:mm)</label>
 				</div>
 			</Template>
 		</DxGridLayoutItem>
 
-		<DxGridLayoutItem Row="0" 
-						  Column="8" ColumnSpan="4">
+		<DxGridLayoutItem Column="3" ColumnSpan="1">
 			<Template>
-				<div class="d-flex justify-content-center align-items-center h-100 testo-piccolo mt-2">
-					<label>BADGE</label>
+				<div class="d-flex justify-content-center align-items-center h-100 testo-grande mt-2">
+					<DxSpinEdit @bind-Value="@InfoTaskOperatoreViewModel.OraDaDichiarare"
+								MinValue="00"
+								MaxValue="24"
+								ShowSpinButtons="false"
+								CssClass="dxbl-text-edit"
+								@onkeydown="HandleOraKeyPress" />
 				</div>
 			</Template>
 		</DxGridLayoutItem>
 
-		<DxGridLayoutItem Row="1" 
-						  Column="0" ColumnSpan="8">
+		<DxGridLayoutItem Column="4" ColumnSpan="1">
 			<Template>
-				<DxTextBox Text="@InfoTaskOperatoreViewModel.NomeCognomeOperatore"
-						   Enabled="false"
-						   CssClass="mt-2" />
-			</Template>
-		</DxGridLayoutItem>
-
-		<DxGridLayoutItem Row="1" 
-						  Column="8" ColumnSpan="4">
-			<Template>
-				<DxSpinEdit Value="@InfoTaskOperatoreViewModel.BadgeOperatore"
-							Enabled="false"
-							ShowSpinButtons="false"
-							CssClass="mt-2" />
-			</Template>
-		</DxGridLayoutItem>
-
-		<DxGridLayoutItem Row="2" 
-						  Column="0" ColumnSpan="12">
-			<Template>
-				<div class="d-flex justify-content-center align-items-center h-100 testo-piccolo mt-2">
-					<label>TIPOLOGIA</label>
+				<div class="d-flex justify-content-center align-items-center h-100 testo-grande mt-2">
+					<label>:</label>
 				</div>
 			</Template>
 		</DxGridLayoutItem>
 
-		<DxGridLayoutItem Row="3" 
-						  Column="0" ColumnSpan="12">
+		<DxGridLayoutItem Column="5" ColumnSpan="1">
 			<Template>
-				<DxComboBox Data="@InfoTaskOperatoreViewModel.TipologieTimbraturaErrata"
-							@bind-Value="@InfoTaskOperatoreViewModel.TipologiaTimbraturaErrataSelezionata"
-							CssClass="mt-2" />
-			</Template>
-		</DxGridLayoutItem>
-
-		<DxGridLayoutItem Row="4"
-						  Column="0" ColumnSpan="6">
-			<Template>
-				<div class="d-flex justify-content-center align-items-center h-100 testo-piccolo mt-2">
-					<label>ORARIO DA CORREGGERE</label>
+				<div class="d-flex justify-content-center align-items-center h-100 testo-grande mt-2">
+					<DxSpinEdit @bind-Value="@InfoTaskOperatoreViewModel.MinutoDaDichiarare"
+								MinValue="00"
+								MaxValue="59"
+								ShowSpinButtons="false"
+								CssClass="dxbl-text-edit"
+								@ref="Minuto"
+								@onkeydown="HandleMinutoKeyPress" />
 				</div>
-			</Template>
-		</DxGridLayoutItem>
-
-		<DxGridLayoutItem Row="4"
-						  Column="6" ColumnSpan="6">
-			<Template>
-				<div class="d-flex justify-content-center align-items-center h-100 testo-piccolo mt-2">
-					<label>ORARIO DA DICHIARARE</label>
-				</div>
-			</Template>
-		</DxGridLayoutItem>
-
-		<DxGridLayoutItem Row="5"
-						  Column="0" ColumnSpan="6">
-			<Template>
-				<DxMaskedInput @bind-Value="@InfoTaskOperatoreViewModel.OrarioDaCorreggere"
-							   Mask="@TimeSpanMask.GeneralShortFormat"
-							   CssClass="dxbl-text-edit mt-2" />
-			</Template>
-		</DxGridLayoutItem>
-
-		<DxGridLayoutItem Row="5"
-						  Column="6" ColumnSpan="6">
-			<Template>
-				<DxMaskedInput @bind-Value="@InfoTaskOperatoreViewModel.OrarioDaDichiarare"
-							   Mask="@TimeSpanMask.GeneralShortFormat"
-							   CssClass="dxbl-text-edit mt-2" />
 			</Template>
 		</DxGridLayoutItem>
 	</Items>
 </DxGridLayout>
 
 @code {
+	[Parameter] public EventCallback OrarioAggiunto { get; set; }
+
+	private DxSpinEdit<int> Minuto;
+
 	protected override void OnInitialized()
 	{
 		InfoTaskOperatoreViewModel.NotifyStateChanged += InfoTaskOperatoreViewModel_NotifyStateChanged;
@@ -129,4 +71,37 @@
 	}
 
 	private async void InfoTaskOperatoreViewModel_NotifyStateChanged() => await InvokeAsync(StateHasChanged);
+
+	private async void SetFocus(IFocusableEditor element)
+	{
+		try
+		{
+			await Task.Delay(10);
+			await element.FocusAsync();
+		}
+		catch
+		{
+
+		}
+	}
+
+	private void HandleOraKeyPress(KeyboardEventArgs e)
+	{
+		switch (e.Key)
+		{
+			case "Enter":
+				SetFocus(Minuto);
+				break;
+		}
+	}
+
+	private void HandleMinutoKeyPress(KeyboardEventArgs e)
+	{
+		switch (e.Key)
+		{
+			case "Enter":
+				OrarioAggiunto.InvokeAsync();
+				break;
+		}
+	}
 }

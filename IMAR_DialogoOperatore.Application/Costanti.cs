@@ -26,6 +26,7 @@
 		public const string JMES_LAVORO_SOSPESO = "Lavoro sospeso";
 		public const string JMES_ATTREZZAGGIO_SOSPESO = "Attrezzaggio sospeso";
 		public const string JMES_ATTREZZAGGIO_COMPLETATO = "Attrezzaggio completato";
+		public const string JMES_AVANZAMENTO = "Avanzamento";
 
 		public const string TASK_QUANTITA_ERRATA = "Quantità attività errata";
         public const string TASK_CHIUSURA_A_SALDO_ERRATA = "Chiusura a saldo attività errata";

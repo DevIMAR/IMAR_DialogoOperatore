@@ -1,6 +1,7 @@
 ﻿using IMAR_DialogoOperatore.Application;
 using IMAR_DialogoOperatore.Application.Interfaces.Clients;
 using IMAR_DialogoOperatore.Application.Interfaces.Services.Activities;
+using IMAR_DialogoOperatore.Application.Interfaces.UoW;
 using IMAR_DialogoOperatore.Application.Interfaces.Utilities;
 using IMAR_DialogoOperatore.Domain.Models;
 using IMAR_DialogoOperatore.Infrastructure.Mappers;
@@ -14,12 +15,14 @@ namespace IMAR_DialogoOperatore.Services
         private readonly IJmesApiClient _jmesApiClient;
         private readonly IJMesApiClientErrorUtility _jMesApiClientErrorUtility;
         private readonly CaricamentoAttivitaInBackgroundService _caricamentoAttivitaInBackroundService;
+        private readonly ISynergyJmesUoW _synergyJmesUoW;
 
         public AttivitaService(
             IMacchinaService macchinaService,
             IJmesApiClient jmesApiClient,
             IJMesApiClientErrorUtility jMesApiClientErrorUtility,
-            CaricamentoAttivitaInBackgroundService caricamentoAttivitaInBackroundService)
+            CaricamentoAttivitaInBackgroundService caricamentoAttivitaInBackroundService,
+            ISynergyJmesUoW synergyJmesUoW)
         {
             _macchinaService = macchinaService;
 
@@ -27,6 +30,8 @@ namespace IMAR_DialogoOperatore.Services
             _jMesApiClientErrorUtility = jMesApiClientErrorUtility;
 
             _caricamentoAttivitaInBackroundService = caricamentoAttivitaInBackroundService;
+
+            _synergyJmesUoW = synergyJmesUoW;
         }
 
         public bool ConfrontaCausaliAttivita(IList<Attivita> listaAttivitaDaControllare, string bollaAttivitaDaConfrontare, string operazioneAttivitaDaConfrontare)
@@ -106,18 +111,17 @@ namespace IMAR_DialogoOperatore.Services
             return null;
         }
 
-        public IList<Attivita> OttieniAttivitaOperatore(string badgeOperatore)
+        public IList<Attivita> OttieniAttivitaOperatore(Operatore operatore)
         {
-            IList<mesEvtOpe>? attivitaOperatore = OttieniTutteAttivitaOperatore(badgeOperatore);
-            IList<mesTskForOpe>? attivitaIndiretteOperatore = OttieniAttivitaIndiretteOperatore(badgeOperatore);
-            if (attivitaOperatore == null && attivitaIndiretteOperatore == null)
+            IList<mesTskForOpe>? attivitaIndiretteOperatore = OttieniAttivitaIndiretteOperatore(operatore.Badge);
+            if (attivitaIndiretteOperatore == null)
                 return new List<Attivita>();
 
             IList<mesDiaOpe>? attivitaAperte = GetAttivitaAperte();
             if (attivitaAperte == null)
                 return new List<Attivita>();
 
-            IList<Attivita> attivitaOperatoreAperte = GetAttivitaOperatoreAperte(attivitaOperatore, attivitaAperte, attivitaIndiretteOperatore);
+            IList<Attivita> attivitaOperatoreAperte = GetAttivitaOperatoreAperte(operatore, attivitaAperte, attivitaIndiretteOperatore);
 
             return attivitaOperatoreAperte;
         }
@@ -149,12 +153,13 @@ namespace IMAR_DialogoOperatore.Services
             return attivitaOperatore;
         }
 
-        private List<Attivita> GetAttivitaOperatoreAperte(IList<mesEvtOpe>? attivitaOperatore, IList<mesDiaOpe> attivitaAperte, IList<mesTskForOpe>? attivitaIndiretteOperatore)
+        private List<Attivita> GetAttivitaOperatoreAperte(Operatore operatore, IList<mesDiaOpe> attivitaAperte, IList<mesTskForOpe>? attivitaIndiretteOperatore)
         {
             List<Attivita> attivitaOperatoreAperte = new List<Attivita>();
 
+            List<Attivita> attivitaOperatore = GetAttivitaOperatore(operatore.IdJMes);
             if (attivitaOperatore != null)
-                attivitaOperatoreAperte.AddRange(OttieniAttivitaOperatoreAperte(attivitaOperatore, attivitaAperte));
+                attivitaOperatoreAperte.AddRange(attivitaOperatore);
 
             if (attivitaIndiretteOperatore != null)
                 attivitaOperatoreAperte.AddRange(OttieniAttivitaIndiretteOperatoreAperte(attivitaAperte, attivitaIndiretteOperatore));
@@ -163,6 +168,47 @@ namespace IMAR_DialogoOperatore.Services
                 attivita.Macchina = _macchinaService.GetMacchinaRealeByAttivita(attivita);
 
             return attivitaOperatoreAperte;
+        }
+
+        private List<Attivita> GetAttivitaOperatore(int idJmesOperatore)
+        {
+            List<Attivita> attivitaOperatore = _synergyJmesUoW.MesEvt
+                                                               .Get(x => (int)x.ResEffStrUid == idJmesOperatore)
+                                                               .Where(x => x.TssEnd == null)
+                                                               .Join(_synergyJmesUoW.MesEvtDet.Get(),
+                                                                        me => me.Uid,
+                                                                        med => med.EvtUid,
+                                                                        (me, med) => new { me, med })
+                                                               .Join(_synergyJmesUoW.MesDiaOpe.Get(),
+                                                                        x => (double?)x.me.Uid,
+                                                                        mdo => (double?) mdo.EvtUid,
+                                                                        (x, mdo) => new Attivita
+                                                                        {
+                                                                            Bolla = x.med.DocCod,
+                                                                            Causale = StatoAttivitaMapper.FromJMesCode(x.me.EvtTypUid),
+                                                                            CausaleEstesa = StatoAttivitaMapper.FromJMesCodeExtended(x.me.EvtTypUid),
+                                                                            CodiceJMes = (double) mdo.Uid,
+                                                                            InizioAttivita = x.me.TssStr,
+                                                                            FineAttivita = x.me.TssEnd
+                                                                        })
+                                                               .ToList();
+
+            List<Attivita> attivita = _caricamentoAttivitaInBackroundService.GetAttivitaAperte()
+                                       .Join(attivitaOperatore,
+                                             a => a.Bolla,
+                                             aoa => aoa.Bolla,
+                                             (a, aoa) =>
+                                             {
+                                                 a.CausaleEstesa = aoa.CausaleEstesa;
+                                                 a.Causale = aoa.Causale;
+                                                 a.CodiceJMes = aoa.CodiceJMes;
+                                                 a.InizioAttivita = aoa.InizioAttivita;
+                                                 a.FineAttivita = aoa.FineAttivita;
+                                                 return a;
+                                             })
+                                       .ToList();
+
+            return attivita;
         }
 
         private List<Attivita> OttieniAttivitaOperatoreAperte(IList<mesEvtOpe> attivitaOperatore, IList<mesDiaOpe> attivitaAperte)
@@ -257,6 +303,40 @@ namespace IMAR_DialogoOperatore.Services
                    .Distinct()
                    .Select(x => x.ID_EvtOpe3279.ToString())
                    .ToList();
+        }
+
+        public IList<Attivita>? GetAttivitaOperatoreDellUltimaGiornata(int idJmesOperatore)
+        {
+            DateTime ieriAlle2045 = DateTime.Today.AddHours(-4).AddMinutes(45);
+            DateTime oggiAlle2115 = DateTime.Today.AddHours(21).AddMinutes(15);
+
+            IList<Attivita> attivitaOperatoreDellUltimaGiornata = _synergyJmesUoW.MesEvt
+                                                                                 .Get(x => (int)x.ResEffStrUid == idJmesOperatore)
+                                                                                 .Where(x => x.TssStr >= ieriAlle2045 &&
+                                                                                             x.TssStr <= oggiAlle2115 &&
+                                                                                             x.EvtTypUid != 3) //evito le sospensioni
+                                                                                 .Join(_synergyJmesUoW.MesEvtDet.Get(),
+                                                                                       me => me.Uid,
+                                                                                       med => med.EvtUid,
+                                                                                       (me, med) => new { me, med })
+                                                                                 .Join(_synergyJmesUoW.MesEvtMacDet.Get(),
+                                                                                       x => x.med.Uid,
+                                                                                       memd => memd.EvtDetUid,
+                                                                                       (x, memd) =>
+                                                                                       new Attivita
+                                                                                       {
+                                                                                           CausaleEstesa = StatoAttivitaMapper.FromJMesCodeExtended(x.me.EvtTypUid),
+                                                                                           Bolla = x.med.DocCod,
+                                                                                           Odp = x.med.PrdOrdCod,
+                                                                                           Fase = x.med.PrdPhsCod,
+                                                                                           QuantitaProdotta = (int)memd.QtyPrd,
+                                                                                           QuantitaScartata = (int)memd.QtyRej,
+                                                                                           InizioAttivita = x.me.TssStr,
+                                                                                           FineAttivita = x.me.TssEnd
+                                                                                       })
+                                                                                 .ToList();
+
+            return attivitaOperatoreDellUltimaGiornata;
         }
     }
 }

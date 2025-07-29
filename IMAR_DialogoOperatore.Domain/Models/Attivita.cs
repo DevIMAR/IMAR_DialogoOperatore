@@ -21,5 +21,7 @@
 		public string SaldoAcconto { get; set; }
 		public double? CodiceJMes {  get; set; }
 		public Macchina Macchina { get; set; }
+		public DateTime InizioAttivita { get; set; }
+		public DateTime? FineAttivita { get; set; }
 	}
 }
