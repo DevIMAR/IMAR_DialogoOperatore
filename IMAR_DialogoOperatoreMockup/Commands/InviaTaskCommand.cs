@@ -39,7 +39,7 @@ namespace IMAR_DialogoOperatore.Commands
         public override async void Execute(object? parameter)
         {
             _taskCompilerHelper.CompilaTaskAsana();
-            string feedback = await _imarApiClient.SendTaskAsana(_taskCompilerHelper.TaskAsana, "luca.marangoni@imarsrl.com");
+            string feedback = await _imarApiClient.SendTaskAsana(_taskCompilerHelper.TaskAsana, "federico.crescenzi@imarsrl.com");
         }
     }
 }

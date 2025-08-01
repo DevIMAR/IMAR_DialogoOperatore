@@ -91,7 +91,7 @@ namespace IMAR_DialogoOperatore.Helpers
                 Projects = new List<string>() { "1210581212376329" },
                 Followers = new List<string>(),
                 Tags = new List<string>(),
-                Assignee = "federico.crescenzi@imarsrl.com", //"produzione@imarsrl.com"
+                Assignee = "luca.marangoni@imarsrl.com", //"produzione@imarsrl.com"
                 Html_notes = string.Empty
             };
         }
