@@ -9,7 +9,7 @@ namespace EsportatoreTimbratureTeamSystem.Services
         public FileExportService(
             IConfiguration config)
         {
-            _pathEsportazioneFile = config["FilePaths:TeamSystemTest"];
+            _pathEsportazioneFile = config["FilePaths:TeamSystem"];
         }
 
         public void Export(string timbratureCodificate)
