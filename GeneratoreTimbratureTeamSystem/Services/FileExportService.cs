@@ -17,7 +17,7 @@ namespace EsportatoreTimbratureTeamSystem.Services
             if (!Directory.Exists(_pathEsportazioneFile))
                 Directory.CreateDirectory(_pathEsportazioneFile);
 
-            string fileName = $"TeamSystem_{DateTime.Now:yyyyMMdd}.txt";
+            string fileName = $"timbrature.txt";
             string fullPath = Path.Combine(_pathEsportazioneFile, fileName);
             if (File.Exists(fullPath))
                 return;
