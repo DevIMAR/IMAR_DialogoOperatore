@@ -14,8 +14,12 @@
 	</HeaderTemplate>
 
 	<BodyTemplate>
-		<AttivitaDetails @ref="@AttivitaDetails"
-						 WorkDoneCallback="@Conferma" />
+		<div style="border:3px solid @GetBorderColor();
+					border-radius:8px;
+					height:stretch;">
+			<AttivitaDetails @ref="@AttivitaDetails"
+							 WorkDoneCallback="@Conferma" />
+		</div>
 	</BodyTemplate>
 
 	<FooterTemplate>
@@ -46,6 +50,19 @@
 	private async void GestoreAttivitaViewModel_NotifyStateChanged()
 	{
 		await InvokeAsync(StateHasChanged);
+	}
+
+	private string GetBorderColor()
+	{
+		return GestoreAttivitaViewModel.OperazioneInCorso switch
+		{
+			"Inizio lavoro" => "limegreen",
+			"Fine lavoro" => "royalblue",
+			"Avanzamento" => "dodgerblue",
+			"Inizio Attrezzaggio" => "limegreen",
+			"Fine Attrezzaggio" => "royalblue",
+			_ => string.Empty
+		};
 	}
 
 	private void Conferma()
