@@ -13,6 +13,8 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
         private readonly Timer _timer;
         private readonly Timer _timerDatiDaMonitor;
         private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
+        private readonly IJmesApiClient _jmesApiClient;
+        private readonly IAs400Repository _as400Repository;
 
         private List<string> _odpDatiMonitor;
         private IList<Attivita>? _attivitaAperte;
@@ -25,8 +27,12 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
             _attivitaAperte = new List<Attivita>();
             _attivitaIndirette = new List<stdMesIndTsk>();
 
+            using var scope = _serviceProvider.CreateScope();
+            _jmesApiClient = scope.ServiceProvider.GetRequiredService<IJmesApiClient>();
+            _as400Repository = scope.ServiceProvider.GetRequiredService<IAs400Repository>();
+
             _timerDatiDaMonitor = new Timer(UpdateDatiDaMonitor, null, TimeSpan.Zero, TimeSpan.FromMinutes(15));
-            _timer = new Timer(UpdateAttivita, null, TimeSpan.Zero, TimeSpan.FromSeconds(5));
+            _timer = new Timer(UpdateAttivita, null, TimeSpan.Zero, TimeSpan.FromSeconds(10));
         }
 
         private void UpdateAttivita(object? state)
@@ -38,10 +44,6 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
             {
                 Stopwatch stopwatch = Stopwatch.StartNew();
 
-                using var scope = _serviceProvider.CreateScope();
-                var jmesApiClient = scope.ServiceProvider.GetRequiredService<IJmesApiClient>();
-                var as400Repository = scope.ServiceProvider.GetRequiredService<IAs400Repository>();
-
                 List<Attivita> nuoveAttivita = new List<Attivita>();
 
                 decimal dimensioneBatch = 1000;
@@ -52,7 +54,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
                     var batchConsiderato = Math.Min((int)dimensioneBatch, _odpDatiMonitor.Count - (int)dimensioneBatch * i);
                     var batchOdp = string.Join(',', _odpDatiMonitor.Slice((int)dimensioneBatch * i, batchConsiderato));
 
-                    var batchAttivita = as400Repository.ExecuteQuery<Attivita>(@"SELECT
+                    var batchAttivita = _as400Repository.ExecuteQuery<Attivita>(@"SELECT
                                                                                  NRBLCI AS BOLLA, ORPRCI AS ODP, CDARCI AS ARTICOLO, trim(DSARMA) AS DESCRIZIONEARTICOLO, 
                                                                                  CDFACI AS FASE, DSFACI AS DESCRIZIONEFASE, PF2.QORDCI AS QUANTITAORDINE, 
                                                                                  COALESCE(SUM(jf.QTVERJM), 0) AS QUANTITAPRODOTTANONCONTABILIZZATA, 
@@ -72,7 +74,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
                     nuoveAttivita.AddRange(batchAttivita);
                 }
 
-                var attivitaIndirette = jmesApiClient.ChiamaQueryGetJmes<stdMesIndTsk>();
+                var attivitaIndirette = _jmesApiClient.ChiamaQueryGetJmes<stdMesIndTsk>();
 
                 _lock.EnterWriteLock();
                 try
@@ -96,17 +98,13 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
 
         private void UpdateDatiDaMonitor(object? state)
         {
-            using var scope = _serviceProvider.CreateScope();
-            var imarSchedulatoreUoW = scope.ServiceProvider.GetRequiredService<IImarSchedulatoreUoW>();
-
             _lock.EnterWriteLock();
             try
             {
-                _odpDatiMonitor = imarSchedulatoreUoW.DatiMonitorRepository.Get()
-                                                .Select(x => x.ODP)
-                                                .Distinct()
-                                                .Order()
-                                                .ToList();
+                _odpDatiMonitor = _as400Repository.ExecuteQuery<string>(@"SELECT DISTINCT(ORPRCI)
+                                                                          FROM IMA90DAT.PCIMP00F
+                                                                          WHERE TIRECI <> 'S'")
+                                                  .ToList();
             }
             finally
             {

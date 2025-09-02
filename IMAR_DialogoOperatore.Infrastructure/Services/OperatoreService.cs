@@ -175,7 +175,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
 
             if (isCambioCausaleApertura)
             {
-                errore = GestisciCambioCausale(operatore, attivitaDaAggiungere, isCambioCausaleApertura);
+                errore = GestisciCambioCausale(operatore, attivitaDaAggiungere);
                 if (errore != null)
                     return errore;
             }
@@ -185,7 +185,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
             return errore;
         }
 
-        private string? GestisciCambioCausale(Operatore operatore, Attivita attivitaDaAggiungere, bool isCambioCausaleApertura)
+        private string? GestisciCambioCausale(Operatore operatore, Attivita attivitaDaAggiungere)
         {
             Attivita AttivitaOperatoreDaRimuovere = operatore.AttivitaAperte.Single(x => x.Bolla == attivitaDaAggiungere.Bolla);
             return RimuoviAttivitaDaOperatore(operatore, AttivitaOperatoreDaRimuovere, null, null, isAttrezzaggio: true);

@@ -58,7 +58,7 @@ namespace IMAR_DialogoOperatore.Commands
 				   && _dialogoOperatoreObserver.OperatoreSelezionato.Stato == Costanti.PRESENTE
 				   && _dialogoOperatoreObserver.OperazioneInCorso != Costanti.NESSUNA
 				   && _dialogoOperatoreObserver.AttivitaSelezionata != null
-                   && _dialogoOperatoreObserver.AttivitaSelezionata.SaldoAcconto != Costanti.SALDO
+                   //&& _dialogoOperatoreObserver.AttivitaSelezionata.SaldoAcconto != Costanti.SALDO
 				   && base.CanExecute(parameter);
 		}
 
@@ -160,8 +160,8 @@ namespace IMAR_DialogoOperatore.Commands
 
         private void EseguiOperazioneOMostraMessaggio()
         {
-            if (_dialogoOperatoreObserver.IsAperturaLavoroAutomaticaAttiva)
-                _dialogoOperatoreObserver.OperazioneInCorso = Costanti.AVANZAMENTO;
+            //if (_dialogoOperatoreObserver.IsAperturaLavoroAutomaticaAttiva)
+            //    _dialogoOperatoreObserver.OperazioneInCorso = Costanti.AVANZAMENTO;
 
             string? result = _confermaOperazioneHelper.EseguiOperazione();
             if (result != null)
