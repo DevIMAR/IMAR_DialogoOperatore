@@ -6,7 +6,7 @@
    "IncludeConnectionString": false,
    "ModelNamespace": null,
    "OutputContextPath": null,
-   "OutputPath": "Models",
+   "OutputPath": "Entities.Imar_Connect",
    "PreserveCasingWithRegex": true,
    "ProjectRootNamespace": "IMAR_DialogoOperatore.Domain",
    "Schemas": null,
@@ -15,7 +15,7 @@
    "T4TemplatePath": null,
    "Tables": [
       {
-         "Name": "[dbo].[DATIMONITOR]",
+         "Name": "[dbo].[Interfaccia]",
          "ObjectType": 0
       }
    ],

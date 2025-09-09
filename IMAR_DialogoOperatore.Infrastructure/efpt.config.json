@@ -6,16 +6,16 @@
    "IncludeConnectionString": false,
    "ModelNamespace": null,
    "OutputContextPath": null,
-   "OutputPath": "Imar_Schedulatore",
+   "OutputPath": "",
    "PreserveCasingWithRegex": true,
-   "ProjectRootNamespace": "IMAR_DialogoOperatore.Infrastructure.Imar_Schedulatore",
+   "ProjectRootNamespace": "IMAR_DialogoOperatore.Infrastructure.Imar_Connect",
    "Schemas": null,
    "SelectedHandlebarsLanguage": 2,
    "SelectedToBeGenerated": 1,
    "T4TemplatePath": null,
    "Tables": [
       {
-         "Name": "[dbo].[DATIMONITOR]",
+         "Name": "[dbo].[Interfaccia]",
          "ObjectType": 0
       }
    ],
