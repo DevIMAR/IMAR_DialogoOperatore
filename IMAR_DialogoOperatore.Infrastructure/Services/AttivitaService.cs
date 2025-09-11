@@ -4,6 +4,7 @@ using IMAR_DialogoOperatore.Application.Interfaces.Repositories;
 using IMAR_DialogoOperatore.Application.Interfaces.Services.Activities;
 using IMAR_DialogoOperatore.Application.Interfaces.UoW;
 using IMAR_DialogoOperatore.Application.Interfaces.Utilities;
+using IMAR_DialogoOperatore.Domain.Entities.Imar_Connect;
 using IMAR_DialogoOperatore.Domain.Models;
 using IMAR_DialogoOperatore.Infrastructure.Mappers;
 using IMAR_DialogoOperatore.Infrastructure.Services;
@@ -17,6 +18,7 @@ namespace IMAR_DialogoOperatore.Services
         private readonly IJMesApiClientErrorUtility _jMesApiClientErrorUtility;
         private readonly CaricamentoAttivitaInBackgroundService _caricamentoAttivitaInBackroundService;
         private readonly ISynergyJmesUoW _synergyJmesUoW;
+        private readonly IImarConnectUoW _imarConnectUoW;
         private readonly IAs400Repository _as400Repository;
 
         public AttivitaService(
@@ -25,6 +27,7 @@ namespace IMAR_DialogoOperatore.Services
             IJMesApiClientErrorUtility jMesApiClientErrorUtility,
             CaricamentoAttivitaInBackgroundService caricamentoAttivitaInBackroundService,
             ISynergyJmesUoW synergyJmesUoW,
+            IImarConnectUoW imarConnectUoW,
             IAs400Repository as400Repository)
         {
             _macchinaService = macchinaService;
@@ -36,6 +39,7 @@ namespace IMAR_DialogoOperatore.Services
 
             _as400Repository = as400Repository;
             _synergyJmesUoW = synergyJmesUoW;
+            _imarConnectUoW = imarConnectUoW;
         }
 
         public bool ConfrontaCausaliAttivita(IList<Attivita> listaAttivitaDaControllare, string bollaAttivitaDaConfrontare, string operazioneAttivitaDaConfrontare)
@@ -110,7 +114,14 @@ namespace IMAR_DialogoOperatore.Services
                                                                             GROUP BY NRBLCI, ORPRCI, CDARCI, DSARMA, CDFACI, DSFACI,
                                                                                     pf2.QORDCI, pf2.QPROCI, pf2.QSCACI, pf2.QRESCI")
                                                   .SingleOrDefault();
-                                                                            
+
+            if (attivitaTrovata == null)
+                return attivitaTrovata;
+
+            Interfaccia? attivitaInterfaccia = _imarConnectUoW.InterfacciaRepository.Get(i => i.Bolla == attivitaTrovata.Bolla)
+                                                                                   .OrderByDescending(i => i.TimestampEnd)
+                                                                                   .FirstOrDefault();
+
             return attivitaTrovata;
         }
 
@@ -137,21 +148,69 @@ namespace IMAR_DialogoOperatore.Services
                                                                             GROUP BY NRBLCI, ORPRCI, CDARCI, DSARMA, CDFACI, DSFACI,
                                                                                     pf2.QORDCI, pf2.QPROCI, pf2.QSCACI, pf2.QRESCI");
 
+            IEnumerable<Interfaccia> attivitaInterfaccia = _imarConnectUoW.InterfacciaRepository.Get();
+            Interfaccia? interfaccia;
+
+            foreach (Attivita attivita in attivitaFiltrate)
+            {
+                interfaccia = attivitaInterfaccia.Where(i => i.Bolla == attivita.Bolla)
+                                                 .OrderByDescending(i => i.TimestampEnd)
+                                                 .FirstOrDefault();
+            }
+
             return attivitaFiltrate.OrderBy(x => x.Bolla);
         }
 
         public string? AvanzaAttivita(Operatore operatore, Attivita attivitaDaAvanzare, int quantitaProdotta, int quantitaScartata)
         {
-            if (attivitaDaAvanzare.SaldoAcconto != "S")
+            if (attivitaDaAvanzare.SaldoAcconto != Costanti.SALDO)
                 attivitaDaAvanzare.QuantitaResidua = attivitaDaAvanzare.QuantitaOrdine - attivitaDaAvanzare.QuantitaProdottaNonContabilizzata;
 
-            HttpResponseMessage result = _jmesApiClient.MesAdvanceDeclaration(operatore, attivitaDaAvanzare, quantitaProdotta, quantitaScartata);
+            Interfaccia nuovoRecordInterfaccia = new Interfaccia
+            {
+                Id = Guid.NewGuid(),
+                BadgeOperatore = operatore.Badge,
+                Bolla = attivitaDaAvanzare.Bolla,
+                TimestampStart = DateTime.Now,
+                TimestampEnd = DateTime.Now,
+                QuantitaProdotta = quantitaProdotta,
+                QuantitaProdottaTotale = attivitaDaAvanzare.QuantitaProdotta,
+                QuantitaScartata = quantitaScartata,
+                QuantitaScartataTotale = attivitaDaAvanzare.QuantitaScartata
+            };
 
-            string? errore = _jMesApiClientErrorUtility.GestioneEventualeErrore(result);
-            if (errore != null)
-                return errore;
+            nuovoRecordInterfaccia.Acconto = attivitaDaAvanzare.SaldoAcconto == Costanti.ACCONTO;
+            string? errore = ControllaAttivitaConcorrentiEGestisci(nuovoRecordInterfaccia, operatore);
 
-            return null;
+            _imarConnectUoW.InterfacciaRepository.Insert(nuovoRecordInterfaccia);
+
+            _imarConnectUoW.Save();
+
+            return errore;
+        }
+
+        public string? ControllaAttivitaConcorrentiEGestisci(Interfaccia attivita, Operatore operatore)
+        {
+            string? errore = null;
+
+            IQueryable<Interfaccia> attivitaConcorrenti = _imarConnectUoW.InterfacciaRepository.Get(i => i.Bolla == attivita.Bolla)
+                                                                                               .Where(i => i.BadgeOperatore != operatore.Badge &&
+                                                                                                           i.TimestampEnd == null &&
+                                                                                                           i.Sospeso != true);
+            if (attivitaConcorrenti.Any() && (bool)!attivita.Acconto)
+            {
+                errore = GestisciPresenzaAttivitaConcorrenti(attivita);
+            }
+
+            return errore;
+        }
+
+        private string GestisciPresenzaAttivitaConcorrenti(Interfaccia attivita)
+        {
+            attivita.Acconto = true;
+            string errore = "Attivita aperta da altri utenti.\nLa chiusura è stata posta in acconto (NON A SALDO)";
+
+            return errore;
         }
 
         public IList<Attivita> OttieniAttivitaOperatore(Operatore operatore)
@@ -189,7 +248,7 @@ namespace IMAR_DialogoOperatore.Services
         {
             List<Attivita> attivitaOperatoreAperte = new List<Attivita>();
 
-            List<Attivita> attivitaOperatore = GetAttivitaOperatore(operatore.IdJMes);
+            List<Attivita> attivitaOperatore = GetAttivitaOperatore(operatore);
             if (attivitaOperatore != null)
                 attivitaOperatoreAperte.AddRange(attivitaOperatore);
 
@@ -202,10 +261,31 @@ namespace IMAR_DialogoOperatore.Services
             return attivitaOperatoreAperte;
         }
 
-        private List<Attivita> GetAttivitaOperatore(int idJmesOperatore)
+        private List<Attivita> GetAttivitaOperatore(Operatore operatore)
         {
+            List<Attivita> lavoriOperatore = new List<Attivita>();
+            List<Interfaccia> attivitaInterfaccia = _imarConnectUoW.InterfacciaRepository.Get(i => i.BadgeOperatore == operatore.Badge)
+                                                                                         .Where(i => i.TimestampEnd == null)
+                                                                                         .ToList();
+            Interfaccia ultimoAggiornamento;
+
+            foreach (Interfaccia interfaccia in attivitaInterfaccia)
+            {
+                ultimoAggiornamento = _imarConnectUoW.InterfacciaRepository.Get(i => i.Bolla == interfaccia.Bolla)
+                                                                           .OrderByDescending(i => i.TimestampEnd)
+                                                                           .First();
+
+                lavoriOperatore.Add(new Attivita
+                {
+                    Bolla = interfaccia.Bolla,
+                    Causale = Costanti.IN_LAVORO,
+                    CausaleEstesa = Costanti.JMES_IN_LAVORO,
+                    InizioAttivita = interfaccia.TimestampStart
+                });
+            }
+
             List<Attivita> attivitaOperatore = _synergyJmesUoW.MesEvt
-                                                               .Get(x => (int)x.ResEffStrUid == idJmesOperatore)
+                                                               .Get(x => (int)x.ResEffStrUid == operatore.IdJMes)
                                                                .Where(x => x.TssEnd == null)
                                                                .Join(_synergyJmesUoW.MesEvtDet.Get(),
                                                                         me => me.Uid,
@@ -213,13 +293,13 @@ namespace IMAR_DialogoOperatore.Services
                                                                         (me, med) => new { me, med })
                                                                .Join(_synergyJmesUoW.MesDiaOpe.Get(),
                                                                         x => (double?)x.me.Uid,
-                                                                        mdo => (double?) mdo.EvtUid,
+                                                                        mdo => (double?)mdo.EvtUid,
                                                                         (x, mdo) => new Attivita
                                                                         {
                                                                             Bolla = x.med.DocCod,
                                                                             Causale = StatoAttivitaMapper.FromJMesCode(x.me.EvtTypUid),
                                                                             CausaleEstesa = StatoAttivitaMapper.FromJMesCodeExtended(x.me.EvtTypUid),
-                                                                            CodiceJMes = (double) mdo.Uid,
+                                                                            CodiceJMes = (double)mdo.Uid,
                                                                             InizioAttivita = x.me.TssStr,
                                                                             FineAttivita = x.me.TssEnd
                                                                         })
@@ -240,6 +320,18 @@ namespace IMAR_DialogoOperatore.Services
                                              })
                                        .ToList();
 
+            attivita.AddRange(lavoriOperatore
+                              .Join(_caricamentoAttivitaInBackroundService.GetAttivitaAperte(),
+                                    lo => lo.Bolla,
+                                    aa => aa.Bolla,
+                                    (lo, aa) =>
+                                    {
+                                        aa.Causale = lo.Causale;
+                                        aa.CausaleEstesa = lo.CausaleEstesa;
+                                        aa.InizioAttivita = lo.InizioAttivita;
+                                        return aa;
+                                    }));
+
             return attivita;
         }
 
@@ -257,7 +349,7 @@ namespace IMAR_DialogoOperatore.Services
                                                                 CodiceJMes = aa.ID_Det3348,
                                                                 CausaleEstesa = aa.ID_Sts3130,
                                                                 Causale = StatoAttivitaMapper.FromJMesStatus(aa.ID_Sts3130),
-                                                                SaldoAcconto = "A"
+                                                                SaldoAcconto = Costanti.ACCONTO
                                                             })
                                                     .Where(x => x.Causale == Costanti.IN_LAVORO ||
                                                                 x.Causale == Costanti.IN_ATTREZZAGGIO ||

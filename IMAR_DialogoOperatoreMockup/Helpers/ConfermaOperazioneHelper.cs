@@ -52,12 +52,10 @@ namespace IMAR_DialogoOperatore.Helpers
 			{
 				case Costanti.INIZIO_LAVORO:
                     result = AggiungiAttivitaAdOperatore(false);
-                    AggiornaOperatoreSelezionato();
                     break;
 
 				case Costanti.INIZIO_ATTREZZAGGIO:
 					result = AggiungiAttivitaAdOperatore(true);
-                    AggiornaOperatoreSelezionato();
                     break;
 
 				case Costanti.AVANZAMENTO:
@@ -66,18 +64,18 @@ namespace IMAR_DialogoOperatore.Helpers
 
 				case Costanti.FINE_LAVORO:
                     result = RimuoviAttivitaDaOperatore();
-                    AggiornaOperatoreSelezionato();
                     break;
 
 				case Costanti.FINE_ATTREZZAGGIO:
 					result = GestisciFineAttrezzaggio();
-                    AggiornaOperatoreSelezionato();
                     break;
 
 				default:
 					break;
             }
+
             _attivitaGridViewModel.AttivitaSelezionata = null;
+            AggiornaOperatoreSelezionato();
 
             return result;
         }

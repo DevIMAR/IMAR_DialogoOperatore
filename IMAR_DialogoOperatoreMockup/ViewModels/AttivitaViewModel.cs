@@ -25,7 +25,7 @@ namespace IMAR_DialogoOperatore.ViewModels
 		public string SaldoAcconto { get; set; }
 		public double? CodiceJMes => _attivita?.CodiceJMes;
 		public Macchina? Macchina => _attivita?.Macchina;
-		public string CausaleEstesa => _attivita?.CausaleEstesa;
+		public string? CausaleEstesa => _attivita?.CausaleEstesa;
         public DateTime? InizioAttivita => _attivita?.InizioAttivita;
 		public DateTime? FineAttivita => _attivita?.FineAttivita;
 

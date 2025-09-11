@@ -1,4 +1,5 @@
-﻿using IMAR_DialogoOperatore.Domain.Models;
+﻿using IMAR_DialogoOperatore.Domain.Entities.Imar_Connect;
+using IMAR_DialogoOperatore.Domain.Models;
 
 namespace IMAR_DialogoOperatore.Application.Interfaces.Services.Activities
 {
@@ -7,6 +8,7 @@ namespace IMAR_DialogoOperatore.Application.Interfaces.Services.Activities
         bool ConfrontaCausaliAttivita(IList<Attivita> listaAttivitaDaControllare, string bollaAttivitaDaConfrontare, string operazioneAttivitaDaConfrontare);
         Attivita? CercaAttivitaDaBolla(string bolla);
         string? AvanzaAttivita(Operatore operatore, Attivita attivitaDaAvanzare, int quantitaProdotta, int quantitaScartata);
+        string? ControllaAttivitaConcorrentiEGestisci(Interfaccia attivita, Operatore operatore);
         public IEnumerable<Attivita> GetAttivitaPerOdp(string odp);
         public IList<Attivita> OttieniAttivitaOperatore(Operatore operatore);
         IList<mesDiaOpe>? GetAttivitaAperte();

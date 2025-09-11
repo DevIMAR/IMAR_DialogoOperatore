@@ -7,7 +7,7 @@ namespace IMAR_DialogoOperatore.Application.Interfaces.Services.Activities
         Operatore Operatore { get; set; }
 
         Operatore? OttieniOperatore(int? badge);
-        string? RimuoviAttivitaDaOperatore(Operatore operatore, Attivita attivitaDaRimuovere, int? quantitaProdotta, int? quantitaScartata, bool isSospeso = false, bool? isAttrezzaggio = null);
+        string? RimuoviAttivitaDaOperatore(Operatore operatore, Attivita attivitaDaRimuovere, int quantitaProdotta, int quantitaScartata, bool isSospeso = false, bool? isAttrezzaggio = null);
         string? AggiungiAttivitaAdOperatore(bool isAttrezzaggio, Operatore operatore, Attivita attivita, bool isAttivitaIndiretta);
         Operatore GetOperatoreDaIdJMes(string idJMesOperatore);
     }

@@ -48,8 +48,7 @@ public partial class ImarConnectContext : DbContext
             entity.Property(e => e.TimestampEnd).HasColumnType("datetime");
             entity.Property(e => e.TimestampStart)
                 .IsRequired()
-                .HasMaxLength(14)
-                .IsUnicode(false);
+                .HasColumnType("datetime");
         });
 
         OnModelCreatingPartial(modelBuilder);

@@ -7,27 +7,29 @@ namespace IMAR_DialogoOperatore.Domain.Entities.Imar_Connect;
 
 public partial class Interfaccia
 {
+    public Guid Id { get; set; }
+
     public string BadgeOperatore { get; set; }
 
     public string Bolla { get; set; }
 
-    public string TimestampStart { get; set; }
+    public DateTime TimestampStart { get; set; }
 
     public DateTime? TimestampEnd { get; set; }
 
     public int? QuantitaProdotta { get; set; }
 
+    public int? QuantitaProdottaTotale { get; set; }
+
     public int? QuantitaScartata { get; set; }
 
-    public bool? SaldoAcconto { get; set; }
+    public int? QuantitaScartataTotale { get; set; }
+
+    public bool? Acconto { get; set; }
 
     public int? CodiceMacchinaJMes { get; set; }
 
     public string CodiceAttivitaJMes { get; set; }
 
-    public int? QuantitaProdottaTotale { get; set; }
-
-    public int? QuantitaScartataTotale { get; set; }
-
-    public Guid Id { get; set; }
+    public bool? Sospeso { get; set; }
 }

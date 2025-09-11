@@ -2,8 +2,10 @@
 using IMAR_DialogoOperatore.Application.Interfaces.Clients;
 using IMAR_DialogoOperatore.Application.Interfaces.Services.Activities;
 using IMAR_DialogoOperatore.Application.Interfaces.UoW;
+using IMAR_DialogoOperatore.Domain.Entities.Imar_Connect;
 using IMAR_DialogoOperatore.Domain.Entities.JMES;
 using IMAR_DialogoOperatore.Domain.Models;
+using System.Diagnostics;
 using System.Globalization;
 
 namespace IMAR_DialogoOperatore.Infrastructure.Services
@@ -11,6 +13,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
     public class OperatoreService : IOperatoreService
     {
         private readonly ISynergyJmesUoW _synergyJmesUoW;
+        private readonly IImarConnectUoW _imarConnectUoW;
         private readonly IJmesApiClient _jmesApiClient;
 
         private readonly IAttivitaService _attivitaService;
@@ -20,11 +23,13 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
 
         public OperatoreService(
             ISynergyJmesUoW synergyJmesUoW,
+            IImarConnectUoW imarConnectUoW,
             IJmesApiClient jmesApiClient,
             IAttivitaService attivitaService,
             IMacchinaService macchinaService)
         {
             _synergyJmesUoW = synergyJmesUoW;
+            _imarConnectUoW = imarConnectUoW;
             _jmesApiClient = jmesApiClient;
 
             _attivitaService = attivitaService;
@@ -47,6 +52,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
             AngRes? risorsa = _synergyJmesUoW.AngRes.Get(x => !string.IsNullOrEmpty(x.ResNam + x.ResSur))
                                                     .ToList()
                                                     .SingleOrDefault(x => x.ResCod.TrimStart('0').Trim() == badge.ToString().TrimStart('0').Trim());
+            
             if (risorsa == null)
                 return null;
 
@@ -56,6 +62,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
             Operatore.Uscita = DateTime.ParseExact(ingressiUscite.Where(x => x.ID_AngRes368 == risorsa.ResCod).Select(x => x.ID_ClkRes2366).Max() ?? "19000101000000", format, provider);
             Operatore.InizioPausa = DateTime.ParseExact(iniziFiniPause.Where(x => x.ID_Res368 == risorsa.ResCod).Select(x => x.ID_ResBrk2426).Max() ?? "19000101000000", format, provider);
             Operatore.FinePausa = DateTime.ParseExact(iniziFiniPause.Where(x => x.ID_Res368 == risorsa.ResCod).Select(x => x.ID_ResBrk2427).Max() ?? "19000101000000", format, provider);
+
             Operatore.AttivitaAperte = _attivitaService.OttieniAttivitaOperatore(Operatore);
 
             AssegnaMacchinaAdOperatore();
@@ -102,33 +109,80 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
             return Costanti.PRESENTE;
         }
 
-        public string? RimuoviAttivitaDaOperatore(Operatore operatore, Attivita attivitaDaRimuovere, int? quantitaProdotta, int? quantitaScartata, bool isSospeso = false, bool? isAttrezzaggio = null)
+        public string? RimuoviAttivitaDaOperatore(Operatore operatore, Attivita attivitaDaRimuovere, int quantitaProdotta = 0, int quantitaScartata = 0, bool isSospeso = false, bool? isAttrezzaggio = null)
         {
             if (isAttrezzaggio == null)
                 isAttrezzaggio = attivitaDaRimuovere.Causale == Costanti.IN_ATTREZZAGGIO;
 
             string? errore = null;
 
-            //if (isSospeso)
-            //{
-            //  errore = _jmesApiClient.RegistrazioneOperazioneSuDb(() => _jmesApiClient.MesSuspensionStart(operatore.Badge, attivitaDaRimuovere.Macchina.CodiceJMes));
-            //	return errore;
-            //}
-
             if (isAttrezzaggio == true)
             {
-                if (isSospeso)
-                    errore = _jmesApiClient.RegistrazioneOperazioneSuDb(() => _jmesApiClient.MesEquipSuspension(operatore.Badge, (double)attivitaDaRimuovere.CodiceJMes));
-                else
-                    errore = _jmesApiClient.RegistrazioneOperazioneSuDb(() => _jmesApiClient.MesEquipEnd(operatore.Badge, (double)attivitaDaRimuovere.CodiceJMes));
+                errore = GestisciAttrezzaggio(operatore, attivitaDaRimuovere, isSospeso);
             }
             else
             {
-                if (isSospeso)
-                    errore = _jmesApiClient.RegistrazioneOperazioneSuDb(() => _jmesApiClient.MesWorkSuspension(operatore.Badge, attivitaDaRimuovere, (int)quantitaProdotta, (int)quantitaScartata));
-                else
-                    errore = _jmesApiClient.RegistrazioneOperazioneSuDb(() => _jmesApiClient.MesWorkEnd(operatore.Badge, attivitaDaRimuovere, (int)quantitaProdotta, (int)quantitaScartata));
+                errore = GestisciLavoro(operatore, attivitaDaRimuovere, quantitaProdotta, quantitaScartata, isSospeso);
             }
+
+            return errore;
+        }
+
+        private string? GestisciAttrezzaggio(Operatore operatore, Attivita attivitaDaRimuovere, bool isSospeso)
+        {
+            string? errore;
+
+            if (isSospeso)
+                errore = _jmesApiClient.RegistrazioneOperazioneSuDb(() => _jmesApiClient.MesEquipSuspension(operatore.Badge, (double)attivitaDaRimuovere.CodiceJMes));
+            else
+                errore = _jmesApiClient.RegistrazioneOperazioneSuDb(() => _jmesApiClient.MesEquipEnd(operatore.Badge, (double)attivitaDaRimuovere.CodiceJMes));
+            return errore;
+        }
+
+        private string? GestisciLavoro(Operatore operatore, Attivita attivitaDaRimuovere, int quantitaProdotta, int quantitaScartata, bool isSospeso)
+        {
+            string? errore = null;
+            Interfaccia attivita = _imarConnectUoW.InterfacciaRepository.Get(i => i.BadgeOperatore == operatore.Badge)
+                                                                                        .Single(i => i.Bolla == attivitaDaRimuovere.Bolla &&
+                                                                                                     i.TimestampEnd == null);
+
+            Interfaccia ultimoAggiornamento = _imarConnectUoW.InterfacciaRepository.Get(i => i.Bolla == attivita.Bolla)
+                                                                                   .OrderByDescending(i => i.TimestampEnd)
+                                                                                   .First();
+
+            if (isSospeso)
+            {
+                SospendiLavoro(operatore, attivitaDaRimuovere, quantitaProdotta, quantitaScartata, attivita);
+            }
+            else
+            {
+                errore = ChiudiLavoro(attivitaDaRimuovere, quantitaProdotta, quantitaScartata, attivita, ultimoAggiornamento);
+            }
+
+            _imarConnectUoW.Save();
+
+            return errore;
+        }
+
+        private void SospendiLavoro(Operatore operatore, Attivita attivitaDaRimuovere, int quantitaProdotta, int quantitaScartata, Interfaccia attivita)
+        {
+            _attivitaService.AvanzaAttivita(operatore, attivitaDaRimuovere, quantitaProdotta, quantitaScartata);
+            attivita.Sospeso = true;
+        }
+
+        private string? ChiudiLavoro(Attivita attivitaDaRimuovere, int quantitaProdotta, int quantitaScartata, Interfaccia attivita, Interfaccia ultimoAggiornamento)
+        {
+            string? errore = null;
+
+            attivita.QuantitaProdotta = quantitaProdotta;
+            attivita.QuantitaProdottaTotale = ultimoAggiornamento.QuantitaProdottaTotale + quantitaProdotta;
+            attivita.QuantitaScartata = quantitaScartata;
+            attivita.QuantitaScartataTotale = ultimoAggiornamento.QuantitaScartataTotale + quantitaScartata;
+            attivita.TimestampEnd = DateTime.Now;
+
+            attivita.Acconto = attivitaDaRimuovere.SaldoAcconto == Costanti.ACCONTO;
+
+            errore = _attivitaService.ControllaAttivitaConcorrentiEGestisci(attivita, Operatore);
 
             return errore;
         }
@@ -180,7 +234,15 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
                     return errore;
             }
 
-            errore = _jmesApiClient.RegistrazioneOperazioneSuDb(() => _jmesApiClient.MesWorkStart(operatore, attivitaDaAggiungere.Bolla));
+            _imarConnectUoW.InterfacciaRepository.Insert(new Interfaccia
+            {
+                Id = Guid.NewGuid(),
+                BadgeOperatore = operatore.Badge,
+                Bolla = attivitaDaAggiungere.Bolla,
+                TimestampStart = DateTime.Now
+            });
+
+            _imarConnectUoW.Save();
 
             return errore;
         }
@@ -188,7 +250,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
         private string? GestisciCambioCausale(Operatore operatore, Attivita attivitaDaAggiungere)
         {
             Attivita AttivitaOperatoreDaRimuovere = operatore.AttivitaAperte.Single(x => x.Bolla == attivitaDaAggiungere.Bolla);
-            return RimuoviAttivitaDaOperatore(operatore, AttivitaOperatoreDaRimuovere, null, null, isAttrezzaggio: true);
+            return RimuoviAttivitaDaOperatore(operatore, AttivitaOperatoreDaRimuovere, isAttrezzaggio: true);
         }
 
         public Operatore GetOperatoreDaIdJMes(string idJMesOperatore)
