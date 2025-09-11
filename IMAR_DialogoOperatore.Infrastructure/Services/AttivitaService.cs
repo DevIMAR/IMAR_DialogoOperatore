@@ -15,7 +15,6 @@ namespace IMAR_DialogoOperatore.Services
     {
         private readonly IMacchinaService _macchinaService;
         private readonly IJmesApiClient _jmesApiClient;
-        private readonly IJMesApiClientErrorUtility _jMesApiClientErrorUtility;
         private readonly CaricamentoAttivitaInBackgroundService _caricamentoAttivitaInBackroundService;
         private readonly ISynergyJmesUoW _synergyJmesUoW;
         private readonly IImarConnectUoW _imarConnectUoW;
@@ -24,7 +23,6 @@ namespace IMAR_DialogoOperatore.Services
         public AttivitaService(
             IMacchinaService macchinaService,
             IJmesApiClient jmesApiClient,
-            IJMesApiClientErrorUtility jMesApiClientErrorUtility,
             CaricamentoAttivitaInBackgroundService caricamentoAttivitaInBackroundService,
             ISynergyJmesUoW synergyJmesUoW,
             IImarConnectUoW imarConnectUoW,
@@ -33,7 +31,6 @@ namespace IMAR_DialogoOperatore.Services
             _macchinaService = macchinaService;
 
             _jmesApiClient = jmesApiClient;
-            _jMesApiClientErrorUtility = jMesApiClientErrorUtility;
 
             _caricamentoAttivitaInBackroundService = caricamentoAttivitaInBackroundService;
 

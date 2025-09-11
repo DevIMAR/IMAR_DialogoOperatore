@@ -13,6 +13,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IMAR_DialogoOperatore.Infra
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EsportatoreTimbratureTeamSystem", "GeneratoreTimbratureTeamSystem\EsportatoreTimbratureTeamSystem.csproj", "{49C8FE7D-7D96-442B-BF8B-271EDB6029BF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IMAR_DialogoOperatore.Test", "IMAR_DialogoOperatore.Test\IMAR_DialogoOperatore.Test.csproj", "{9E4ACAF4-347E-5439-6D13-6F2D6BD6F124}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{49C8FE7D-7D96-442B-BF8B-271EDB6029BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{49C8FE7D-7D96-442B-BF8B-271EDB6029BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{49C8FE7D-7D96-442B-BF8B-271EDB6029BF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9E4ACAF4-347E-5439-6D13-6F2D6BD6F124}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9E4ACAF4-347E-5439-6D13-6F2D6BD6F124}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9E4ACAF4-347E-5439-6D13-6F2D6BD6F124}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9E4ACAF4-347E-5439-6D13-6F2D6BD6F124}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

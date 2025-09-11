@@ -4,7 +4,7 @@ using IMAR_DialogoOperatore.Domain.Entities.Imar_Connect;
 
 namespace IMAR_DialogoOperatore.Infrastructure.Imar_Connect
 {
-    internal class ImarConnectUoW : IImarConnectUoW
+    public class ImarConnectUoW : IImarConnectUoW
     {
         private ImarConnectContext _context;
 

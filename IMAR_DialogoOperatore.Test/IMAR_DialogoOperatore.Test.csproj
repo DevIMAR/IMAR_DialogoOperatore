@@ -21,10 +21,20 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="9.0.4" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.4" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.7" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.7" />
+    <PackageReference Include="FluentAssertions" Version="7.0.0" />
+    <PackageReference Include="bunit" Version="1.28.9" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\IMAR_DialogoOperatoreMockup\IMAR_DialogoOperatore.csproj" />
+    <ProjectReference Include="..\IMAR_DialogoOperatore.Application\IMAR_DialogoOperatore.Application.csproj" />
+    <ProjectReference Include="..\IMAR_DialogoOperatore.Domain\IMAR_DialogoOperatore.Domain.csproj" />
+    <ProjectReference Include="..\IMAR_DialogoOperatore.Infrastructure\IMAR_DialogoOperatore.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>
