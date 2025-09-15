@@ -34,6 +34,8 @@ public partial class ImarConnectContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("Interfaccia_PK");
 
+            entity.ToTable(tb => tb.HasTrigger("trg_InterfacciaToInterfacciaShadow"));
+
             entity.Property(e => e.Id).ValueGeneratedNever();
             entity.Property(e => e.BadgeOperatore)
                 .HasMaxLength(4)
@@ -46,9 +48,7 @@ public partial class ImarConnectContext : DbContext
                 .HasMaxLength(10)
                 .IsFixedLength();
             entity.Property(e => e.TimestampEnd).HasColumnType("datetime");
-            entity.Property(e => e.TimestampStart)
-                .IsRequired()
-                .HasColumnType("datetime");
+            entity.Property(e => e.TimestampStart).HasColumnType("datetime");
         });
 
         OnModelCreatingPartial(modelBuilder);
