@@ -1,4 +1,5 @@
 ﻿using IMAR_DialogoOperatore.Application;
+using IMAR_DialogoOperatore.Application.Interfaces.Utilities;
 using IMAR_DialogoOperatore.Commands;
 using IMAR_DialogoOperatore.Interfaces.Observers;
 using System.Windows.Input;
@@ -8,6 +9,7 @@ namespace IMAR_DialogoOperatore.ViewModels
     public class TaskPopupViewModel : ViewModelBase
     {
         private readonly ITaskCompilerObserver _taskCompilerObserver;
+        private readonly IAutoLogoutUtility _autoLogoutUtility;
 
         private bool _visible;
         private string _categoriaErroreSelezionata;
@@ -43,11 +45,13 @@ namespace IMAR_DialogoOperatore.ViewModels
 
         public TaskPopupViewModel(
             InviaTaskCommand inviaTaskCommand,
-            ITaskCompilerObserver taskCompilerObserver)
+            ITaskCompilerObserver taskCompilerObserver,
+            IAutoLogoutUtility autoLogoutUtility)
         {
             _taskCompilerObserver = taskCompilerObserver;
 
             InviaTaskCommand = inviaTaskCommand;
+            _autoLogoutUtility = autoLogoutUtility;
         }
     }
 }

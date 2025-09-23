@@ -1,4 +1,5 @@
 ﻿using IMAR_DialogoOperatore.Interfaces.Observers;
+using IMAR_DialogoOperatore.Managers;
 
 namespace IMAR_DialogoOperatore.ViewModels
 {
@@ -13,7 +14,8 @@ namespace IMAR_DialogoOperatore.ViewModels
 
         public DialogoOperatoreViewModel(
 			IDialogoOperatoreObserver dialogoOperatoreStore,
-			PulsantieraGeneraleViewModel pulsantieraGeneraleViewModel)
+			PulsantieraGeneraleViewModel pulsantieraGeneraleViewModel,
+            LogoutTimerManager logoutTimerManager)
         {
 			_dialogoOperatoreStore = dialogoOperatoreStore;
 

@@ -3,6 +3,7 @@ using IMAR_DialogoOperatore.Helpers;
 using IMAR_DialogoOperatore.Interfaces.Helpers;
 using IMAR_DialogoOperatore.Interfaces.Mappers;
 using IMAR_DialogoOperatore.Interfaces.Observers;
+using IMAR_DialogoOperatore.Managers;
 using IMAR_DialogoOperatore.Mappers;
 using IMAR_DialogoOperatore.Observers;
 using IMAR_DialogoOperatore.Utilities;
@@ -33,6 +34,8 @@ namespace IMAR_DialogoOperatore
 			services.AddScoped<ITimbraturaMapper, TimbraturaMapper>();
 
 			services.AddScoped<ToastDisplayerUtility>();
+
+			services.AddScoped<LogoutTimerManager>();
 
 			services.AddScoped<AttivitaDetailsViewModel>();
 			services.AddScoped<AttivitaGridViewModel>();

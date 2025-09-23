@@ -1,11 +1,9 @@
-﻿using DevExpress.Blazor;
-using IMAR_DialogoOperatore.Application;
+﻿using IMAR_DialogoOperatore.Application;
 using IMAR_DialogoOperatore.Application.Interfaces.Services.Activities;
 using IMAR_DialogoOperatore.Application.Interfaces.Utilities;
 using IMAR_DialogoOperatore.Domain.Models;
 using IMAR_DialogoOperatore.Interfaces.Observers;
 using IMAR_DialogoOperatore.Interfaces.ViewModels;
-using IMAR_DialogoOperatore.Utilities;
 
 namespace IMAR_DialogoOperatore.ViewModels
 {
@@ -33,9 +31,6 @@ namespace IMAR_DialogoOperatore.ViewModels
 
                 SelezionaOperatore();
                 _dialogoOperatoreObserver.OperazioneInCorso = Costanti.NESSUNA;
-
-                if (value != null)
-                    _autoLogoutUtility.StartLogoutTimer(300);
             }
         }
 

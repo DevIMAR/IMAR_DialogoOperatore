@@ -61,20 +61,11 @@ namespace IMAR_DialogoOperatore.ViewModels
 
             _dialogoOperatoreObserver.OnAttivitaSelezionataChanged += DialogoOperatoreStore_OnAttivitaSelezionataChanged;
             _dialogoOperatoreObserver.OnIsRiaperturaAttivaChanged += DialogoOperatoreObserver_OnIsRiaperturaAttivaChanged;
-            _dialogoOperatoreObserver.OnIsDettaglioAttivitaOpenChanged += DialogoOperatoreObserver_OnIsDettaglioAttivitaOpenChanged;
         }
 
         private void DialogoOperatoreObserver_OnIsRiaperturaAttivaChanged()
         {
             _isRiaperturaAttiva = _dialogoOperatoreObserver.IsRiaperturaAttiva;
-        }
-
-        private void DialogoOperatoreObserver_OnIsDettaglioAttivitaOpenChanged()
-        {
-			if (_dialogoOperatoreObserver.IsDettaglioAttivitaOpen)
-	            _autoLogoutUtility.StartLogoutTimer(300);
-            else
-                _autoLogoutUtility.StartLogoutTimer(30);
         }
 
         private void DialogoOperatoreStore_OnAttivitaSelezionataChanged()
@@ -96,7 +87,6 @@ namespace IMAR_DialogoOperatore.ViewModels
         {
             _dialogoOperatoreObserver.OnAttivitaSelezionataChanged -= DialogoOperatoreStore_OnAttivitaSelezionataChanged;
             _dialogoOperatoreObserver.OnIsRiaperturaAttivaChanged -= DialogoOperatoreObserver_OnIsRiaperturaAttivaChanged;
-            _dialogoOperatoreObserver.OnIsDettaglioAttivitaOpenChanged -= DialogoOperatoreObserver_OnIsDettaglioAttivitaOpenChanged;
         }
 	}
 }
