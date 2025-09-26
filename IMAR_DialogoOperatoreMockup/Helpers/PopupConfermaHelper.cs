@@ -3,6 +3,7 @@ using IMAR_DialogoOperatore.Application.Interfaces.Services.Activities;
 using IMAR_DialogoOperatore.Domain.Models;
 using IMAR_DialogoOperatore.Interfaces.Helpers;
 using IMAR_DialogoOperatore.Interfaces.Observers;
+using IMAR_DialogoOperatore.ViewModels;
 
 namespace IMAR_DialogoOperatore.Helpers
 {
@@ -189,7 +190,7 @@ namespace IMAR_DialogoOperatore.Helpers
         {
             int quantitaProdottaAggiornata = _dialogoOperatoreObserver.AttivitaSelezionata.QuantitaProdotta + (int)_avanzamentoObserver.QuantitaProdotta;
 
-            Attivita? attivitaFasePrecedente = GetAttivitaFasePrecedente();
+            AttivitaViewModel? attivitaFasePrecedente = new AttivitaViewModel(GetAttivitaFasePrecedente());
 
             if (attivitaFasePrecedente == null || attivitaFasePrecedente.QuantitaProdotta >= quantitaProdottaAggiornata)
                 return string.Empty;

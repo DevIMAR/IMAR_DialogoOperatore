@@ -160,9 +160,6 @@ namespace IMAR_DialogoOperatore.Commands
 
         private void EseguiOperazioneOMostraMessaggio()
         {
-            //if (_dialogoOperatoreObserver.IsAperturaLavoroAutomaticaAttiva)
-            //    _dialogoOperatoreObserver.OperazioneInCorso = Costanti.AVANZAMENTO;
-
             string? result = _confermaOperazioneHelper.EseguiOperazione();
             if (result != null)
                 MostraPopupConTesto(result);

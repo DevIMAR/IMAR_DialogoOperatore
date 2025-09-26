@@ -109,12 +109,6 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
 
             string? errore = null;
 
-            //if (isSospeso)
-            //{
-            //  errore = _jmesApiClient.RegistrazioneOperazioneSuDb(() => _jmesApiClient.MesSuspensionStart(operatore.Badge, attivitaDaRimuovere.Macchina.CodiceJMes));
-            //	return errore;
-            //}
-
             if (isAttrezzaggio == true)
             {
                 if (isSospeso)
