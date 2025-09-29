@@ -173,10 +173,13 @@ namespace IMAR_DialogoOperatore.Helpers
         private string GestisciAvanzamentoOChiusuraLavoro()
         {
             string messaggioPopup = string.Empty;
-            int quantitaProdottaAggiornata = _dialogoOperatoreObserver.AttivitaSelezionata.QuantitaProdotta + (int)_avanzamentoObserver.QuantitaProdotta;
 
+            if (_dialogoOperatoreObserver.AttivitaSelezionata.DescrizioneArticolo.Equals(Costanti.FASE_INDIRETTA))
+                return messaggioPopup;
+
+            int quantitaProdottaAggiornata = _dialogoOperatoreObserver.AttivitaSelezionata.QuantitaProdotta + (int)_avanzamentoObserver.QuantitaProdotta;
             messaggioPopup += GestisciCambioDiFaseSelezionata();
-            messaggioPopup += GestisciFaseConQtaProdottaMaggioreDiFasePrecedente();
+            messaggioPopup += GestisciFaseConQtaProdottaMaggioreDiFasePrecedente(quantitaProdottaAggiornata);
             messaggioPopup += GestisciAvanzamentoFaseChiusaASaldo();
 
             messaggioPopup += "Stai dichiarando " + _avanzamentoObserver.QuantitaProdotta + " pezzi.\n" +
@@ -186,10 +189,8 @@ namespace IMAR_DialogoOperatore.Helpers
             return messaggioPopup;
         }
 
-        private string GestisciFaseConQtaProdottaMaggioreDiFasePrecedente()
+        private string GestisciFaseConQtaProdottaMaggioreDiFasePrecedente(int quantitaProdottaAggiornata)
         {
-            int quantitaProdottaAggiornata = _dialogoOperatoreObserver.AttivitaSelezionata.QuantitaProdotta + (int)_avanzamentoObserver.QuantitaProdotta;
-
             AttivitaViewModel? attivitaFasePrecedente = new AttivitaViewModel(GetAttivitaFasePrecedente());
 
             if (attivitaFasePrecedente == null || attivitaFasePrecedente.QuantitaProdotta >= quantitaProdottaAggiornata)
