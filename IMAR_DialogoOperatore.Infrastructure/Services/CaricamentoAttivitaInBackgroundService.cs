@@ -1,6 +1,5 @@
 ﻿using IMAR_DialogoOperatore.Application.Interfaces.Clients;
 using IMAR_DialogoOperatore.Application.Interfaces.Repositories;
-using IMAR_DialogoOperatore.Application.Interfaces.UoW;
 using IMAR_DialogoOperatore.Domain.Models;
 using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics;
@@ -11,7 +10,6 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
     {
         private readonly IServiceProvider _serviceProvider;
         private readonly Timer _timer;
-        private readonly Timer _timerDatiDaMonitor;
         private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
         private readonly IJmesApiClient _jmesApiClient;
         private readonly IAs400Repository _as400Repository;
@@ -31,7 +29,6 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
             _jmesApiClient = scope.ServiceProvider.GetRequiredService<IJmesApiClient>();
             _as400Repository = scope.ServiceProvider.GetRequiredService<IAs400Repository>();
 
-            _timerDatiDaMonitor = new Timer(UpdateDatiDaMonitor, null, TimeSpan.Zero, TimeSpan.FromMinutes(15));
             _timer = new Timer(UpdateAttivita, null, TimeSpan.Zero, TimeSpan.FromSeconds(10));
         }
 
@@ -42,9 +39,9 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
 
             try
             {
-                Stopwatch stopwatch = Stopwatch.StartNew();
-
                 List<Attivita> nuoveAttivita = new List<Attivita>();
+
+                UpdateDatiDaMonitor();
 
                 decimal dimensioneBatch = 1000;
                 decimal batchCount = Math.Ceiling(_odpDatiMonitor.Count / dimensioneBatch);
@@ -85,18 +82,15 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
                 finally
                 {
                     _lock.ExitWriteLock();
-
-                    stopwatch.Stop();
-                    Console.WriteLine(stopwatch.Elapsed.ToString());
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Errore nell'aggiornamento delle attività: {ex.Message}");
+                Debug.WriteLine($"Errore nell'aggiornamento delle attività: {ex.Message}");
             }
         }
 
-        private void UpdateDatiDaMonitor(object? state)
+        private void UpdateDatiDaMonitor()
         {
             _lock.EnterWriteLock();
             try

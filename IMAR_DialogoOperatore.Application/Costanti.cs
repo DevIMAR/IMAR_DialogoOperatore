@@ -37,5 +37,10 @@
 		public const string FINE_PAUSA = "Fine Pausa";
 		public const string INGRESSO = "Ingresso";
 		public const string USCITA = "Uscita";
-	}
+
+		public const string RILAVORAZIONE_GENERICA = "0001";
+
+		public const string ERRORE_MACCHINE_FINITE = "!!! NON CI SONO MACCHINE DISPONIBILI !!!\nCONTATTARE UFFICIO IT";
+
+    }
 }

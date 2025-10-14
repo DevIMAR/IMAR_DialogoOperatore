@@ -10,6 +10,7 @@ namespace IMAR_DialogoOperatore.Application.Interfaces.Clients
 		string? RegistrazioneOperazioneSuDb(Func<HttpResponseMessage> operazione);
         HttpResponseMessage MesAdvanceDeclaration(Operatore operatore, Attivita attivita, int quantitaProdotta, int quantitaScartata);
 		HttpResponseMessage MesWorkStart(Operatore operatore, string bolla);
+		HttpResponseMessage MesWorkStartNotPln(Operatore operatore, string bolla, string codiceFase);
 		HttpResponseMessage MesWorkStartIndiretta(string badge, string codiceAttivitaIndiretta);
         HttpResponseMessage MesWorkEnd(string badge, Attivita attivita, int quantitaProdotta, int quantitaScartata);
 		HttpResponseMessage MesWorkSuspension(string badge, Attivita attivita, int quantitaProdotta, int quantitaScartata);
@@ -17,6 +18,7 @@ namespace IMAR_DialogoOperatore.Application.Interfaces.Clients
         HttpResponseMessage MesSuspensionStart(string badge, int codiceJmesMacchina);
 		HttpResponseMessage MesSuspensionEnd(string badge, int codiceJmesMacchina);
         HttpResponseMessage MesEquipStart(Operatore operatore, string bolla);
+        HttpResponseMessage MesEquipStartNotPln(Operatore operatore, string bolla, string codiceFase);
 		HttpResponseMessage MesEquipEnd(string badge, double? idJmesAttrezzaggio);
 		HttpResponseMessage MesEquipSuspension(string badge, double? idJmesAttrezzaggio);
 

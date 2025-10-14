@@ -4,6 +4,7 @@ using IMAR_DialogoOperatore.Application.Interfaces.Repositories;
 using IMAR_DialogoOperatore.Application.Interfaces.Services.Activities;
 using IMAR_DialogoOperatore.Application.Interfaces.UoW;
 using IMAR_DialogoOperatore.Application.Interfaces.Utilities;
+using IMAR_DialogoOperatore.Domain.Entities.JMES;
 using IMAR_DialogoOperatore.Domain.Models;
 using IMAR_DialogoOperatore.Infrastructure.Mappers;
 using IMAR_DialogoOperatore.Infrastructure.Services;
@@ -335,6 +336,20 @@ namespace IMAR_DialogoOperatore.Services
                                                                                  .ToList();
 
             return attivitaOperatoreDellUltimaGiornata;
+        }
+
+        public string? ApriAttrezzaggioFaseNonPianificata(Attivita attivita, Operatore operatore)
+        {
+            string codiceFase = Costanti.RILAVORAZIONE_GENERICA;
+
+            return _jmesApiClient.RegistrazioneOperazioneSuDb(() => _jmesApiClient.MesEquipStartNotPln(operatore, attivita.Bolla, codiceFase));
+        }
+
+        public string? ApriLavoroFaseNonPianificata(Attivita attivita, Operatore operatore)
+        {
+            string codiceFase = Costanti.RILAVORAZIONE_GENERICA;
+
+            return _jmesApiClient.RegistrazioneOperazioneSuDb(() => _jmesApiClient.MesWorkStartNotPln(operatore, attivita.Bolla, codiceFase));
         }
     }
 }

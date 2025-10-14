@@ -8,50 +8,55 @@ namespace IMAR_DialogoOperatore.ViewModels
 {
     public class GestoreAttivitaViewModel : ViewModelBase
 	{
-		private readonly IDialogoOperatoreObserver _dialogoOperatoreStore;
-		private readonly ICercaAttivitaObserver _cercaAttivitaStore;
+		private readonly IDialogoOperatoreObserver _dialogoOperatoreObserver;
+		private readonly ICercaAttivitaObserver _cercaAttivitaObserver;
 
 		public bool IsOpen => IsOpenCondition();
-		public string? OperazioneInCorso => _dialogoOperatoreStore.OperazioneInCorso;
+		public string? OperazioneInCorso => _dialogoOperatoreObserver.OperazioneInCorso;
 
 		public ICommand ConfermaCommand { get; set; }
+		public ICommand CreaFaseNonPianificataCommand { get; set; }
 
 		public GestoreAttivitaViewModel(
-			IDialogoOperatoreObserver dialogoOperatoreStore,
-			ICercaAttivitaObserver cercaAttivitaStore,
-			ConfermaCommand confermaCommand)
+			IDialogoOperatoreObserver dialogoOperatoreObserver,
+			ICercaAttivitaObserver cercaAttivitaObserver,
+			ConfermaCommand confermaCommand,
+			CreaFaseNonPianificataCommand creaFaseNonPianificataCommand)
         {
-			_dialogoOperatoreStore = dialogoOperatoreStore;
-			_cercaAttivitaStore = cercaAttivitaStore;
-			ConfermaCommand = confermaCommand;
+			_dialogoOperatoreObserver = dialogoOperatoreObserver;
+			_cercaAttivitaObserver = cercaAttivitaObserver;
 
-			_dialogoOperatoreStore.OnAttivitaSelezionataChanged += AttivitaStore_OnAttivitaSelezionataChanged;
-			_dialogoOperatoreStore.OnOperazioneInCorsoChanged += DialogoOperatoreStore_OnOperazioneInCorsoChanged;
+			ConfermaCommand = confermaCommand;
+			CreaFaseNonPianificataCommand = creaFaseNonPianificataCommand;
+
+
+            _dialogoOperatoreObserver.OnAttivitaSelezionataChanged += AttivitaStore_OnAttivitaSelezionataChanged;
+			_dialogoOperatoreObserver.OnOperazioneInCorsoChanged += DialogoOperatoreStore_OnOperazioneInCorsoChanged;
 		}
 
 		private void DialogoOperatoreStore_OnOperazioneInCorsoChanged()
 		{
-			if (!(_dialogoOperatoreStore.OperazioneInCorso == Costanti.AVANZAMENTO || 
-					_dialogoOperatoreStore.OperazioneInCorso == Costanti.INIZIO_LAVORO || 
-					_dialogoOperatoreStore.OperazioneInCorso == Costanti.INIZIO_ATTREZZAGGIO))
-				_cercaAttivitaStore.IsAttivitaCercata = false;
+			if (!(_dialogoOperatoreObserver.OperazioneInCorso == Costanti.AVANZAMENTO || 
+					_dialogoOperatoreObserver.OperazioneInCorso == Costanti.INIZIO_LAVORO || 
+					_dialogoOperatoreObserver.OperazioneInCorso == Costanti.INIZIO_ATTREZZAGGIO))
+				_cercaAttivitaObserver.IsAttivitaCercata = false;
 
-            _dialogoOperatoreStore.IsDettaglioAttivitaOpen = IsOpen;
+            _dialogoOperatoreObserver.IsDettaglioAttivitaOpen = IsOpen;
 
             OnNotifyStateChanged();
 		}
 
 		private void AttivitaStore_OnAttivitaSelezionataChanged()
 		{
-			_dialogoOperatoreStore.IsDettaglioAttivitaOpen = IsOpen;
+			_dialogoOperatoreObserver.IsDettaglioAttivitaOpen = IsOpen;
 			OnNotifyStateChanged();
 		}
 
 		private bool IsOpenCondition()
 		{
-			IOperatoreViewModel operatore = _dialogoOperatoreStore.OperatoreSelezionato;
-			string operazioneInCorso = _dialogoOperatoreStore.OperazioneInCorso;
-			IAttivitaViewModel attivitaSelezionata = _dialogoOperatoreStore.AttivitaSelezionata;
+			IOperatoreViewModel operatore = _dialogoOperatoreObserver.OperatoreSelezionato;
+			string operazioneInCorso = _dialogoOperatoreObserver.OperazioneInCorso;
+			IAttivitaViewModel attivitaSelezionata = _dialogoOperatoreObserver.AttivitaSelezionata;
 
 			if (operatore == null)
 				return false;
@@ -70,8 +75,8 @@ namespace IMAR_DialogoOperatore.ViewModels
 
 		public override void Dispose()
 		{
-			_dialogoOperatoreStore.OnAttivitaSelezionataChanged -= AttivitaStore_OnAttivitaSelezionataChanged;
-			_dialogoOperatoreStore.OnOperazioneInCorsoChanged -= DialogoOperatoreStore_OnOperazioneInCorsoChanged;
+			_dialogoOperatoreObserver.OnAttivitaSelezionataChanged -= AttivitaStore_OnAttivitaSelezionataChanged;
+			_dialogoOperatoreObserver.OnOperazioneInCorsoChanged -= DialogoOperatoreStore_OnOperazioneInCorsoChanged;
 		}
 	}
 }

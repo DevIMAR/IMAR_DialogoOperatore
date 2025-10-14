@@ -25,6 +25,7 @@ namespace IMAR_DialogoOperatore
 
 			services.AddScoped<ICercaAttivitaHelper, CercaAttivitaHelper>();
 			services.AddScoped<IConfermaOperazioneHelper, ConfermaOperazioneHelper>();
+			services.AddScoped<ICreaFaseNonPianificataHelper, CreaFaseNonPianificataHelper>();
 			services.AddScoped<IInterruzioneAttivitaHelper, InterruzioneAttivitaHelper>();
 			services.AddScoped<IPopupConfermaHelper, PopupConfermaHelper>();
 			services.AddScoped<ITaskCompilerHelper, AsanaTaskCompilerHelper>();
@@ -61,6 +62,7 @@ namespace IMAR_DialogoOperatore
 			services.AddScoped<AnnullaOperazioneCommand>();
 			services.AddScoped<AvanzamentoCommand>();
 			services.AddScoped<ConfermaCommand>();
+			services.AddScoped<CreaFaseNonPianificataCommand>();
 			services.AddScoped<FineAttrezzaggioCommand>();
 			services.AddScoped<FineLavoroCommand>();
 			services.AddScoped<IngressoUscitaCommand>();

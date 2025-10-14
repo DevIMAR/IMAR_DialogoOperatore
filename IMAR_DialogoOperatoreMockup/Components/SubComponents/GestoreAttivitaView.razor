@@ -23,6 +23,13 @@
 	</BodyTemplate>
 
 	<FooterTemplate>
+		<DxButton Text="Rilavorazione/Ritaglio"
+				  RenderStyle="ButtonRenderStyle.Warning"
+				  RenderStyleMode="ButtonRenderStyleMode.Outline"
+				  Enabled="@GestoreAttivitaViewModel.CreaFaseNonPianificataCommand.CanExecute(null)"
+				  Click="@GestoreAttivitaViewModel.CreaFaseNonPianificataCommand.Execute"
+				  CssClass="d-flex justify-content-center align-items-center conferma-dettagli" />
+
 		<DxButton Text="Conferma"
 				  RenderStyle="ButtonRenderStyle.Warning"
 				  Enabled="@GestoreAttivitaViewModel.ConfermaCommand.CanExecute(null)"

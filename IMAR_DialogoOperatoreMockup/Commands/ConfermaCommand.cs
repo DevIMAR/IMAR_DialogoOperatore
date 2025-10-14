@@ -148,7 +148,7 @@ namespace IMAR_DialogoOperatore.Commands
 
             _dialogoOperatoreObserver.OperatoreSelezionato.MacchinaAssegnata = _macchinaService.GetPrimaMacchinaFittiziaNonUtilizzata();
             if (_dialogoOperatoreObserver.OperatoreSelezionato.MacchinaAssegnata == null)
-                MostraPopupConTesto("!!! NON CI SONO MACCHINE DISPONIBILI!!!\nCONTATTARE UFFICIO IT");
+                MostraPopupConTesto(Costanti.ERRORE_MACCHINE_FINITE);
         }
 
         private bool CanAssegnareMacchinaFittiziaAdOperatore()
