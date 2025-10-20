@@ -34,14 +34,13 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
 
         private void UpdateAttivita(object? state)
         {
-            if (_odpDatiMonitor == null)
-                return;
-
             try
             {
                 List<Attivita> nuoveAttivita = new List<Attivita>();
 
                 UpdateDatiDaMonitor();
+                if (_odpDatiMonitor == null)
+                    return;
 
                 decimal dimensioneBatch = 1000;
                 decimal batchCount = Math.Ceiling(_odpDatiMonitor.Count / dimensioneBatch);
