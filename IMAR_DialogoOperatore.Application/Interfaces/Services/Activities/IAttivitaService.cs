@@ -13,7 +13,6 @@ namespace IMAR_DialogoOperatore.Application.Interfaces.Services.Activities
         public IList<Attivita> GetAttivitaIndirette();
         List<string> GetIdOperatoriConBollaAperta(string bolla);
         IList<Attivita>? GetAttivitaOperatoreDellUltimaGiornata(int idJmesOperatore);
-        string? ApriAttrezzaggioFaseNonPianificata(Attivita attivita, Operatore operatore);
         string? ApriLavoroFaseNonPianificata(Attivita attivita, Operatore operatore);
     }
 }

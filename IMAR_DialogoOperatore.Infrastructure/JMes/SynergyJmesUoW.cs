@@ -1,6 +1,5 @@
 ﻿using IMAR_DialogoOperatore.Application.Interfaces.Repositories;
 using IMAR_DialogoOperatore.Application.Interfaces.UoW;
-using IMAR_DialogoOperatore.Domain.JMes;
 using IMAR_DialogoOperatore.Domain.Entities.JMES;
 
 namespace IMAR_DialogoOperatore.Infrastructure.JMes
@@ -19,7 +18,9 @@ namespace IMAR_DialogoOperatore.Infrastructure.JMes
 		private readonly IGenericRepository<AngMesDecTypLng> _angMesDecTypLng;
 		private readonly IGenericRepository<AngMesEvtOpeSts> _angMesEvtOpeSts;
 		private readonly IGenericRepository<AngMesEvtOpeStsLng> _angMesEvtOpeStsLng;
-		private readonly IGenericRepository<AngMesSsp> _angMesSsp;
+        private readonly IGenericRepository<AngMesNotPln> _angMesNotPln;
+        private readonly IGenericRepository<AngMesNotPlnLng> _angMesNotPlnLng;
+        private readonly IGenericRepository<AngMesSsp> _angMesSsp;
 		private readonly IGenericRepository<AngMesSspLng> _angMesSspLng;
 		private readonly IGenericRepository<AngMesSts> _angMesSts;
 		private readonly IGenericRepository<AngMesStsLng> _angMesStsLng;
@@ -55,7 +56,9 @@ namespace IMAR_DialogoOperatore.Infrastructure.JMes
 		public IGenericRepository<AngMesDecTypLng> AngMesDecTypLng => _angMesDecTypLng ?? new GenericRepository<AngMesDecTypLng>(_context);
 		public IGenericRepository<AngMesEvtOpeSts> AngMesEvtOpeSts => _angMesEvtOpeSts ?? new GenericRepository<AngMesEvtOpeSts>(_context);
 		public IGenericRepository<AngMesEvtOpeStsLng> AngMesEvtOpeStsLng => _angMesEvtOpeStsLng ?? new GenericRepository<AngMesEvtOpeStsLng>(_context);
-		public IGenericRepository<AngMesSsp> AngMesSsp => _angMesSsp ?? new GenericRepository<AngMesSsp>(_context);
+        public IGenericRepository<AngMesNotPln> AngMesNotPln => _angMesNotPln ?? new GenericRepository<AngMesNotPln>(_context);
+        public IGenericRepository<AngMesNotPlnLng> AngMesNotPlnLng => _angMesNotPlnLng ?? new GenericRepository<AngMesNotPlnLng>(_context);
+        public IGenericRepository<AngMesSsp> AngMesSsp => _angMesSsp ?? new GenericRepository<AngMesSsp>(_context);
 		public IGenericRepository<AngMesSspLng> AngMesSspLng => _angMesSspLng ?? new GenericRepository<AngMesSspLng>(_context);
 		public IGenericRepository<AngMesSts> AngMesSts => _angMesSts ?? new GenericRepository<AngMesSts>(_context);
 		public IGenericRepository<AngMesStsLng> AngMesStsLng => _angMesStsLng ?? new GenericRepository<AngMesStsLng>(_context);
@@ -75,7 +78,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.JMes
 		public IGenericRepository<TblResBrk> TblResBrk => _tblResBrk ?? new GenericRepository<TblResBrk>(_context);
 		public IGenericRepository<TblResClk> TblResClk => _tblResClk ?? new GenericRepository<TblResClk>(_context);
 
-		public void Dispose()
+        public void Dispose()
 		{
 			Dispose(true);
 			GC.SuppressFinalize(this);

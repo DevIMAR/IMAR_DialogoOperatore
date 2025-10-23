@@ -15,6 +15,8 @@ namespace IMAR_DialogoOperatore.Application.Interfaces.UoW
 		public IGenericRepository<AngMesDecTypLng> AngMesDecTypLng { get; }
 		public IGenericRepository<AngMesEvtOpeSts> AngMesEvtOpeSts { get; }
 		public IGenericRepository<AngMesEvtOpeStsLng> AngMesEvtOpeStsLng { get; }
+		public IGenericRepository<AngMesNotPln> AngMesNotPln { get; }
+		public IGenericRepository<AngMesNotPlnLng> AngMesNotPlnLng { get; }
 		public IGenericRepository<AngMesSsp> AngMesSsp { get; }
 		public IGenericRepository<AngMesSspLng> AngMesSspLng { get; }
 		public IGenericRepository<AngMesSts> AngMesSts { get; }

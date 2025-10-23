@@ -3,28 +3,29 @@
 using IMAR_DialogoOperatore.Domain.Entities.JMES;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using System;
+using System.Collections.Generic;
 
-namespace IMAR_DialogoOperatore.Domain.JMes;
+namespace IMAR_DialogoOperatore.Infrastructure.JMes;
 
 public partial class SynergyJmesContext : DbContext
 {
-	IConfiguration _configuration;
+    IConfiguration _configuration;
 
-	public SynergyJmesContext(
-        DbContextOptions<SynergyJmesContext> options,
-			IConfiguration configuration)
+    public SynergyJmesContext(DbContextOptions<SynergyJmesContext> options,
+            IConfiguration configuration)
         : base(options)
-	{
-		_configuration = configuration;
-	}
+    {
+        _configuration = configuration;
+    }
 
-	protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-	{
-		base.OnConfiguring(optionsBuilder);
-		optionsBuilder.UseSqlServer(_configuration["ConnectionStrings:SynergyJmesCrescenzi"]);
-	}
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        base.OnConfiguring(optionsBuilder);
+        optionsBuilder.UseSqlServer(_configuration["ConnectionStrings:SynergyJmes"]);
+    }
 
-	public virtual DbSet<AngBdg> AngBdg { get; set; }
+    public virtual DbSet<AngBdg> AngBdg { get; set; }
 
     public virtual DbSet<AngDay> AngDay { get; set; }
 
@@ -43,6 +44,10 @@ public partial class SynergyJmesContext : DbContext
     public virtual DbSet<AngMesEvtOpeSts> AngMesEvtOpeSts { get; set; }
 
     public virtual DbSet<AngMesEvtOpeStsLng> AngMesEvtOpeStsLng { get; set; }
+
+    public virtual DbSet<AngMesNotPln> AngMesNotPln { get; set; }
+
+    public virtual DbSet<AngMesNotPlnLng> AngMesNotPlnLng { get; set; }
 
     public virtual DbSet<AngMesSsp> AngMesSsp { get; set; }
 
@@ -139,17 +144,18 @@ public partial class SynergyJmesContext : DbContext
 
             entity.Property(e => e.Uid).HasColumnType("decimal(10, 0)");
             entity.Property(e => e.CalUid).HasColumnType("decimal(10, 0)");
-            entity.Property(e => e.DisDayMinSl1).HasColumnType("decimal(6, 0)");
-            entity.Property(e => e.DisDayMinSl2).HasColumnType("decimal(6, 0)");
-            entity.Property(e => e.DisDayMinSl3).HasColumnType("decimal(6, 0)");
-            entity.Property(e => e.DisDayMinSl4).HasColumnType("decimal(6, 0)");
-            entity.Property(e => e.DisDayMinSl5).HasColumnType("decimal(6, 0)");
-            entity.Property(e => e.DisDayMinSl6).HasColumnType("decimal(6, 0)");
-            entity.Property(e => e.DisDayMinSl7).HasColumnType("decimal(6, 0)");
+            entity.Property(e => e.DisDayMinSl1).HasColumnType("decimal(12, 0)");
+            entity.Property(e => e.DisDayMinSl2).HasColumnType("decimal(12, 0)");
+            entity.Property(e => e.DisDayMinSl3).HasColumnType("decimal(12, 0)");
+            entity.Property(e => e.DisDayMinSl4).HasColumnType("decimal(12, 0)");
+            entity.Property(e => e.DisDayMinSl5).HasColumnType("decimal(12, 0)");
+            entity.Property(e => e.DisDayMinSl6).HasColumnType("decimal(12, 0)");
+            entity.Property(e => e.DisDayMinSl7).HasColumnType("decimal(12, 0)");
             entity.Property(e => e.DisGrpTyp)
                 .IsRequired()
-                .HasMaxLength(1);
-            entity.Property(e => e.EmlAdd).HasMaxLength(50);
+                .HasMaxLength(1)
+                .HasDefaultValue("R");
+            entity.Property(e => e.EmlAdd).HasMaxLength(255);
             entity.Property(e => e.EtyUid).HasColumnType("decimal(10, 0)");
             entity.Property(e => e.GrpCod)
                 .IsRequired()
@@ -157,18 +163,23 @@ public partial class SynergyJmesContext : DbContext
             entity.Property(e => e.GrpEff).HasColumnType("decimal(4, 0)");
             entity.Property(e => e.GrpIco)
                 .IsRequired()
-                .HasMaxLength(50);
-            entity.Property(e => e.GrpPblUsg).HasColumnType("decimal(1, 0)");
+                .HasMaxLength(50)
+                .HasDefaultValue("mdi mdi-account-multiple");
+            entity.Property(e => e.GrpPblUsg)
+                .HasDefaultValue(-1m)
+                .HasColumnType("decimal(1, 0)");
             entity.Property(e => e.GrpTyp)
                 .IsRequired()
-                .HasMaxLength(1);
+                .HasMaxLength(1)
+                .HasDefaultValue("U");
             entity.Property(e => e.LogDel).HasColumnType("decimal(1, 0)");
             entity.Property(e => e.PerNis).HasColumnType("decimal(2, 0)");
             entity.Property(e => e.RecVer).HasColumnType("decimal(5, 0)");
             entity.Property(e => e.SchEnb).HasColumnType("decimal(1, 0)");
             entity.Property(e => e.SchTyp)
                 .IsRequired()
-                .HasMaxLength(1);
+                .HasMaxLength(1)
+                .HasDefaultValue("F");
             entity.Property(e => e.Tsd).HasColumnType("datetime");
             entity.Property(e => e.Tsi).HasColumnType("datetime");
             entity.Property(e => e.Tsu).HasColumnType("datetime");
@@ -202,7 +213,8 @@ public partial class SynergyJmesContext : DbContext
                 .HasMaxLength(30);
             entity.Property(e => e.BrkIco)
                 .IsRequired()
-                .HasMaxLength(50);
+                .HasMaxLength(50)
+                .HasDefaultValue("mdi mdi-coffee");
             entity.Property(e => e.EtyUid).HasColumnType("decimal(10, 0)");
             entity.Property(e => e.LogDel).HasColumnType("decimal(1, 0)");
             entity.Property(e => e.RecVer).HasColumnType("decimal(5, 0)");
@@ -239,7 +251,8 @@ public partial class SynergyJmesContext : DbContext
                 .HasMaxLength(30);
             entity.Property(e => e.DecTypIco)
                 .IsRequired()
-                .HasMaxLength(50);
+                .HasMaxLength(50)
+                .HasDefaultValue("mdi mdi-file-document-box-outline");
             entity.Property(e => e.LogDel).HasColumnType("decimal(1, 0)");
             entity.Property(e => e.RecVer).HasColumnType("decimal(5, 0)");
             entity.Property(e => e.Tsd).HasColumnType("datetime");
@@ -275,7 +288,8 @@ public partial class SynergyJmesContext : DbContext
                 .HasMaxLength(30);
             entity.Property(e => e.EvtOpeStsIco)
                 .IsRequired()
-                .HasMaxLength(50);
+                .HasMaxLength(50)
+                .HasDefaultValue("mdi mdi-help-circle-outline");
             entity.Property(e => e.LogDel).HasColumnType("decimal(1, 0)");
             entity.Property(e => e.RecVer).HasColumnType("decimal(5, 0)");
             entity.Property(e => e.Tsd).HasColumnType("datetime");
@@ -299,6 +313,46 @@ public partial class SynergyJmesContext : DbContext
                 .HasConstraintName("FLng00127");
         });
 
+        modelBuilder.Entity<AngMesNotPln>(entity =>
+        {
+            entity.HasKey(e => e.Uid).HasName("PK__AngMesNo__C5B69A4A290833AC");
+
+            entity.HasIndex(e => e.NotPlnCod, "IDXCODE320");
+
+            entity.Property(e => e.Uid).HasColumnType("decimal(10, 0)");
+            entity.Property(e => e.CauCod).HasMaxLength(30);
+            entity.Property(e => e.EtyUid).HasColumnType("decimal(10, 0)");
+            entity.Property(e => e.LogDel).HasColumnType("decimal(1, 0)");
+            entity.Property(e => e.NotPlnCod)
+                .IsRequired()
+                .HasMaxLength(30);
+            entity.Property(e => e.NotPlnIco)
+                .IsRequired()
+                .HasMaxLength(50)
+                .HasDefaultValue("mdi mdi-not-equal");
+            entity.Property(e => e.ProCod).HasMaxLength(30);
+            entity.Property(e => e.RecVer).HasColumnType("decimal(5, 0)");
+            entity.Property(e => e.Tsd).HasColumnType("datetime");
+            entity.Property(e => e.Tsi).HasColumnType("datetime");
+            entity.Property(e => e.Tsu).HasColumnType("datetime");
+        });
+
+        modelBuilder.Entity<AngMesNotPlnLng>(entity =>
+        {
+            entity.HasKey(e => new { e.RecUid, e.LngUid }).HasName("PK__AngMesNo__6CB1DB0B0DECB799");
+
+            entity.Property(e => e.RecUid).HasColumnType("decimal(10, 0)");
+            entity.Property(e => e.LngUid).HasColumnType("decimal(10, 0)");
+            entity.Property(e => e.NotPlnDsc).HasMaxLength(100);
+            entity.Property(e => e.RecVer).HasColumnType("decimal(5, 0)");
+            entity.Property(e => e.Tsi).HasColumnType("datetime");
+            entity.Property(e => e.Tsu).HasColumnType("datetime");
+
+            entity.HasOne(d => d.RecU).WithMany(p => p.AngMesNotPlnLng)
+                .HasForeignKey(d => d.RecUid)
+                .HasConstraintName("FLng00129");
+        });
+
         modelBuilder.Entity<AngMesSsp>(entity =>
         {
             entity.HasKey(e => e.Uid).HasName("PK__AngMesSs__C5B69A4AC49FE3AD");
@@ -309,13 +363,16 @@ public partial class SynergyJmesContext : DbContext
             entity.Property(e => e.EtyUid).HasColumnType("decimal(10, 0)");
             entity.Property(e => e.LogDel).HasColumnType("decimal(1, 0)");
             entity.Property(e => e.RecVer).HasColumnType("decimal(5, 0)");
-            entity.Property(e => e.SspBlc).HasColumnType("decimal(1, 0)");
+            entity.Property(e => e.SspBlc)
+                .HasDefaultValue(-1m)
+                .HasColumnType("decimal(1, 0)");
             entity.Property(e => e.SspCod)
                 .IsRequired()
                 .HasMaxLength(30);
             entity.Property(e => e.SspIco)
                 .IsRequired()
-                .HasMaxLength(50);
+                .HasMaxLength(50)
+                .HasDefaultValue("mdi mdi-pause");
             entity.Property(e => e.SspMac).HasColumnType("decimal(1, 0)");
             entity.Property(e => e.SspWrk).HasColumnType("decimal(1, 0)");
             entity.Property(e => e.Tsd).HasColumnType("datetime");
@@ -351,14 +408,18 @@ public partial class SynergyJmesContext : DbContext
             entity.Property(e => e.StsAlm).HasColumnType("decimal(1, 0)");
             entity.Property(e => e.StsClr)
                 .IsRequired()
-                .HasMaxLength(30);
+                .HasMaxLength(30)
+                .HasDefaultValue("blue");
             entity.Property(e => e.StsCod)
                 .IsRequired()
                 .HasMaxLength(30);
             entity.Property(e => e.StsIco)
                 .IsRequired()
-                .HasMaxLength(50);
-            entity.Property(e => e.StsWhtTxt).HasColumnType("decimal(1, 0)");
+                .HasMaxLength(50)
+                .HasDefaultValue("mdi mdi-cogs");
+            entity.Property(e => e.StsWhtTxt)
+                .HasDefaultValue(-1m)
+                .HasColumnType("decimal(1, 0)");
             entity.Property(e => e.Tsd).HasColumnType("datetime");
             entity.Property(e => e.Tsi).HasColumnType("datetime");
             entity.Property(e => e.Tsu).HasColumnType("datetime");
@@ -397,7 +458,7 @@ public partial class SynergyJmesContext : DbContext
             entity.Property(e => e.DiaOpeViwUid).HasColumnType("decimal(10, 0)");
             entity.Property(e => e.DteVal).HasColumnType("datetime");
             entity.Property(e => e.DtsVal).HasColumnType("datetime");
-            entity.Property(e => e.EmlAdd).HasMaxLength(50);
+            entity.Property(e => e.EmlAdd).HasMaxLength(255);
             entity.Property(e => e.EtyUid).HasColumnType("decimal(10, 0)");
             entity.Property(e => e.GntCfgDefMdlUid).HasColumnType("decimal(10, 0)");
             entity.Property(e => e.GntCfgDefPrjUid).HasColumnType("decimal(10, 0)");
@@ -420,7 +481,9 @@ public partial class SynergyJmesContext : DbContext
             entity.Property(e => e.OrgGntCfgDefPrjUid).HasColumnType("decimal(10, 0)");
             entity.Property(e => e.PerNis).HasColumnType("decimal(2, 0)");
             entity.Property(e => e.PlnQty).HasColumnType("decimal(4, 0)");
-            entity.Property(e => e.PrjBdgSec).HasColumnType("decimal(4, 0)");
+            entity.Property(e => e.PrjBdgSec)
+                .HasDefaultValue(30m)
+                .HasColumnType("decimal(4, 0)");
             entity.Property(e => e.PrlGrp).HasMaxLength(100);
             entity.Property(e => e.RecVer).HasColumnType("decimal(5, 0)");
             entity.Property(e => e.RepGrpUid).HasColumnType("decimal(10, 0)");
@@ -433,17 +496,21 @@ public partial class SynergyJmesContext : DbContext
             entity.Property(e => e.ResEff).HasColumnType("decimal(4, 0)");
             entity.Property(e => e.ResIco)
                 .IsRequired()
-                .HasMaxLength(50);
+                .HasMaxLength(50)
+                .HasDefaultValue("mdi mdi-account");
             entity.Property(e => e.ResNam).HasMaxLength(100);
             entity.Property(e => e.ResShtDsc).HasMaxLength(50);
             entity.Property(e => e.ResSur).HasMaxLength(100);
             entity.Property(e => e.ResTpl).HasColumnType("decimal(1, 0)");
             entity.Property(e => e.ResTypUid).HasColumnType("decimal(10, 0)");
             entity.Property(e => e.SchEnb).HasColumnType("decimal(1, 0)");
-            entity.Property(e => e.SchFin).HasColumnType("decimal(1, 0)");
+            entity.Property(e => e.SchFin)
+                .HasDefaultValue(-1m)
+                .HasColumnType("decimal(1, 0)");
             entity.Property(e => e.SdeBarViw).HasColumnType("decimal(1, 0)");
             entity.Property(e => e.StdWrkTim).HasColumnType("decimal(17, 4)");
             entity.Property(e => e.TeaPlnCfgDefUid).HasColumnType("decimal(10, 0)");
+            entity.Property(e => e.TeaPlnSrcFltDefUid).HasColumnType("decimal(10, 0)");
             entity.Property(e => e.TimZonUid).HasColumnType("decimal(10, 0)");
             entity.Property(e => e.TmuIco).HasMaxLength(50);
             entity.Property(e => e.TmuVal).HasColumnType("decimal(3, 0)");
@@ -478,10 +545,14 @@ public partial class SynergyJmesContext : DbContext
             entity.Property(e => e.EvtRefUid).HasColumnType("decimal(10, 0)");
             entity.Property(e => e.EvtTypUid).HasColumnType("decimal(10, 0)");
             entity.Property(e => e.EvtUac).HasColumnType("decimal(1, 0)");
+            entity.Property(e => e.LckQty).HasColumnType("decimal(1, 0)");
+            entity.Property(e => e.LckTim).HasColumnType("decimal(1, 0)");
+            entity.Property(e => e.LogErr).HasMaxLength(500);
             entity.Property(e => e.MatDecLck).HasColumnType("decimal(1, 0)");
             entity.Property(e => e.MatFlg).HasMaxLength(20);
             entity.Property(e => e.OrgLvlUid).HasColumnType("decimal(10, 0)");
             entity.Property(e => e.OvrLapNum).HasColumnType("decimal(20, 0)");
+            entity.Property(e => e.OvrLapOpn).HasColumnType("decimal(1, 0)");
             entity.Property(e => e.RecVer).HasColumnType("decimal(5, 0)");
             entity.Property(e => e.ResEffEndUid).HasColumnType("decimal(10, 0)");
             entity.Property(e => e.ResEffStrUid).HasColumnType("decimal(10, 0)");
@@ -490,12 +561,16 @@ public partial class SynergyJmesContext : DbContext
             entity.Property(e => e.ResOrgUid).HasColumnType("decimal(10, 0)");
             entity.Property(e => e.ResPriUid).HasColumnType("decimal(10, 0)");
             entity.Property(e => e.SspUid).HasColumnType("decimal(10, 0)");
+            entity.Property(e => e.StsEvtUid).HasColumnType("decimal(10, 0)");
             entity.Property(e => e.Tsi).HasColumnType("datetime");
             entity.Property(e => e.TssCnsQty).HasColumnType("datetime");
             entity.Property(e => e.TssCnsTim).HasColumnType("datetime");
             entity.Property(e => e.TssEnd).HasColumnType("datetime");
-            entity.Property(e => e.TssStr).HasColumnType("datetime");
+            entity.Property(e => e.TssStr)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
             entity.Property(e => e.Tsu).HasColumnType("datetime");
+            entity.Property(e => e.UndMov).HasColumnType("decimal(1, 0)");
 
             entity.HasOne(d => d.DtcDayU).WithMany(p => p.MesBckEvt)
                 .HasForeignKey(d => d.DtcDayUid)
@@ -598,7 +673,9 @@ public partial class SynergyJmesContext : DbContext
             entity.Property(e => e.PrsFldIco003).HasMaxLength(50);
             entity.Property(e => e.PrsFldIco004).HasMaxLength(50);
             entity.Property(e => e.PrsFldIco005).HasMaxLength(50);
-            entity.Property(e => e.PrtNum).HasColumnType("decimal(7, 0)");
+            entity.Property(e => e.PrtNum)
+                .HasDefaultValue(1m)
+                .HasColumnType("decimal(7, 0)");
             entity.Property(e => e.Qt2Nco).HasColumnType("decimal(17, 4)");
             entity.Property(e => e.Qt2Ord).HasColumnType("decimal(17, 4)");
             entity.Property(e => e.Qt2Prd).HasColumnType("decimal(17, 4)");
@@ -666,6 +743,7 @@ public partial class SynergyJmesContext : DbContext
             entity.Property(e => e.NmvQtyNco).HasColumnType("decimal(17, 4)");
             entity.Property(e => e.NmvQtyPrd).HasColumnType("decimal(17, 4)");
             entity.Property(e => e.NmvQtyRej).HasColumnType("decimal(17, 4)");
+            entity.Property(e => e.NotDec).HasMaxLength(1000);
             entity.Property(e => e.PerCom).HasColumnType("decimal(7, 2)");
             entity.Property(e => e.Qt2Nco).HasColumnType("decimal(17, 4)");
             entity.Property(e => e.Qt2Prd).HasColumnType("decimal(17, 4)");
@@ -705,7 +783,9 @@ public partial class SynergyJmesContext : DbContext
             entity.Property(e => e.StsUid).HasColumnType("decimal(10, 0)");
             entity.Property(e => e.Tsi).HasColumnType("datetime");
             entity.Property(e => e.TssEnd).HasColumnType("datetime");
-            entity.Property(e => e.TssStr).HasColumnType("datetime");
+            entity.Property(e => e.TssStr)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
             entity.Property(e => e.Tsu).HasColumnType("datetime");
 
             entity.HasOne(d => d.BrkU).WithMany(p => p.MesBckEvtOpe)
@@ -864,7 +944,9 @@ public partial class SynergyJmesContext : DbContext
             entity.Property(e => e.PrsFldIco003).HasMaxLength(50);
             entity.Property(e => e.PrsFldIco004).HasMaxLength(50);
             entity.Property(e => e.PrsFldIco005).HasMaxLength(50);
-            entity.Property(e => e.PrtNum).HasColumnType("decimal(7, 0)");
+            entity.Property(e => e.PrtNum)
+                .HasDefaultValue(1m)
+                .HasColumnType("decimal(7, 0)");
             entity.Property(e => e.Qt2Nco).HasColumnType("decimal(17, 4)");
             entity.Property(e => e.Qt2Ord).HasColumnType("decimal(17, 4)");
             entity.Property(e => e.Qt2Prd).HasColumnType("decimal(17, 4)");
@@ -922,10 +1004,14 @@ public partial class SynergyJmesContext : DbContext
             entity.Property(e => e.EvtRefUid).HasColumnType("decimal(10, 0)");
             entity.Property(e => e.EvtTypUid).HasColumnType("decimal(10, 0)");
             entity.Property(e => e.EvtUac).HasColumnType("decimal(1, 0)");
+            entity.Property(e => e.LckQty).HasColumnType("decimal(1, 0)");
+            entity.Property(e => e.LckTim).HasColumnType("decimal(1, 0)");
+            entity.Property(e => e.LogErr).HasMaxLength(500);
             entity.Property(e => e.MatDecLck).HasColumnType("decimal(1, 0)");
             entity.Property(e => e.MatFlg).HasMaxLength(20);
             entity.Property(e => e.OrgLvlUid).HasColumnType("decimal(10, 0)");
             entity.Property(e => e.OvrLapNum).HasColumnType("decimal(20, 0)");
+            entity.Property(e => e.OvrLapOpn).HasColumnType("decimal(1, 0)");
             entity.Property(e => e.RecVer).HasColumnType("decimal(5, 0)");
             entity.Property(e => e.ResEffEndUid).HasColumnType("decimal(10, 0)");
             entity.Property(e => e.ResEffStrUid).HasColumnType("decimal(10, 0)");
@@ -934,12 +1020,16 @@ public partial class SynergyJmesContext : DbContext
             entity.Property(e => e.ResOrgUid).HasColumnType("decimal(10, 0)");
             entity.Property(e => e.ResPriUid).HasColumnType("decimal(10, 0)");
             entity.Property(e => e.SspUid).HasColumnType("decimal(10, 0)");
+            entity.Property(e => e.StsEvtUid).HasColumnType("decimal(10, 0)");
             entity.Property(e => e.Tsi).HasColumnType("datetime");
             entity.Property(e => e.TssCnsQty).HasColumnType("datetime");
             entity.Property(e => e.TssCnsTim).HasColumnType("datetime");
             entity.Property(e => e.TssEnd).HasColumnType("datetime");
-            entity.Property(e => e.TssStr).HasColumnType("datetime");
+            entity.Property(e => e.TssStr)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
             entity.Property(e => e.Tsu).HasColumnType("datetime");
+            entity.Property(e => e.UndMov).HasColumnType("decimal(1, 0)");
 
             entity.HasOne(d => d.DtcDayU).WithMany(p => p.MesEvt)
                 .HasForeignKey(d => d.DtcDayUid)
@@ -1046,7 +1136,9 @@ public partial class SynergyJmesContext : DbContext
             entity.Property(e => e.PrsFldIco003).HasMaxLength(50);
             entity.Property(e => e.PrsFldIco004).HasMaxLength(50);
             entity.Property(e => e.PrsFldIco005).HasMaxLength(50);
-            entity.Property(e => e.PrtNum).HasColumnType("decimal(7, 0)");
+            entity.Property(e => e.PrtNum)
+                .HasDefaultValue(1m)
+                .HasColumnType("decimal(7, 0)");
             entity.Property(e => e.Qt2Nco).HasColumnType("decimal(17, 4)");
             entity.Property(e => e.Qt2Ord).HasColumnType("decimal(17, 4)");
             entity.Property(e => e.Qt2Prd).HasColumnType("decimal(17, 4)");
@@ -1114,6 +1206,7 @@ public partial class SynergyJmesContext : DbContext
             entity.Property(e => e.NmvQtyNco).HasColumnType("decimal(17, 4)");
             entity.Property(e => e.NmvQtyPrd).HasColumnType("decimal(17, 4)");
             entity.Property(e => e.NmvQtyRej).HasColumnType("decimal(17, 4)");
+            entity.Property(e => e.NotDec).HasMaxLength(1000);
             entity.Property(e => e.PerCom).HasColumnType("decimal(7, 2)");
             entity.Property(e => e.Qt2Nco).HasColumnType("decimal(17, 4)");
             entity.Property(e => e.Qt2Prd).HasColumnType("decimal(17, 4)");
@@ -1153,7 +1246,9 @@ public partial class SynergyJmesContext : DbContext
             entity.Property(e => e.StsUid).HasColumnType("decimal(10, 0)");
             entity.Property(e => e.Tsi).HasColumnType("datetime");
             entity.Property(e => e.TssEnd).HasColumnType("datetime");
-            entity.Property(e => e.TssStr).HasColumnType("datetime");
+            entity.Property(e => e.TssStr)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
             entity.Property(e => e.Tsu).HasColumnType("datetime");
 
             entity.HasOne(d => d.BrkU).WithMany(p => p.MesEvtOpe)
@@ -1222,7 +1317,9 @@ public partial class SynergyJmesContext : DbContext
             entity.Property(e => e.ResUid).HasColumnType("decimal(10, 0)");
             entity.Property(e => e.Tsi).HasColumnType("datetime");
             entity.Property(e => e.TssEnd).HasColumnType("datetime");
-            entity.Property(e => e.TssStr).HasColumnType("datetime");
+            entity.Property(e => e.TssStr)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
             entity.Property(e => e.Tsu).HasColumnType("datetime");
 
             entity.HasOne(d => d.BrkU).WithMany(p => p.TblResBrk)
@@ -1278,6 +1375,575 @@ public partial class SynergyJmesContext : DbContext
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FRes00013");
         });
+        modelBuilder.HasSequence("SApp00001").StartsAt(1000L);
+        modelBuilder.HasSequence("SApp00002");
+        modelBuilder.HasSequence("SApp00003");
+        modelBuilder.HasSequence("SApp00004");
+        modelBuilder.HasSequence("SApp00005");
+        modelBuilder.HasSequence("SApp00006");
+        modelBuilder.HasSequence("SApp00007");
+        modelBuilder.HasSequence("SApsAtt00001");
+        modelBuilder.HasSequence("SApsAtt00002");
+        modelBuilder.HasSequence("SApsCst00001").StartsAt(1000L);
+        modelBuilder.HasSequence("SApsCst00002");
+        modelBuilder.HasSequence("SApsCst00003");
+        modelBuilder.HasSequence("SApsCst00004");
+        modelBuilder.HasSequence("SApsCst00005");
+        modelBuilder.HasSequence("SApsCst00006");
+        modelBuilder.HasSequence("SApsCst00007");
+        modelBuilder.HasSequence("SApsCst00008");
+        modelBuilder.HasSequence("SApsLay00001");
+        modelBuilder.HasSequence("SApsLay00002");
+        modelBuilder.HasSequence("SApsLay00003");
+        modelBuilder.HasSequence("SApsLay00004");
+        modelBuilder.HasSequence("SApsLay00005").StartsAt(1000L);
+        modelBuilder.HasSequence("SApsLay00006");
+        modelBuilder.HasSequence("SApsLay00007").StartsAt(1000L);
+        modelBuilder.HasSequence("SApsLay00008");
+        modelBuilder.HasSequence("SApsLay00009");
+        modelBuilder.HasSequence("SApsLay00010");
+        modelBuilder.HasSequence("SApsLay00011");
+        modelBuilder.HasSequence("SApsLay00012");
+        modelBuilder.HasSequence("SApsLay00013");
+        modelBuilder.HasSequence("SApsLay00014");
+        modelBuilder.HasSequence("SApsLay00015");
+        modelBuilder.HasSequence("SApsOpr00001").StartsAt(1000L);
+        modelBuilder.HasSequence("SApsOpr00002").StartsAt(1000L);
+        modelBuilder.HasSequence("SApsOpr00003").StartsAt(1000L);
+        modelBuilder.HasSequence("SApsOpr00004").StartsAt(1000L);
+        modelBuilder.HasSequence("SApsOpr00005").StartsAt(1000L);
+        modelBuilder.HasSequence("SApsOpr00006").StartsAt(1000L);
+        modelBuilder.HasSequence("SApsOpr00007");
+        modelBuilder.HasSequence("SApsOpr00008");
+        modelBuilder.HasSequence("SApsOpr00009");
+        modelBuilder.HasSequence("SApsOpr00010");
+        modelBuilder.HasSequence("SApsOpr00011");
+        modelBuilder.HasSequence("SApsOpr00012");
+        modelBuilder.HasSequence("SApsOpr00013");
+        modelBuilder.HasSequence("SApsOpr00014");
+        modelBuilder.HasSequence("SApsOpr00015");
+        modelBuilder.HasSequence("SApsOpr00016");
+        modelBuilder.HasSequence("SApsOpr00017");
+        modelBuilder.HasSequence("SApsRes00001");
+        modelBuilder.HasSequence("SApsRes00002");
+        modelBuilder.HasSequence("SApsRes00003");
+        modelBuilder.HasSequence("SApsRes00004");
+        modelBuilder.HasSequence("SApsRes00005");
+        modelBuilder.HasSequence("SApsRes00006").StartsAt(1000L);
+        modelBuilder.HasSequence("SApsRes00007");
+        modelBuilder.HasSequence("SApsSce00001");
+        modelBuilder.HasSequence("SApsSce00002");
+        modelBuilder.HasSequence("SApsSce00003");
+        modelBuilder.HasSequence("SApsSce00004");
+        modelBuilder.HasSequence("SApsSce00005");
+        modelBuilder.HasSequence("SApsSce00006");
+        modelBuilder.HasSequence("SApsSce00007");
+        modelBuilder.HasSequence("SApsSce00008");
+        modelBuilder.HasSequence("SApsSce00009");
+        modelBuilder.HasSequence("SApsSce00010").StartsAt(1000L);
+        modelBuilder.HasSequence("SApsSce00011");
+        modelBuilder.HasSequence("SApsSce00012");
+        modelBuilder.HasSequence("SApsSce00013").StartsAt(1000L);
+        modelBuilder.HasSequence("SApsSch00001").StartsAt(1000L);
+        modelBuilder.HasSequence("SApsSch00002").StartsAt(1000L);
+        modelBuilder.HasSequence("SApsSch00003");
+        modelBuilder.HasSequence("SApsSch00004");
+        modelBuilder.HasSequence("SApsSch00005");
+        modelBuilder.HasSequence("SApsSch00006");
+        modelBuilder.HasSequence("SApsSch00007");
+        modelBuilder.HasSequence("SBas00001");
+        modelBuilder.HasSequence("SBas00002");
+        modelBuilder.HasSequence("SBas00003");
+        modelBuilder.HasSequence("SBas00004").StartsAt(1000L);
+        modelBuilder.HasSequence("SBas00005").StartsAt(1000L);
+        modelBuilder.HasSequence("SBas00006");
+        modelBuilder.HasSequence("SBas00007");
+        modelBuilder.HasSequence("SBas00008");
+        modelBuilder.HasSequence("SBas00009");
+        modelBuilder.HasSequence("SBas00010");
+        modelBuilder.HasSequence("SBas00011");
+        modelBuilder.HasSequence("SBas00012");
+        modelBuilder.HasSequence("SBas00013").StartsAt(1000L);
+        modelBuilder.HasSequence("SBas00014");
+        modelBuilder.HasSequence("SBas00015");
+        modelBuilder.HasSequence("SBas00016").StartsAt(1000L);
+        modelBuilder.HasSequence("SBas00017");
+        modelBuilder.HasSequence("SBas00018");
+        modelBuilder.HasSequence("SBas00019");
+        modelBuilder.HasSequence("SBas00020");
+        modelBuilder.HasSequence("SBas00021").StartsAt(1000L);
+        modelBuilder.HasSequence("SBas00022");
+        modelBuilder.HasSequence("SBas00023");
+        modelBuilder.HasSequence("SBas00024");
+        modelBuilder.HasSequence("SBas00025");
+        modelBuilder.HasSequence("SBas00026");
+        modelBuilder.HasSequence("SBas00027");
+        modelBuilder.HasSequence("SBas00028");
+        modelBuilder.HasSequence("SBas00029").StartsAt(1000L);
+        modelBuilder.HasSequence("SBas00030").StartsAt(1000L);
+        modelBuilder.HasSequence("SBas00031").StartsAt(1000L);
+        modelBuilder.HasSequence("SBas00032").StartsAt(1000L);
+        modelBuilder.HasSequence("SBas00033");
+        modelBuilder.HasSequence("SBas00034");
+        modelBuilder.HasSequence("SBas00035").StartsAt(2L);
+        modelBuilder.HasSequence("SBsl00001").StartsAt(100L);
+        modelBuilder.HasSequence("SCal00001");
+        modelBuilder.HasSequence("SCal00002");
+        modelBuilder.HasSequence("SCal00003");
+        modelBuilder.HasSequence("SCal00004");
+        modelBuilder.HasSequence("SCal00005");
+        modelBuilder.HasSequence("SCal00006");
+        modelBuilder.HasSequence("SCal00007");
+        modelBuilder.HasSequence("SCal00008");
+        modelBuilder.HasSequence("SCal00009");
+        modelBuilder.HasSequence("SCal00010");
+        modelBuilder.HasSequence("SCal00011");
+        modelBuilder.HasSequence("SCal00012");
+        modelBuilder.HasSequence("SCal00013");
+        modelBuilder.HasSequence("SCal00014");
+        modelBuilder.HasSequence("SCal00015");
+        modelBuilder.HasSequence("SCal00016");
+        modelBuilder.HasSequence("SDin00001");
+        modelBuilder.HasSequence("SDin00002");
+        modelBuilder.HasSequence("SDin00003");
+        modelBuilder.HasSequence("SDin00004");
+        modelBuilder.HasSequence("SDin00005");
+        modelBuilder.HasSequence("SDin00006");
+        modelBuilder.HasSequence("SDin00007");
+        modelBuilder.HasSequence("SDin00008");
+        modelBuilder.HasSequence("SDvzWks001").StartsAt(1000L);
+        modelBuilder.HasSequence("SDvzWks002").StartsAt(1000L);
+        modelBuilder.HasSequence("SDvzWks003").StartsAt(1000L);
+        modelBuilder.HasSequence("SDvzWks004");
+        modelBuilder.HasSequence("SDvzWks005");
+        modelBuilder.HasSequence("SDvzWks006");
+        modelBuilder.HasSequence("SDvzWks007");
+        modelBuilder.HasSequence("SDvzWks008");
+        modelBuilder.HasSequence("SDvzWks009");
+        modelBuilder.HasSequence("SDvzWks010");
+        modelBuilder.HasSequence("SDvzWks011");
+        modelBuilder.HasSequence("SDvzWks012");
+        modelBuilder.HasSequence("SDvzWks013");
+        modelBuilder.HasSequence("SDvzWks014");
+        modelBuilder.HasSequence("SDvzWks015");
+        modelBuilder.HasSequence("SDvzWks016");
+        modelBuilder.HasSequence("SDvzWks017");
+        modelBuilder.HasSequence("SEcm00001");
+        modelBuilder.HasSequence("SEcm00002");
+        modelBuilder.HasSequence("SEcm00003");
+        modelBuilder.HasSequence("SEcm00004");
+        modelBuilder.HasSequence("SEcm00005");
+        modelBuilder.HasSequence("SEma00001");
+        modelBuilder.HasSequence("SEma00002");
+        modelBuilder.HasSequence("SEnv00001");
+        modelBuilder.HasSequence("SEnv00002");
+        modelBuilder.HasSequence("SEnv00003");
+        modelBuilder.HasSequence("SEnv00004");
+        modelBuilder.HasSequence("SEnv00005");
+        modelBuilder.HasSequence("SEnv00006");
+        modelBuilder.HasSequence("SEnv00007");
+        modelBuilder.HasSequence("SEnv00008");
+        modelBuilder.HasSequence("SEnv00009");
+        modelBuilder.HasSequence("SEty00001");
+        modelBuilder.HasSequence("SEty00002");
+        modelBuilder.HasSequence("SEty00003").StartsAt(1000L);
+        modelBuilder.HasSequence("SEty00004");
+        modelBuilder.HasSequence("SEty00005");
+        modelBuilder.HasSequence("SEty00006").StartsAt(1000L);
+        modelBuilder.HasSequence("SEty00007");
+        modelBuilder.HasSequence("SEty00008");
+        modelBuilder.HasSequence("SEty00009").StartsAt(1000L);
+        modelBuilder.HasSequence("SEty00010");
+        modelBuilder.HasSequence("SGrp00001");
+        modelBuilder.HasSequence("SGrp00002");
+        modelBuilder.HasSequence("SGrp00003");
+        modelBuilder.HasSequence("SGrp00004");
+        modelBuilder.HasSequence("SIco00001");
+        modelBuilder.HasSequence("SJdi00001");
+        modelBuilder.HasSequence("SJdi00002");
+        modelBuilder.HasSequence("SJdi00003");
+        modelBuilder.HasSequence("SJst00001");
+        modelBuilder.HasSequence("SJst00002");
+        modelBuilder.HasSequence("SJst00003");
+        modelBuilder.HasSequence("SJst00004");
+        modelBuilder.HasSequence("SJst00005");
+        modelBuilder.HasSequence("SJst00006");
+        modelBuilder.HasSequence("SKit00001");
+        modelBuilder.HasSequence("SKit00002");
+        modelBuilder.HasSequence("SKit00003");
+        modelBuilder.HasSequence("SKit00004");
+        modelBuilder.HasSequence("SLog00001");
+        modelBuilder.HasSequence("SLog00002");
+        modelBuilder.HasSequence("SMes00001").StartsAt(1000L);
+        modelBuilder.HasSequence("SMes00002");
+        modelBuilder.HasSequence("SMes00003");
+        modelBuilder.HasSequence("SMes00004");
+        modelBuilder.HasSequence("SMes00005").StartsAt(1000L);
+        modelBuilder.HasSequence("SMes00006");
+        modelBuilder.HasSequence("SMes00007");
+        modelBuilder.HasSequence("SMes00008");
+        modelBuilder.HasSequence("SMes00009").StartsAt(1000L);
+        modelBuilder.HasSequence("SMes00010");
+        modelBuilder.HasSequence("SMes00011");
+        modelBuilder.HasSequence("SMes00012").StartsAt(1000L);
+        modelBuilder.HasSequence("SMes00013");
+        modelBuilder.HasSequence("SMes00014");
+        modelBuilder.HasSequence("SMes00015");
+        modelBuilder.HasSequence("SMes00016");
+        modelBuilder.HasSequence("SMes00017");
+        modelBuilder.HasSequence("SMes00018");
+        modelBuilder.HasSequence("SMes00019");
+        modelBuilder.HasSequence("SMes00020");
+        modelBuilder.HasSequence("SMes00021");
+        modelBuilder.HasSequence("SMes00022");
+        modelBuilder.HasSequence("SMes00023");
+        modelBuilder.HasSequence("SMes00024");
+        modelBuilder.HasSequence("SMes00025");
+        modelBuilder.HasSequence("SMes00026");
+        modelBuilder.HasSequence("SMes00027");
+        modelBuilder.HasSequence("SMes00028");
+        modelBuilder.HasSequence("SMes00029");
+        modelBuilder.HasSequence("SMes00030");
+        modelBuilder.HasSequence("SMes00031");
+        modelBuilder.HasSequence("SMes00032");
+        modelBuilder.HasSequence("SMes00035");
+        modelBuilder.HasSequence("SMes00036");
+        modelBuilder.HasSequence("SMes00037");
+        modelBuilder.HasSequence("SMes00038");
+        modelBuilder.HasSequence("SMes00039");
+        modelBuilder.HasSequence("SMes00040");
+        modelBuilder.HasSequence("SMes00041");
+        modelBuilder.HasSequence("SMes00041b");
+        modelBuilder.HasSequence("SMes00042");
+        modelBuilder.HasSequence("SMes00043");
+        modelBuilder.HasSequence("SMes00044");
+        modelBuilder.HasSequence("SMes00045");
+        modelBuilder.HasSequence("SMes00046");
+        modelBuilder.HasSequence("SMes00047");
+        modelBuilder.HasSequence("SMes00048");
+        modelBuilder.HasSequence("SMes00049");
+        modelBuilder.HasSequence("SMes00050");
+        modelBuilder.HasSequence("SMes00051");
+        modelBuilder.HasSequence("SMes00052");
+        modelBuilder.HasSequence("SMes00053");
+        modelBuilder.HasSequence("SMes00054");
+        modelBuilder.HasSequence("SMes00055");
+        modelBuilder.HasSequence("SMes00056");
+        modelBuilder.HasSequence("SMes00057");
+        modelBuilder.HasSequence("SMes00058");
+        modelBuilder.HasSequence("SMes00059");
+        modelBuilder.HasSequence("SMes00060");
+        modelBuilder.HasSequence("SMes00061");
+        modelBuilder.HasSequence("SMes00062");
+        modelBuilder.HasSequence("SMes00063");
+        modelBuilder.HasSequence("SMes00064");
+        modelBuilder.HasSequence("SMes00065");
+        modelBuilder.HasSequence("SMes00066");
+        modelBuilder.HasSequence("SMes00067");
+        modelBuilder.HasSequence("SMes00068");
+        modelBuilder.HasSequence("SMes00069");
+        modelBuilder.HasSequence("SMnc00001");
+        modelBuilder.HasSequence("SMnc00002");
+        modelBuilder.HasSequence("SMnc00003");
+        modelBuilder.HasSequence("SMnc00004");
+        modelBuilder.HasSequence("SMnc00005");
+        modelBuilder.HasSequence("SMnc00006");
+        modelBuilder.HasSequence("SMnc00007");
+        modelBuilder.HasSequence("SMnc00008").StartsAt(1000L);
+        modelBuilder.HasSequence("SMnc00009");
+        modelBuilder.HasSequence("SMnt00001");
+        modelBuilder.HasSequence("SNpr00001");
+        modelBuilder.HasSequence("SNpr00002");
+        modelBuilder.HasSequence("SNpr00003");
+        modelBuilder.HasSequence("SNpr00004").StartsAt(100L);
+        modelBuilder.HasSequence("SNpr00005");
+        modelBuilder.HasSequence("SNpr00006");
+        modelBuilder.HasSequence("SOpt00001");
+        modelBuilder.HasSequence("SOpt00002");
+        modelBuilder.HasSequence("SOpt00003");
+        modelBuilder.HasSequence("SOpt00004");
+        modelBuilder.HasSequence("SOrg00001");
+        modelBuilder.HasSequence("SOrg00002");
+        modelBuilder.HasSequence("SOrg00003");
+        modelBuilder.HasSequence("SOrg00004");
+        modelBuilder.HasSequence("SOrg00005");
+        modelBuilder.HasSequence("SOrg00006");
+        modelBuilder.HasSequence("SOrg00007");
+        modelBuilder.HasSequence("SOrg00008");
+        modelBuilder.HasSequence("SOrg00009");
+        modelBuilder.HasSequence("SOrg00010");
+        modelBuilder.HasSequence("SOrg00011");
+        modelBuilder.HasSequence("SPrj00001");
+        modelBuilder.HasSequence("SPrj00002");
+        modelBuilder.HasSequence("SPrj00003");
+        modelBuilder.HasSequence("SPrj00004");
+        modelBuilder.HasSequence("SPrj00005");
+        modelBuilder.HasSequence("SPrj00006");
+        modelBuilder.HasSequence("SPrj00007");
+        modelBuilder.HasSequence("SPrj00008");
+        modelBuilder.HasSequence("SPrj00009").StartsAt(1000L);
+        modelBuilder.HasSequence("SPrj00010");
+        modelBuilder.HasSequence("SPrj00011").StartsAt(1000L);
+        modelBuilder.HasSequence("SPrj00013").StartsAt(1000L);
+        modelBuilder.HasSequence("SPrj00015");
+        modelBuilder.HasSequence("SPrj00016");
+        modelBuilder.HasSequence("SPrj00017");
+        modelBuilder.HasSequence("SPrj00018");
+        modelBuilder.HasSequence("SPrj00019").StartsAt(1000L);
+        modelBuilder.HasSequence("SPrj00020");
+        modelBuilder.HasSequence("SPrj00021");
+        modelBuilder.HasSequence("SPrj00022");
+        modelBuilder.HasSequence("SPrj00023");
+        modelBuilder.HasSequence("SPrj00024");
+        modelBuilder.HasSequence("SPrj00026");
+        modelBuilder.HasSequence("SPrj00027");
+        modelBuilder.HasSequence("SPrj00028");
+        modelBuilder.HasSequence("SPrj00029");
+        modelBuilder.HasSequence("SPrj00030");
+        modelBuilder.HasSequence("SPrj00031");
+        modelBuilder.HasSequence("SPrj00032");
+        modelBuilder.HasSequence("SPrj00033");
+        modelBuilder.HasSequence("SPrj00034").StartsAt(1000L);
+        modelBuilder.HasSequence("SPrj00035");
+        modelBuilder.HasSequence("SPrj00036");
+        modelBuilder.HasSequence("SPrj00037");
+        modelBuilder.HasSequence("SPrj00038");
+        modelBuilder.HasSequence("SPrj00039");
+        modelBuilder.HasSequence("SPrj00040");
+        modelBuilder.HasSequence("SPrj00041");
+        modelBuilder.HasSequence("SPrj00042");
+        modelBuilder.HasSequence("SPrj00043");
+        modelBuilder.HasSequence("SPrj00044");
+        modelBuilder.HasSequence("SPrj00045");
+        modelBuilder.HasSequence("SPrj00046");
+        modelBuilder.HasSequence("SPrj00047");
+        modelBuilder.HasSequence("SPrj00048");
+        modelBuilder.HasSequence("SPrj00049");
+        modelBuilder.HasSequence("SPrj00050");
+        modelBuilder.HasSequence("SPrj00051");
+        modelBuilder.HasSequence("SPrj00052");
+        modelBuilder.HasSequence("SPrj00053");
+        modelBuilder.HasSequence("SPrjBas0001");
+        modelBuilder.HasSequence("SPrjBas0002").StartsAt(100L);
+        modelBuilder.HasSequence("SPrjBas0003");
+        modelBuilder.HasSequence("SPrjBas0004").StartsAt(1000L);
+        modelBuilder.HasSequence("SPrjBas0005");
+        modelBuilder.HasSequence("SPrjBas0006");
+        modelBuilder.HasSequence("SPrjDcl00001");
+        modelBuilder.HasSequence("SPrjDcl00002");
+        modelBuilder.HasSequence("SPrjDcl00003");
+        modelBuilder.HasSequence("SPrjDcl00004");
+        modelBuilder.HasSequence("SPrjDcl00005");
+        modelBuilder.HasSequence("SPrjDcl00006");
+        modelBuilder.HasSequence("SPrjPrg00001");
+        modelBuilder.HasSequence("SPrjPrg00002").StartsAt(100L);
+        modelBuilder.HasSequence("SPrjPrg00003");
+        modelBuilder.HasSequence("SPrjPrg00004");
+        modelBuilder.HasSequence("SPrjPrg00005").StartsAt(100L);
+        modelBuilder.HasSequence("SPrjPrg00006");
+        modelBuilder.HasSequence("SPrjPrg00007");
+        modelBuilder.HasSequence("SPrjPtf00003");
+        modelBuilder.HasSequence("SPrjPtf00004");
+        modelBuilder.HasSequence("SPrjPtf00005");
+        modelBuilder.HasSequence("SPrjPtf00006");
+        modelBuilder.HasSequence("SPrjPtf00007");
+        modelBuilder.HasSequence("SPrjPtf00008");
+        modelBuilder.HasSequence("SPrjPtf00009");
+        modelBuilder.HasSequence("SPrjPtf00010");
+        modelBuilder.HasSequence("SPrjPtf00011");
+        modelBuilder.HasSequence("SPrjPtf00012");
+        modelBuilder.HasSequence("SPrjPtf00013");
+        modelBuilder.HasSequence("SPrjPtf00015");
+        modelBuilder.HasSequence("SPrjPtf00016");
+        modelBuilder.HasSequence("SPrjPtf00017");
+        modelBuilder.HasSequence("SPrjPtf00018");
+        modelBuilder.HasSequence("SPrjPtf00019");
+        modelBuilder.HasSequence("SPrjPtf00020");
+        modelBuilder.HasSequence("SPrjPtf00021");
+        modelBuilder.HasSequence("SPrjPtf00022");
+        modelBuilder.HasSequence("SPrjSts00001");
+        modelBuilder.HasSequence("SPrjSts00002");
+        modelBuilder.HasSequence("SPrjSts00003");
+        modelBuilder.HasSequence("SPrjSts00004");
+        modelBuilder.HasSequence("SPrjTyp00001");
+        modelBuilder.HasSequence("SPrjTyp00002");
+        modelBuilder.HasSequence("SPrjTyp00003");
+        modelBuilder.HasSequence("SPrjTyp00004");
+        modelBuilder.HasSequence("SPrjTyp00005");
+        modelBuilder.HasSequence("SPrp00001").StartsAt(1000L);
+        modelBuilder.HasSequence("SPrp00002").StartsAt(1000L);
+        modelBuilder.HasSequence("SPtf00001");
+        modelBuilder.HasSequence("SPtf00002");
+        modelBuilder.HasSequence("SQlt00001");
+        modelBuilder.HasSequence("SQlt00002");
+        modelBuilder.HasSequence("SQlt00003");
+        modelBuilder.HasSequence("SQlt00004");
+        modelBuilder.HasSequence("SQlt00005");
+        modelBuilder.HasSequence("SQlt00006");
+        modelBuilder.HasSequence("SQlt00007");
+        modelBuilder.HasSequence("SQlt00008");
+        modelBuilder.HasSequence("SQlt00009");
+        modelBuilder.HasSequence("SQlt00010");
+        modelBuilder.HasSequence("SQlt00011");
+        modelBuilder.HasSequence("SQlt00012");
+        modelBuilder.HasSequence("SQlt00013");
+        modelBuilder.HasSequence("SQlt00014");
+        modelBuilder.HasSequence("SQlt00015");
+        modelBuilder.HasSequence("SQlt00016");
+        modelBuilder.HasSequence("SQlt00017");
+        modelBuilder.HasSequence("SQlt00018");
+        modelBuilder.HasSequence("SQlt00019");
+        modelBuilder.HasSequence("SQlt00020");
+        modelBuilder.HasSequence("SQlt00021");
+        modelBuilder.HasSequence("SQlt00022");
+        modelBuilder.HasSequence("SQry00001");
+        modelBuilder.HasSequence("SQry00002");
+        modelBuilder.HasSequence("SQry00003");
+        modelBuilder.HasSequence("SQry00004");
+        modelBuilder.HasSequence("SQry00005");
+        modelBuilder.HasSequence("SQry00006");
+        modelBuilder.HasSequence("SQry00007");
+        modelBuilder.HasSequence("SQry00008");
+        modelBuilder.HasSequence("SQry00009");
+        modelBuilder.HasSequence("SQry00010");
+        modelBuilder.HasSequence("SRes00001");
+        modelBuilder.HasSequence("SRes00002");
+        modelBuilder.HasSequence("SRes00003");
+        modelBuilder.HasSequence("SRes00005");
+        modelBuilder.HasSequence("SRes00006");
+        modelBuilder.HasSequence("SRes00007");
+        modelBuilder.HasSequence("SRes00008");
+        modelBuilder.HasSequence("SRes00009");
+        modelBuilder.HasSequence("SRes00010");
+        modelBuilder.HasSequence("SRes00011");
+        modelBuilder.HasSequence("SRes00012");
+        modelBuilder.HasSequence("SRes00013").StartsAt(1000L);
+        modelBuilder.HasSequence("SRes00014");
+        modelBuilder.HasSequence("SRes00015");
+        modelBuilder.HasSequence("SRes00016");
+        modelBuilder.HasSequence("SRes00017");
+        modelBuilder.HasSequence("SRes00018");
+        modelBuilder.HasSequence("SRes00019");
+        modelBuilder.HasSequence("SRes00020");
+        modelBuilder.HasSequence("SRes00021");
+        modelBuilder.HasSequence("SRes00022");
+        modelBuilder.HasSequence("SRes00023");
+        modelBuilder.HasSequence("SRes00024").StartsAt(1000L);
+        modelBuilder.HasSequence("SRes00025");
+        modelBuilder.HasSequence("SRes00026");
+        modelBuilder.HasSequence("SRes00027");
+        modelBuilder.HasSequence("SRes00028");
+        modelBuilder.HasSequence("SRes00029");
+        modelBuilder.HasSequence("SRes00030");
+        modelBuilder.HasSequence("SRes00031");
+        modelBuilder.HasSequence("SRes00032");
+        modelBuilder.HasSequence("SRes00033");
+        modelBuilder.HasSequence("SRes00034");
+        modelBuilder.HasSequence("SRes00035");
+        modelBuilder.HasSequence("SRes00036");
+        modelBuilder.HasSequence("SRes00037");
+        modelBuilder.HasSequence("SRes00038");
+        modelBuilder.HasSequence("SRes00039");
+        modelBuilder.HasSequence("SRfc00001");
+        modelBuilder.HasSequence("SScm00001");
+        modelBuilder.HasSequence("SScm00002");
+        modelBuilder.HasSequence("SSfm00001");
+        modelBuilder.HasSequence("SSfm00002");
+        modelBuilder.HasSequence("SSfm00003");
+        modelBuilder.HasSequence("SSfm00004");
+        modelBuilder.HasSequence("SShf00001").StartsAt(1000L);
+        modelBuilder.HasSequence("SShf00002");
+        modelBuilder.HasSequence("SShf00003");
+        modelBuilder.HasSequence("SShf00004");
+        modelBuilder.HasSequence("SShf00005");
+        modelBuilder.HasSequence("SShf00006");
+        modelBuilder.HasSequence("SShf00007");
+        modelBuilder.HasSequence("SShf00008");
+        modelBuilder.HasSequence("SShf00009");
+        modelBuilder.HasSequence("SSns00001");
+        modelBuilder.HasSequence("SSrs00001");
+        modelBuilder.HasSequence("SSrs00002");
+        modelBuilder.HasSequence("SSrs00003");
+        modelBuilder.HasSequence("SSrs00004");
+        modelBuilder.HasSequence("SSrs00005").StartsAt(1000L);
+        modelBuilder.HasSequence("SSrs00006");
+        modelBuilder.HasSequence("SSrs00007");
+        modelBuilder.HasSequence("SSrs00008");
+        modelBuilder.HasSequence("SSrs00009");
+        modelBuilder.HasSequence("SSrs00010");
+        modelBuilder.HasSequence("SSrs00011");
+        modelBuilder.HasSequence("SSrs00012");
+        modelBuilder.HasSequence("SSrs00013").StartsAt(1000L);
+        modelBuilder.HasSequence("SSrs00014");
+        modelBuilder.HasSequence("SSrs00015");
+        modelBuilder.HasSequence("SSrs00016");
+        modelBuilder.HasSequence("SSrs00017");
+        modelBuilder.HasSequence("SSrs00018").StartsAt(1000L);
+        modelBuilder.HasSequence("SSrs00019");
+        modelBuilder.HasSequence("SSrs00020").StartsAt(1000L);
+        modelBuilder.HasSequence("SSys00001");
+        modelBuilder.HasSequence("SSys00002");
+        modelBuilder.HasSequence("SSys00003");
+        modelBuilder.HasSequence("SSys00004");
+        modelBuilder.HasSequence("SSys00005");
+        modelBuilder.HasSequence("SSys00006");
+        modelBuilder.HasSequence("SSys00007");
+        modelBuilder.HasSequence("SSys00008");
+        modelBuilder.HasSequence("SSys00009").StartsAt(90000L);
+        modelBuilder.HasSequence("SSys00010").StartsAt(90000L);
+        modelBuilder.HasSequence("SSys00011").StartsAt(90000L);
+        modelBuilder.HasSequence("SSys00012").StartsAt(90000L);
+        modelBuilder.HasSequence("SSys00013").StartsAt(90000L);
+        modelBuilder.HasSequence("SSys00014");
+        modelBuilder.HasSequence("SSys00015");
+        modelBuilder.HasSequence("SSys00016");
+        modelBuilder.HasSequence("SSysQry011").StartsAt(1000L);
+        modelBuilder.HasSequence("SSysQry012");
+        modelBuilder.HasSequence("SSysQry013");
+        modelBuilder.HasSequence("SSysWks001");
+        modelBuilder.HasSequence("SSysWks002");
+        modelBuilder.HasSequence("SSysWks003");
+        modelBuilder.HasSequence("SSysWks004");
+        modelBuilder.HasSequence("SSysWks005");
+        modelBuilder.HasSequence("SSysWks006");
+        modelBuilder.HasSequence("SSysWks007");
+        modelBuilder.HasSequence("SSysWks008").StartsAt(100000L);
+        modelBuilder.HasSequence("SSysWks009");
+        modelBuilder.HasSequence("SSysWks010");
+        modelBuilder.HasSequence("SSysWks011");
+        modelBuilder.HasSequence("SSysWks012");
+        modelBuilder.HasSequence("STck00001");
+        modelBuilder.HasSequence("STck00002");
+        modelBuilder.HasSequence("STck00003");
+        modelBuilder.HasSequence("STra00001");
+        modelBuilder.HasSequence("STra00002");
+        modelBuilder.HasSequence("STra00003");
+        modelBuilder.HasSequence("SUdm00001");
+        modelBuilder.HasSequence("SUdm00002");
+        modelBuilder.HasSequence("SUdm00003");
+        modelBuilder.HasSequence("SUdm00004");
+        modelBuilder.HasSequence("SUdm00005");
+        modelBuilder.HasSequence("SUdm00006");
+        modelBuilder.HasSequence("SUdm00007");
+        modelBuilder.HasSequence("SUdm00008");
+        modelBuilder.HasSequence("SUif00001");
+        modelBuilder.HasSequence("SUif00002");
+        modelBuilder.HasSequence("SUpf00001");
+        modelBuilder.HasSequence("SUpf00002");
+        modelBuilder.HasSequence("SUpf00003");
+        modelBuilder.HasSequence("SUpf00004");
+        modelBuilder.HasSequence("SWbs00001");
+        modelBuilder.HasSequence("SWbs00002");
+        modelBuilder.HasSequence("SWbs00003");
+        modelBuilder.HasSequence("SWbs00004");
+        modelBuilder.HasSequence("SWbs00005");
+        modelBuilder.HasSequence("SWbs00006");
+        modelBuilder.HasSequence("SWkl00001");
+        modelBuilder.HasSequence("SWkl00002");
+        modelBuilder.HasSequence("SWzd00001");
+        modelBuilder.HasSequence("SWzd00002");
+        modelBuilder.HasSequence("SWzd00003");
+        modelBuilder.HasSequence("SWzd00004");
 
         OnModelCreatingPartial(modelBuilder);
     }

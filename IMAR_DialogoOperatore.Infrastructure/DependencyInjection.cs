@@ -5,7 +5,6 @@ using IMAR_DialogoOperatore.Application.Interfaces.Services.External;
 using IMAR_DialogoOperatore.Application.Interfaces.UoW;
 using IMAR_DialogoOperatore.Application.Interfaces.Utilities;
 using IMAR_DialogoOperatore.Domain.Imar_Produzione;
-using IMAR_DialogoOperatore.Domain.JMes;
 using IMAR_DialogoOperatore.Infrastructure.As400;
 using IMAR_DialogoOperatore.Infrastructure.Imar_Connect;
 using IMAR_DialogoOperatore.Infrastructure.Imar_Produzione;

@@ -63,6 +63,18 @@ public partial class MesEvt
 
     public string MatFlg { get; set; }
 
+    public decimal UndMov { get; set; }
+
+    public decimal OvrLapOpn { get; set; }
+
+    public string LogErr { get; set; }
+
+    public decimal? StsEvtUid { get; set; }
+
+    public decimal LckTim { get; set; }
+
+    public decimal LckQty { get; set; }
+
     public virtual AngDay DtcDayU { get; set; }
 
     public virtual ICollection<MesDiaOpe> MesDiaOpe { get; set; } = new List<MesDiaOpe>();

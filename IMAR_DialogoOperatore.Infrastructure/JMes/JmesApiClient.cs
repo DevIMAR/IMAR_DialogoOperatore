@@ -373,30 +373,6 @@ namespace IMAR_DialogoOperatore.Infrastructure.JMes
             return result;
         }
 
-        public HttpResponseMessage MesEquipStartNotPln(Operatore operatore, string bolla, string codiceFase)
-        {
-            string wizardPath = "?wzdCod=MesEquipStart";
-
-            var entity = new
-            {
-                entity = new
-                {
-                    paramsIO = new
-                    {
-                        qck = true,
-                        clkBdgCod = operatore.Badge,
-                        notPlnCod = codiceFase,
-                        notPlnNotCod = bolla,
-                        clkMacUid = operatore.MacchinaAssegnata.CodiceJMes
-                    }
-                }
-            };
-
-            var urlStartWork = SERVER + WIZARD_WORK_PATH + wizardPath;
-            var result = _jmesClient.PostAsync(urlStartWork, _jsonUtility.BuildJsonContent(entity)).GetAwaiter().GetResult();
-            return result;
-        }
-
         public HttpResponseMessage MesEquipEnd(string badge, double? idJmesAttrezzaggio)
         {
             string wizardPath = "?wzdCod=MesEquipEnd";

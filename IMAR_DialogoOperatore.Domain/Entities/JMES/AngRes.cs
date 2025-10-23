@@ -31,8 +31,6 @@ public partial class AngRes
 
     public string LgnUsr { get; set; }
 
-    public string EmlAdd { get; set; }
-
     public string LgnCrpPwd { get; set; }
 
     public string LgnIpa { get; set; }
@@ -130,6 +128,10 @@ public partial class AngRes
     public decimal? GntSchPtfFltDefUid { get; set; }
 
     public decimal? GntSchPtfCmpFltDefUid { get; set; }
+
+    public string EmlAdd { get; set; }
+
+    public decimal? TeaPlnSrcFltDefUid { get; set; }
 
     public virtual AngBdg Bd { get; set; }
 

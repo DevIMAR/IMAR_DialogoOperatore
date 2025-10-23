@@ -19,8 +19,6 @@ public partial class AngGrp
 
     public string GrpIco { get; set; }
 
-    public string EmlAdd { get; set; }
-
     public decimal LogDel { get; set; }
 
     public DateTime? Tsi { get; set; }
@@ -37,6 +35,14 @@ public partial class AngGrp
 
     public string DisGrpTyp { get; set; }
 
+    public decimal PerNis { get; set; }
+
+    public decimal? CalUid { get; set; }
+
+    public decimal? GrpEff { get; set; }
+
+    public string EmlAdd { get; set; }
+
     public decimal DisDayMinSl1 { get; set; }
 
     public decimal DisDayMinSl2 { get; set; }
@@ -46,12 +52,6 @@ public partial class AngGrp
     public decimal DisDayMinSl4 { get; set; }
 
     public decimal DisDayMinSl5 { get; set; }
-
-    public decimal PerNis { get; set; }
-
-    public decimal? CalUid { get; set; }
-
-    public decimal? GrpEff { get; set; }
 
     public decimal DisDayMinSl6 { get; set; }
 

@@ -38,7 +38,7 @@
 		public const string INGRESSO = "Ingresso";
 		public const string USCITA = "Uscita";
 
-		public const string RILAVORAZIONE_GENERICA = "0001";
+		public const string PREFISSO_RILAVORAZIONE = "RIPASSO";
 
 		public const string ERRORE_MACCHINE_FINITE = "!!! NON CI SONO MACCHINE DISPONIBILI !!!\nCONTATTARE UFFICIO IT";
 

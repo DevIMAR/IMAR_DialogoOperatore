@@ -67,6 +67,8 @@ public partial class MesBckEvtMacDet
 
     public decimal QtyPhsPrv { get; set; }
 
+    public string NotDec { get; set; }
+
     public virtual MesBckEvtDet EvtDetU { get; set; }
 
     public virtual MesBckEvt EvtU { get; set; }

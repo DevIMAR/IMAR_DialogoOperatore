@@ -33,21 +33,8 @@ namespace IMAR_DialogoOperatore.Helpers
 
         public string? ApriFaseNonPianificata(IAttivitaViewModel attivita)
         {
-            string? result = null;
-
-            switch (_dialogoOperatoreObserver.OperazioneInCorso)
-            {
-                case Costanti.INIZIO_ATTREZZAGGIO:
-                    result = _attivitaService.ApriAttrezzaggioFaseNonPianificata(_attivitaMapper.AttivitaViewModelToAttivita(attivita),
-                                                                                 _operatoreMapper.OperatoreViewModelToOperatore(_dialogoOperatoreObserver.OperatoreSelezionato));
-                    break;
-                case Costanti.INIZIO_LAVORO:
-                    result = _attivitaService.ApriLavoroFaseNonPianificata(_attivitaMapper.AttivitaViewModelToAttivita(attivita),
-                                                                           _operatoreMapper.OperatoreViewModelToOperatore(_dialogoOperatoreObserver.OperatoreSelezionato));
-                    break;
-                default:
-                    break;
-            }
+            string? result = _attivitaService.ApriLavoroFaseNonPianificata(_attivitaMapper.AttivitaViewModelToAttivita(attivita),
+                                                                   _operatoreMapper.OperatoreViewModelToOperatore(_dialogoOperatoreObserver.OperatoreSelezionato));
 
             _dialogoOperatoreObserver.OperazioneInCorso = Costanti.NESSUNA;
             _dialogoOperatoreObserver.AttivitaSelezionata = null;
