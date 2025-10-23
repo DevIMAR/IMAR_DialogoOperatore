@@ -45,8 +45,11 @@ namespace IMAR_DialogoOperatore
 			services.AddScoped<CronologiaAttivitaGridViewModel>();
 			services.AddScoped<DialogoOperatoreViewModel>();
 			services.AddScoped<DocumentaleViewModel>();
+			services.AddScoped<GestoreFasiNonPianificateViewModel>();
+			services.AddTransient<FasiAttivitaGridViewModel>();
 			services.AddScoped<FasiIndiretteGridViewModel>();
 			services.AddScoped<FasiIndirettePopupViewModel>();
+			services.AddScoped<FasiNonPianificatePopupViewModel>();
 			services.AddScoped<FormSegnalazioneDifformitaViewModel>();
 			services.AddScoped<GestoreAttivitaViewModel>();
 			services.AddScoped<HeaderToolbarViewModel>();
@@ -71,6 +74,7 @@ namespace IMAR_DialogoOperatore
 			services.AddScoped<InizioLavoroCommand>();
 			services.AddScoped<InviaTaskCommand>();
 			services.AddScoped<MostraIndiretteCommand>();
+			services.AddScoped<MostraFasiNonPianificatePopupCommand>();
 			services.AddScoped<RispostaPopupDiConfermaCommand>();
 			services.AddScoped<ShowEntrateUscitePauseCommand>();
 			services.AddScoped<ShowTaskPopupCommand>();

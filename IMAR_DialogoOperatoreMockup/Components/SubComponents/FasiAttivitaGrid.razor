@@ -1,0 +1,63 @@
+﻿@using IMAR_DialogoOperatore.Interfaces.ViewModels
+@using IMAR_DialogoOperatore.ViewModels
+
+<DxGrid @bind-Data="@FasiAttivitaGridViewModel.AttivitaConStessoOdp"
+		SelectedDataItem="@FasiAttivitaGridViewModel.FaseSelezionata"
+		SelectedDataItemChanged="@SelectedFaseChanged"
+		SelectionMode="GridSelectionMode.Single"
+		AllowSelectRowByClick="@AllowSelectRowByClick"
+		AllowSort="false"
+		PageSize="50">
+	<Columns>
+		<DxGridDataColumn FieldName="@(nameof(AttivitaViewModel.Fase))"
+						  Caption="Fase"
+						  TextAlignment="GridTextAlignment.Center"
+						  Width="10%"
+						  SortIndex="0">
+		</DxGridDataColumn>
+
+		<DxGridDataColumn FieldName="@(nameof(AttivitaViewModel.DescrizioneFase))"
+						  Caption="Descrizione Fase"
+						  TextAlignment="GridTextAlignment.Center"
+						  Width="90%">
+		</DxGridDataColumn>
+	</Columns>
+</DxGrid>
+
+@code {
+	[Parameter] public FasiAttivitaGridViewModel FasiAttivitaGridViewModel { get; set; } = null!;
+	[Parameter] public IAttivitaViewModel? FaseSelezionata { get; set; }
+	[Parameter] public EventCallback<IAttivitaViewModel?> FaseSelezionataChanged { get; set; }
+	[Parameter] public bool AllowSelectRowByClick { get; set; }
+
+	protected override Task OnInitializedAsync()
+	{
+		FasiAttivitaGridViewModel.NotifyStateChanged += FasiAttivitaGridViewModel_NotifyStateChanged;
+
+		return base.OnInitializedAsync();
+	}
+
+	protected override void OnParametersSet()
+	{
+		base.OnParametersSet();
+
+		if (FaseSelezionata != FasiAttivitaGridViewModel.FaseSelezionata)
+			FasiAttivitaGridViewModel.FaseSelezionata = FaseSelezionata;
+	}
+
+	private async void FasiAttivitaGridViewModel_NotifyStateChanged()
+	{
+		await InvokeAsync(StateHasChanged);
+	}
+
+	private async Task SelectedFaseChanged(object? faseSelezionata)
+	{
+		FaseSelezionata = (IAttivitaViewModel?)faseSelezionata;
+		await FaseSelezionataChanged.InvokeAsync(FaseSelezionata);
+	}
+
+	public void Dispose()
+	{
+		FasiAttivitaGridViewModel.NotifyStateChanged -= FasiAttivitaGridViewModel_NotifyStateChanged;
+	}
+}

@@ -2,6 +2,7 @@
 using IMAR_DialogoOperatore.Application.Interfaces.Services.Activities;
 using IMAR_DialogoOperatore.Interfaces.Helpers;
 using IMAR_DialogoOperatore.Interfaces.Observers;
+using IMAR_DialogoOperatore.Interfaces.ViewModels;
 using IMAR_DialogoOperatore.ViewModels;
 
 namespace IMAR_DialogoOperatore.Commands
@@ -10,19 +11,28 @@ namespace IMAR_DialogoOperatore.Commands
     {
         private readonly IDialogoOperatoreObserver _dialogoOperatoreObserver;
         private readonly IPopupObserver _popupObserver;
+        private readonly ICercaAttivitaObserver _cercaAttivitaObserver;
         private readonly ICreaFaseNonPianificataHelper _creaFaseNonPianificataHelper;
         private readonly IMacchinaService _macchinaService;
+        private readonly GestoreFasiNonPianificateViewModel _gestoreFasiNonPianificateViewModel;
 
         public CreaFaseNonPianificataCommand(
             IDialogoOperatoreObserver dialogoOperatoreObserver,
             IPopupObserver popupObserver,
+            ICercaAttivitaObserver cercaAttivitaObserver,
             ICreaFaseNonPianificataHelper creaFaseNonPianificataHelper,
-            IMacchinaService macchinaService)
+            IMacchinaService macchinaService,
+            GestoreFasiNonPianificateViewModel gestoreFasiNonPianificateViewModel)
         {
             _dialogoOperatoreObserver = dialogoOperatoreObserver;
             _popupObserver = popupObserver;
+            _cercaAttivitaObserver = cercaAttivitaObserver;
+
             _creaFaseNonPianificataHelper = creaFaseNonPianificataHelper;
+
             _macchinaService = macchinaService;
+
+            _gestoreFasiNonPianificateViewModel = gestoreFasiNonPianificateViewModel;
         }
 
         public override bool CanExecute(object? parameter)
@@ -30,7 +40,11 @@ namespace IMAR_DialogoOperatore.Commands
             return _dialogoOperatoreObserver.AttivitaSelezionata != null &&
                    !string.IsNullOrWhiteSpace(_dialogoOperatoreObserver.OperazioneInCorso) &&
                    (_dialogoOperatoreObserver.OperazioneInCorso.Equals(Costanti.INIZIO_ATTREZZAGGIO) ||
-                        _dialogoOperatoreObserver.OperazioneInCorso.Equals(Costanti.INIZIO_LAVORO));
+                        _dialogoOperatoreObserver.OperazioneInCorso.Equals(Costanti.INIZIO_LAVORO)) &&
+                   _gestoreFasiNonPianificateViewModel.FaseDiPartenza != null &&
+                   _gestoreFasiNonPianificateViewModel.FaseDiArrivo != null &&
+                   _gestoreFasiNonPianificateViewModel.QuantitaRilavorazione > 0 &&
+                   Int32.Parse(_gestoreFasiNonPianificateViewModel.FaseDiArrivo.Fase) >= Int32.Parse(_gestoreFasiNonPianificateViewModel.FaseDiPartenza.Fase);
         }
 
         public override async void Execute(object? parameter)
@@ -57,10 +71,23 @@ namespace IMAR_DialogoOperatore.Commands
 
         private void EseguiOperazioneOMostraMessaggio()
         {
+            string? result;
+            List<IAttivitaViewModel> rangeFasiAttivita = _cercaAttivitaObserver.AttivitaTrovate.OrderBy(a => a.Fase)
+                                                                                                      .Where(a => Int32.Parse(a.Fase) >= Int32.Parse(_gestoreFasiNonPianificateViewModel.FaseDiPartenza.Fase) &&
+                                                                                                                  Int32.Parse(a.Fase) < Int32.Parse(_gestoreFasiNonPianificateViewModel.FaseDiArrivo.Fase))
+                                                                                                      .ToList();
+            if (!rangeFasiAttivita.Any())
+                rangeFasiAttivita.Add(_gestoreFasiNonPianificateViewModel.FaseDiArrivo);
 
-            string? result = _creaFaseNonPianificataHelper.ApriFaseNonPianificata();
-            if (result != null)
-                MostraPopupConTesto(result);
+            foreach (IAttivitaViewModel attivita in rangeFasiAttivita)
+            {
+                result = _creaFaseNonPianificataHelper.ApriFaseNonPianificata(attivita);
+                if (result != null)
+                {
+                    MostraPopupConTesto(result);
+                    break;
+                }
+            }
         }
 
         private void MostraPopupConTesto(string testo)

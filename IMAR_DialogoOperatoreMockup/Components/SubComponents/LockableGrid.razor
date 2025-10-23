@@ -1,0 +1,74 @@
+﻿<DxGridLayout>
+	<Columns>
+		<DxGridLayoutColumn />
+		<DxGridLayoutColumn />
+		<DxGridLayoutColumn />
+		<DxGridLayoutColumn />
+		<DxGridLayoutColumn />
+		<DxGridLayoutColumn />
+	</Columns>
+
+	<Rows>
+		<DxGridLayoutRow Height="auto" />
+		<DxGridLayoutRow />
+	</Rows>
+
+	<Items>
+		<DxGridLayoutItem Column="1" ColumnSpan="4"
+						  Row="0"
+						  CssClass="mb-2 mt-2">
+			<Template>
+				<div class="d-flex justify-content-center align-items-center h-100 testo-medio">
+					<label>@Titolo</label>
+				</div>
+			</Template>
+		</DxGridLayoutItem>
+
+		<DxGridLayoutItem Column="5"
+						  Row="0">
+			<Template>
+				<div class="d-flex justify-content-center align-items-center h-100">
+					<DxButton Click="@Toggle"
+							  RenderStyle="ButtonRenderStyle.Warning"
+							  RenderStyleMode="ButtonRenderStyleMode.Outline"
+							  CssClass="p-1"
+							  IconCssClass="@_iconCssClass" />
+				</div>
+			</Template>
+		</DxGridLayoutItem>
+
+		<DxGridLayoutItem Column="0" ColumnSpan="6"
+						  Row="1"
+						  CssClass="m-2">
+			<Template>
+				@ChildContent.Invoke(_allowSelectRowByClick)
+			</Template>
+		</DxGridLayoutItem>
+	</Items>
+</DxGridLayout>
+
+@code {
+	[Parameter] public string? Titolo { get; set; }
+	[Parameter] public required RenderFragment<bool> ChildContent { get; set; }
+
+	private string _iconCssClass;
+	bool _allowSelectRowByClick;
+
+	protected override void OnInitialized()
+	{
+		base.OnInitialized();
+
+		_allowSelectRowByClick = false;
+		_iconCssClass = "icon icon-lucchettoChiuso";
+	}
+
+	private void Toggle()
+	{
+		_allowSelectRowByClick = !_allowSelectRowByClick;
+
+		if (_allowSelectRowByClick)
+			_iconCssClass = "icon icon-lucchettoAperto";
+		else
+			_iconCssClass = "icon icon-lucchettoChiuso";
+	}
+}

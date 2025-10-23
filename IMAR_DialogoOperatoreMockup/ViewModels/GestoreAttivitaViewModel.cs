@@ -21,7 +21,7 @@ namespace IMAR_DialogoOperatore.ViewModels
 			IDialogoOperatoreObserver dialogoOperatoreObserver,
 			ICercaAttivitaObserver cercaAttivitaObserver,
 			ConfermaCommand confermaCommand,
-			CreaFaseNonPianificataCommand creaFaseNonPianificataCommand)
+			MostraFasiNonPianificatePopupCommand creaFaseNonPianificataCommand)
         {
 			_dialogoOperatoreObserver = dialogoOperatoreObserver;
 			_cercaAttivitaObserver = cercaAttivitaObserver;
@@ -32,9 +32,10 @@ namespace IMAR_DialogoOperatore.ViewModels
 
             _dialogoOperatoreObserver.OnAttivitaSelezionataChanged += AttivitaStore_OnAttivitaSelezionataChanged;
 			_dialogoOperatoreObserver.OnOperazioneInCorsoChanged += DialogoOperatoreStore_OnOperazioneInCorsoChanged;
+            _dialogoOperatoreObserver.OnOperatoreSelezionatoChanged += DialogoOperatoreObserver_OnOperatoreSelezionatoChanged;
 		}
 
-		private void DialogoOperatoreStore_OnOperazioneInCorsoChanged()
+        private void DialogoOperatoreStore_OnOperazioneInCorsoChanged()
 		{
 			if (!(_dialogoOperatoreObserver.OperazioneInCorso == Costanti.AVANZAMENTO || 
 					_dialogoOperatoreObserver.OperazioneInCorso == Costanti.INIZIO_LAVORO || 
@@ -45,6 +46,12 @@ namespace IMAR_DialogoOperatore.ViewModels
 
             OnNotifyStateChanged();
 		}
+
+        private void DialogoOperatoreObserver_OnOperatoreSelezionatoChanged()
+        {
+            _dialogoOperatoreObserver.IsDettaglioAttivitaOpen = IsOpen;
+            OnNotifyStateChanged();
+        }
 
 		private void AttivitaStore_OnAttivitaSelezionataChanged()
 		{

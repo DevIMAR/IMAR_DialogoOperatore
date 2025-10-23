@@ -1,0 +1,77 @@
+﻿@using IMAR_DialogoOperatore.Application
+@using IMAR_DialogoOperatore.Application.Interfaces.Utilities
+@using IMAR_DialogoOperatore.Components.SubComponents
+@using IMAR_DialogoOperatore.Interfaces.Observers
+@using IMAR_DialogoOperatore.ViewModels
+
+@inject FasiNonPianificatePopupViewModel FasiNonPianificatePopupViewModel
+@inject IDialogoOperatoreObserver DialogoOperatoreObserver
+@inject IAutoLogoutUtility AutoLogoutUtility
+
+<DxPopup @bind-Visible="@FasiNonPianificatePopupViewModel.MostraPopup"
+		 Width="40%"
+		 ShowCloseButton="false"
+		 CloseOnEscape="false"
+		 CloseOnOutsideClick="false"
+		 ShowFooter="true"
+		 @onkeydown="RestartAutoLogoutTimer"
+		 @onclick="RestartAutoLogoutTimer"
+		 @onmousemove="RestartAutoLogoutTimer"
+		 @onmousedown="RestartAutoLogoutTimer">
+	<BodyContentTemplate>
+		<GestoreFasiNonPianificate OnStateChanged="@(async () => await InvokeAsync(StateHasChanged))" />
+	</BodyContentTemplate>
+
+	<FooterContentTemplate>
+		<DxButton Text="Annulla"
+				  Click="@AnnullaHandler"
+				  RenderStyle="ButtonRenderStyle.Warning"
+				  RenderStyleMode="ButtonRenderStyleMode.Outline"
+				  CssClass="d-flex justify-content-center align-items-center conferma-dettagli" />
+
+		<DxButton Text="Conferma"
+				  Click="@ConfermaHandler"
+				  Enabled="@FasiNonPianificatePopupViewModel.ConfermaCommand.CanExecute(null)"
+				  RenderStyle="ButtonRenderStyle.Warning"
+				  CssClass="d-flex justify-content-center align-items-center conferma-dettagli" />
+	</FooterContentTemplate>
+</DxPopup>
+
+@code {
+	protected override Task OnInitializedAsync()
+	{
+		FasiNonPianificatePopupViewModel.NotifyStateChanged += FasiIndirettePopupViewModel_NotifyStateChanged;
+
+		return base.OnInitializedAsync();
+	}
+
+	private async void FasiIndirettePopupViewModel_NotifyStateChanged()
+	{
+		await InvokeAsync(StateHasChanged);
+	}
+
+	private void RestartAutoLogoutTimer()
+	{
+		if (isRestartTimerActive())
+			AutoLogoutUtility.RestartTimer();
+	}
+
+	private bool isRestartTimerActive()
+	{
+		return AutoLogoutUtility.IsActive &&
+			   DialogoOperatoreObserver.OperatoreSelezionato != null &&
+			   DialogoOperatoreObserver.OperatoreSelezionato.Stato != Costanti.ASSENTE &&
+			   DialogoOperatoreObserver.OperatoreSelezionato.Stato != Costanti.IN_PAUSA;
+	}
+
+	void AnnullaHandler()
+	{
+		FasiNonPianificatePopupViewModel.MostraPopup = false;
+	}
+
+	void ConfermaHandler()
+	{
+		FasiNonPianificatePopupViewModel.ConfermaCommand.Execute(null);
+		FasiNonPianificatePopupViewModel.MostraPopup = false;
+	}
+}

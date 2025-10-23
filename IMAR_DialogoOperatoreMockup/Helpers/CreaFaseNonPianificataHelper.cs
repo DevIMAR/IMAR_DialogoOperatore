@@ -1,10 +1,10 @@
 ﻿using IMAR_DialogoOperatore.Application;
 using IMAR_DialogoOperatore.Application.Interfaces.Services.Activities;
 using IMAR_DialogoOperatore.Domain.Models;
-using IMAR_DialogoOperatore.Infrastructure.Services;
 using IMAR_DialogoOperatore.Interfaces.Helpers;
 using IMAR_DialogoOperatore.Interfaces.Mappers;
 using IMAR_DialogoOperatore.Interfaces.Observers;
+using IMAR_DialogoOperatore.Interfaces.ViewModels;
 using IMAR_DialogoOperatore.ViewModels;
 
 namespace IMAR_DialogoOperatore.Helpers
@@ -31,18 +31,18 @@ namespace IMAR_DialogoOperatore.Helpers
             _dialogoOperatoreObserver = dialogoOperatoreObserver;
         }
 
-        public string? ApriFaseNonPianificata()
+        public string? ApriFaseNonPianificata(IAttivitaViewModel attivita)
         {
             string? result = null;
 
             switch (_dialogoOperatoreObserver.OperazioneInCorso)
             {
                 case Costanti.INIZIO_ATTREZZAGGIO:
-                    result = _attivitaService.ApriAttrezzaggioFaseNonPianificata(_attivitaMapper.AttivitaViewModelToAttivita(_dialogoOperatoreObserver.AttivitaSelezionata),
+                    result = _attivitaService.ApriAttrezzaggioFaseNonPianificata(_attivitaMapper.AttivitaViewModelToAttivita(attivita),
                                                                                  _operatoreMapper.OperatoreViewModelToOperatore(_dialogoOperatoreObserver.OperatoreSelezionato));
                     break;
                 case Costanti.INIZIO_LAVORO:
-                    result = _attivitaService.ApriLavoroFaseNonPianificata(_attivitaMapper.AttivitaViewModelToAttivita(_dialogoOperatoreObserver.AttivitaSelezionata),
+                    result = _attivitaService.ApriLavoroFaseNonPianificata(_attivitaMapper.AttivitaViewModelToAttivita(attivita),
                                                                            _operatoreMapper.OperatoreViewModelToOperatore(_dialogoOperatoreObserver.OperatoreSelezionato));
                     break;
                 default:

@@ -42,5 +42,7 @@
 
 		public const string ERRORE_MACCHINE_FINITE = "!!! NON CI SONO MACCHINE DISPONIBILI !!!\nCONTATTARE UFFICIO IT";
 
+		public const string TAGLIO = "LASER";
+		public const string SPELATURA = "SPELATURA";
     }
 }

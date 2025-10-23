@@ -1,5 +1,4 @@
 ﻿using IMAR_DialogoOperatore.Application;
-using IMAR_DialogoOperatore.Application.Interfaces.Utilities;
 using IMAR_DialogoOperatore.Interfaces.Observers;
 using IMAR_DialogoOperatore.Interfaces.ViewModels;
 
@@ -8,7 +7,6 @@ namespace IMAR_DialogoOperatore.ViewModels
     public class AttivitaDetailsViewModel : ViewModelBase
 	{
 		private readonly IDialogoOperatoreObserver _dialogoOperatoreObserver;
-		private readonly IAutoLogoutUtility _autoLogoutUtility;
 		private IAttivitaViewModel? _attivitaSelezionata;
 		private bool _isRiaperturaAttiva;
 		private bool _isAperturaLavoroAutomaticaAttiva;
@@ -52,12 +50,9 @@ namespace IMAR_DialogoOperatore.ViewModels
 		}
 
 		public AttivitaDetailsViewModel(
-			IDialogoOperatoreObserver dialogoOperatoreStore,
-			IAutoLogoutUtility autoLogoutUtility)
+			IDialogoOperatoreObserver dialogoOperatoreStore)
         {
             _dialogoOperatoreObserver = dialogoOperatoreStore;
-
-            _autoLogoutUtility = autoLogoutUtility;
 
             _dialogoOperatoreObserver.OnAttivitaSelezionataChanged += DialogoOperatoreStore_OnAttivitaSelezionataChanged;
             _dialogoOperatoreObserver.OnIsRiaperturaAttivaChanged += DialogoOperatoreObserver_OnIsRiaperturaAttivaChanged;

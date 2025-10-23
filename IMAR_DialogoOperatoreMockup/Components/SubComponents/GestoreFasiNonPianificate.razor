@@ -1,0 +1,102 @@
+﻿@using IMAR_DialogoOperatore.ViewModels
+
+@inject GestoreFasiNonPianificateViewModel GestoreFasiNonPianificateViewModel
+
+<DxGridLayout>
+	<Columns>
+		<DxGridLayoutColumn />
+		<DxGridLayoutColumn />
+		<DxGridLayoutColumn />
+		<DxGridLayoutColumn />
+	</Columns>
+
+	<Rows>
+		<DxGridLayoutRow Height="auto" />
+		<DxGridLayoutRow />
+		<DxGridLayoutRow />
+	</Rows>
+
+	<Items>
+		<DxGridLayoutItem Column="0" ColumnSpan="2"
+						  Row="0"
+						  CssClass="m-2">
+			<Template>
+				<LockableGrid Titolo="FASE DI PARTENZA">
+					<ChildContent Context="allow">
+						<FasiAttivitaGrid FasiAttivitaGridViewModel="@GestoreFasiNonPianificateViewModel.FasiDiPartenzaGridViewModel"
+										  AllowSelectRowByClick="@allow"
+										  @bind-FaseSelezionata="GestoreFasiNonPianificateViewModel.FaseDiPartenza" />
+					</ChildContent>
+				</LockableGrid>
+			</Template>
+		</DxGridLayoutItem>
+
+		<DxGridLayoutItem Column="2" ColumnSpan="2"
+						  Row="0"
+						  CssClass="m-2">
+			<Template>
+				<LockableGrid Titolo="FASE DI ARRIVO">
+					<ChildContent Context="allow">
+						<FasiAttivitaGrid FasiAttivitaGridViewModel="@GestoreFasiNonPianificateViewModel.FasiDiArrivoGridViewModel"
+										  AllowSelectRowByClick="@allow"
+										  @bind-FaseSelezionata="GestoreFasiNonPianificateViewModel.FaseDiArrivo" />
+					</ChildContent>
+				</LockableGrid>
+			</Template>
+		</DxGridLayoutItem>
+
+		<DxGridLayoutItem Column="0"
+						  Row="1"
+						  CssClass="mb-2">
+			<Template>
+				<div class="d-flex justify-content-center align-items-center h-100 testo-medio">
+					<label>QUANTITA</label>
+				</div>
+			</Template>
+		</DxGridLayoutItem>
+
+		<DxGridLayoutItem Column="0"
+						  Row="2"
+						  CssClass="ms-2">
+			<Template>
+				<DxSpinEdit AllowMouseWheel="false"
+							ShowSpinButtons="false"
+							@bind-Value="GestoreFasiNonPianificateViewModel.QuantitaRilavorazione"
+							BindValueMode="BindValueMode.OnInput"
+							MinValue="1"
+							MaxValue="@GestoreFasiNonPianificateViewModel.MaxQuantita" />
+			</Template>
+		</DxGridLayoutItem>
+	</Items>
+</DxGridLayout>
+
+@code {
+	[Parameter] public EventCallback OnStateChanged { get; set; }
+
+	protected override Task OnInitializedAsync()
+	{
+		GestoreFasiNonPianificateViewModel.NotifyStateChanged += GestoreFasiNonPianificateViewModel_NotifyStateChanged;
+
+		return base.OnInitializedAsync();
+	}
+
+	protected override void OnAfterRender(bool firstRender)
+	{
+		base.OnAfterRender(firstRender);
+
+		if (firstRender)
+			GestoreFasiNonPianificateViewModel.Initialize();
+	}
+
+	protected override void OnParametersSet()
+	{
+		base.OnParametersSet();
+	}
+
+	private async void GestoreFasiNonPianificateViewModel_NotifyStateChanged()
+	{
+		await InvokeAsync(StateHasChanged);
+
+		await OnStateChanged.InvokeAsync();
+	}
+}
