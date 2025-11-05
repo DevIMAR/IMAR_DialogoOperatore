@@ -2,7 +2,7 @@
 #nullable disable
 using System;
 using System.Collections.Generic;
-using IMAR_DialogoOperatore.Domain.Models;
+using IMAR_DialogoOperatore.Domain.Entities.Imar_Schdulazione;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
@@ -14,7 +14,7 @@ public partial class ImarSchedulatoreContext : DbContext
 
     public ImarSchedulatoreContext(
         DbContextOptions<ImarSchedulatoreContext> options,
-            IConfiguration configuration)
+        IConfiguration configuration)
         : base(options)
     {
         _configuration = configuration;
@@ -26,79 +26,24 @@ public partial class ImarSchedulatoreContext : DbContext
         optionsBuilder.UseSqlServer(_configuration["ConnectionStrings:imarSchedulatore"]);
     }
 
-    public virtual DbSet<DATIMONITOR> DATIMONITOR { get; set; }
+    public virtual DbSet<CAL_FL_ODP> CAL_FL_ODP { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<DATIMONITOR>(entity =>
+        modelBuilder.Entity<CAL_FL_ODP>(entity =>
         {
-            entity.HasKey(e => new { e.GIORNO, e.ODP, e.FASE }).HasName("PK_DATIMONITOR_1");
+            entity.HasKey(e => new { e.GIORNO, e.ODP, e.FASE, e.SOVRACCARICO }).HasName("CAL/FL/ODP$PrimaryKey");
+
+            entity.ToTable("CAL/FL/ODP");
+
+            entity.HasIndex(e => e.GIORNO, "CAL/FL/ODP$CAL/FL/ODPGIORNO");
+
+            entity.HasIndex(e => e.ODP, "CAL/FL/ODP$CAL/FL/ODPODP");
 
             entity.Property(e => e.GIORNO).HasColumnType("datetime");
-            entity.Property(e => e.ODP)
-                .HasMaxLength(8)
-                .IsUnicode(false)
-                .IsFixedLength();
-            entity.Property(e => e.ARTICOLO)
-                .HasMaxLength(30)
-                .IsUnicode(false)
-                .IsFixedLength();
-            entity.Property(e => e.CDOPERAT)
-                .HasMaxLength(80)
-                .IsUnicode(false)
-                .IsFixedLength();
-            entity.Property(e => e.DATA_RIFERIMENTO).HasColumnType("datetime");
-            entity.Property(e => e.DESCRIZIONE_ARTICOLO)
-                .HasMaxLength(100)
-                .IsUnicode(false)
-                .IsFixedLength();
-            entity.Property(e => e.DESCRIZIONE_FASE)
-                .HasMaxLength(100)
-                .IsUnicode(false)
-                .IsFixedLength();
-            entity.Property(e => e.DISPONIBILE)
-                .HasMaxLength(40)
-                .IsUnicode(false)
-                .IsFixedLength();
-            entity.Property(e => e.FASE_PREC)
-                .HasMaxLength(40)
-                .IsUnicode(false)
-                .IsFixedLength();
-            entity.Property(e => e.FLUSSO)
-                .HasMaxLength(2)
-                .IsUnicode(false)
-                .IsFixedLength();
-            entity.Property(e => e.FLUSSO_PREC)
-                .HasMaxLength(2)
-                .IsUnicode(false)
-                .IsFixedLength();
-            entity.Property(e => e.FLUSSO_SUC)
-                .HasMaxLength(5)
-                .IsUnicode(false)
-                .IsFixedLength();
-            entity.Property(e => e.GIORNO_CONSEGNA).HasColumnType("datetime");
-            entity.Property(e => e.INFO)
-                .HasMaxLength(80)
-                .IsUnicode(false)
-                .IsFixedLength();
-            entity.Property(e => e.MATERIALE).IsUnicode(false);
-            entity.Property(e => e.NOTE).IsUnicode(false);
-            entity.Property(e => e.NOTE_GEN)
-                .HasMaxLength(250)
-                .IsUnicode(false)
-                .IsFixedLength();
-            entity.Property(e => e.ORDINAMENTO_MANUALE).IsUnicode(false);
-            entity.Property(e => e.PRIORITA)
-                .HasMaxLength(80)
-                .IsUnicode(false)
-                .IsFixedLength();
-            entity.Property(e => e.STATO)
-                .HasMaxLength(50)
-                .IsUnicode(false)
-                .IsFixedLength();
-            entity.Property(e => e.TEMPO_STO).HasColumnType("decimal(9, 2)");
-            entity.Property(e => e.T_ATT_FASE).HasColumnType("decimal(9, 2)");
-            entity.Property(e => e.T_LAV).HasColumnType("decimal(9, 2)");
+            entity.Property(e => e.ODP).HasMaxLength(255);
+            entity.Property(e => e.SOVRACCARICO).HasAnnotation("Relational:DefaultConstraintName", "DF__CAL/FL/OD__SOVRA__40058253");
+            entity.Property(e => e.FLUSSO).HasMaxLength(255);
         });
 
         OnModelCreatingPartial(modelBuilder);

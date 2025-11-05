@@ -1,6 +1,6 @@
 ﻿using IMAR_DialogoOperatore.Application.Interfaces.Repositories;
 using IMAR_DialogoOperatore.Application.Interfaces.UoW;
-using IMAR_DialogoOperatore.Domain.Models;
+using IMAR_DialogoOperatore.Domain.Entities.Imar_Schdulazione;
 
 namespace IMAR_DialogoOperatore.Infrastructure.Imar_Schedulatore
 {
@@ -8,14 +8,14 @@ namespace IMAR_DialogoOperatore.Infrastructure.Imar_Schedulatore
     {
         private ImarSchedulatoreContext _context;
 
-        private readonly IGenericRepository<DATIMONITOR> _datiMonitorRepository;
+        private readonly IGenericRepository<CAL_FL_ODP> _calFlOdpRepository;
 
         public ImarSchedulatoreUoW(
             ImarSchedulatoreContext context)
         {
             _context = context;
         }
-        public IGenericRepository<DATIMONITOR> DatiMonitorRepository => _datiMonitorRepository ?? new GenericRepository<DATIMONITOR>(_context);
+        public IGenericRepository<CAL_FL_ODP> CalFlOdpRepository => _calFlOdpRepository ?? new GenericRepository<CAL_FL_ODP>(_context);
 
         public void Dispose()
         {

@@ -26,6 +26,7 @@ namespace IMAR_DialogoOperatore.ViewModels
 		public double? CodiceJMes => _attivita?.CodiceJMes;
 		public Macchina? Macchina => _attivita?.Macchina;
 		public string CausaleEstesa => _attivita?.CausaleEstesa;
+        public DateTime? DataSchedulata => _attivita?.DataSchedulata;
         public DateTime? InizioAttivita => _attivita?.InizioAttivita;
 		public DateTime? FineAttivita => _attivita?.FineAttivita;
 

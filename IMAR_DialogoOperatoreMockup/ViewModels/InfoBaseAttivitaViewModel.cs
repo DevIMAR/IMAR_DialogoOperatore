@@ -1,4 +1,5 @@
-﻿using IMAR_DialogoOperatore.Commands;
+﻿using IMAR_DialogoOperatore.Application;
+using IMAR_DialogoOperatore.Commands;
 using IMAR_DialogoOperatore.Interfaces.Helpers;
 using IMAR_DialogoOperatore.Interfaces.Observers;
 using IMAR_DialogoOperatore.Interfaces.ViewModels;
@@ -23,8 +24,12 @@ namespace IMAR_DialogoOperatore.ViewModels
         public string? Articolo => _attivitaSelezionata != null ? _attivitaSelezionata.Articolo : string.Empty;
         public string? DescrizioneArticolo => _attivitaSelezionata != null ? _attivitaSelezionata.DescrizioneArticolo : string.Empty;
         public string? DescrizioneFase => _attivitaSelezionata != null ? _attivitaSelezionata.DescrizioneFase : string.Empty;
+        public string? DataSchedulata => _attivitaSelezionata != null ? _attivitaSelezionata.DataSchedulata?.ToString("dd/MM/yyyy") : string.Empty;
         public bool IsAttivitaSelezionata => _dialogoOperatoreObserver.AttivitaSelezionata?.Bolla == Bolla &&
                                              _dialogoOperatoreObserver.AttivitaSelezionata?.Odp == Odp;
+        public bool IsDataSchedulataLontana => _attivitaSelezionata?.DataSchedulata > DateTime.Today.AddDays(10);
+
+        public string TestoDataLontana => Costanti.TESTO_DATA_LONTANA;
 
         public string? Bolla
         {

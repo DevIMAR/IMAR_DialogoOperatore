@@ -44,5 +44,7 @@
 
 		public const string TAGLIO = "LASER";
 		public const string SPELATURA = "SPELATURA";
+
+		public const string TESTO_DATA_LONTANA = "L'odp selezionato ha una data schedulata maggiore di 10 giorni";
     }
 }

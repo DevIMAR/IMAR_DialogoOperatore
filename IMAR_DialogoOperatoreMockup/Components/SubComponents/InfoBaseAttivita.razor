@@ -9,12 +9,14 @@
 	<Rows>
 		<DxGridLayoutRow Height="auto"/>
 		<DxGridLayoutRow Height="auto"/>
-		<DxGridLayoutRow Height="auto"/>
-		<DxGridLayoutRow Height="auto"/>
+		<DxGridLayoutRow Height="auto" Visible="@ShowArticolo"/>
+		<DxGridLayoutRow Height="auto" Visible="@ShowArticolo" />
 		<DxGridLayoutRow Height="auto" Visible="@ShowDescrizioni"/>
 		<DxGridLayoutRow Height="auto" Visible="@ShowDescrizioni"/>
 		<DxGridLayoutRow Height="auto" Visible="@ShowDescrizioni"/>
 		<DxGridLayoutRow Height="auto" Visible="@ShowDescrizioni"/>
+		<DxGridLayoutRow Height="auto" Visible="@ShowDataSchedulata"/>
+		<DxGridLayoutRow Height="auto" Visible="@ShowDataSchedulata" />
 	</Rows>
 
 	<Columns>
@@ -155,6 +157,37 @@
 				</Template>
 			</DxGridLayoutItem>
 		}
+
+		@if (ShowDataSchedulata)
+		{
+			<DxGridLayoutItem Row="8"
+							  Column="0">
+				<Template>
+					<div class="d-flex justify-content-center align-items-center h-100 testo-piccolo mt-2">
+						<label>DATA SCHEDULATA</label>
+					</div>
+				</Template>
+			</DxGridLayoutItem>
+
+			<DxGridLayoutItem Row="9"
+							  Column="0">
+				<Template>
+					<DxTextBox Text="@(InfoBaseAttivitaViewModel.DataSchedulata)"
+							   Enabled="false"
+							   CssClass="dxbl-text-edit mt-2" />
+				</Template>
+			</DxGridLayoutItem>
+
+			<DxGridLayoutItem Row="8" RowSpan="2"
+							  Column="1"
+							  Visible="@(InfoBaseAttivitaViewModel.IsDataSchedulataLontana)">
+				<Template>
+					<div class="d-flex justify-content-center align-items-center h-100 testo-piccolo ms-2 mt-2 rosso">
+						@InfoBaseAttivitaViewModel.TestoDataLontana
+					</div>
+				</Template>
+			</DxGridLayoutItem>
+		}
 	</Items>
 </DxGridLayout>
 
@@ -162,6 +195,7 @@
 	[Parameter] public EventCallback InfoBaseInserite { get; set; }
 	[Parameter] public bool ShowArticolo { get; set; } = false;
 	[Parameter] public bool ShowDescrizioni { get; set; } = false;
+	[Parameter] public bool ShowDataSchedulata { get; set; } = false;
 	[Parameter] public bool ShowBottoneIndirette { get; set; } = false;
 
 	private DxMaskedInput<string?> BollaRef;

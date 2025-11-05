@@ -11,7 +11,7 @@
 					   Enabled="@PulsantieraGeneraleViewModel.IngressoUscitaCommand.CanExecute(null)"
 					   Visible="@PulsantieraGeneraleViewModel.IsAssente">
 			<div style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
-				<i class="icon icon-login icon-verde" style="font-size:60px; margin-bottom:4px;"></i>
+				<i class="icon icon-login verde" style="font-size:60px; margin-bottom:4px;"></i>
 				<div style="text-align:center; line-height:1.2; font-weight: bold"
 					 class="testo-medio">
 					<p style="margin:0;">Entrata</p>
@@ -26,7 +26,7 @@
 					   Enabled="@PulsantieraGeneraleViewModel.IngressoUscitaCommand.CanExecute(null)"
 					   Visible="@(!PulsantieraGeneraleViewModel.IsAssente)">
 			<div style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
-				<i class="icon icon-logout icon-rosso" style="font-size:60px; margin-bottom:4px;"></i>
+				<i class="icon icon-logout rosso" style="font-size:60px; margin-bottom:4px;"></i>
 				<div style="text-align:center; line-height:1.2; font-weight: bold"
 					 class="testo-medio">
 					<p style="margin:0;">Uscita</p>
@@ -40,7 +40,7 @@
 					   Click="@PulsantieraGeneraleViewModel.InizioLavoroCommand.Execute"
 					   Enabled="@PulsantieraGeneraleViewModel.InizioLavoroCommand.CanExecute(null)">
 			<div style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
-				<i class="icon icon-hammerAdd icon-lime" style="font-size:60px; margin-bottom:4px;"></i>
+				<i class="icon icon-hammerAdd lime" style="font-size:60px; margin-bottom:4px;"></i>
 				<div style="text-align:center; line-height:1.2; font-weight: bold"
 					 class="testo-medio">
 					<p style="margin:0;">Inizio lavoro</p>
@@ -54,7 +54,7 @@
 					   Click="@PulsantieraGeneraleViewModel.FineLavoroCommand.Execute"
 					   Enabled="@PulsantieraGeneraleViewModel.FineLavoroCommand.CanExecute(null)">
 			<div style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
-				<i class="icon icon-hammerDone icon-blu" style="font-size:60px; margin-bottom:4px;"></i>
+				<i class="icon icon-hammerDone blu" style="font-size:60px; margin-bottom:4px;"></i>
 				<div style="text-align:center; line-height:1.2; font-weight: bold"
 					 class="testo-medio">
 					<p style="margin:0;">Fine lavoro</p>
@@ -68,7 +68,7 @@
 					   Click="@PulsantieraGeneraleViewModel.AvanzamentoCommand.Execute"
 					   Enabled="@PulsantieraGeneraleViewModel.AvanzamentoCommand.CanExecute(null)">
 			<div style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
-				<i class="icon icon-advance icon-grigioBlu" style="font-size:60px; margin-bottom:4px;"></i>
+				<i class="icon icon-advance grigioBlu" style="font-size:60px; margin-bottom:4px;"></i>
 				<div style="text-align:center; line-height:1.2; font-weight: bold"
 					 class="testo-medio">
 					<p style="margin:0;">Avanzamento</p>
@@ -82,7 +82,7 @@
 					   Click="@PulsantieraGeneraleViewModel.InizioFinePausaCommand.Execute"
 					   Enabled="@PulsantieraGeneraleViewModel.InizioFinePausaCommand.CanExecute(!PulsantieraGeneraleViewModel.IsInPausa)">
 			<div style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
-				<i class="icon icon-coffee icon-giallo" style="font-size:60px; margin-bottom:4px;"></i>
+				<i class="icon icon-coffee giallo" style="font-size:60px; margin-bottom:4px;"></i>
 				<div style="text-align:center; line-height:1.2; font-weight: bold"
 					 class="testo-medio">
 					<p style="margin:0;">Inizio pausa</p>
@@ -96,7 +96,7 @@
 					   Click="@PulsantieraGeneraleViewModel.InizioFinePausaCommand.Execute"
 					   Enabled="@PulsantieraGeneraleViewModel.InizioFinePausaCommand.CanExecute(PulsantieraGeneraleViewModel.IsInPausa)">
 			<div style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
-				<i class="icon icon-coffeeEmpty icon-giallo" style="font-size:60px; margin-bottom:4px;"></i>
+				<i class="icon icon-coffeeEmpty giallo" style="font-size:60px; margin-bottom:4px;"></i>
 				<div style="text-align:center; line-height:1.2; font-weight: bold"
 					 class="testo-medio">
 					<p style="margin:0;">Fine pausa</p>
@@ -110,7 +110,7 @@
 					   Click="@PulsantieraGeneraleViewModel.InizioAttrezzaggioCommand.Execute"
 					   Enabled="@PulsantieraGeneraleViewModel.InizioAttrezzaggioCommand.CanExecute(null)">
 			<div style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
-				<i class="icon icon-wrenchAdd icon-lime" style="font-size:60px; margin-bottom:4px;"></i>
+				<i class="icon icon-wrenchAdd lime" style="font-size:60px; margin-bottom:4px;"></i>
 				<div style="text-align:center; line-height:1.2; font-weight: bold"
 					 class="testo-medio">
 					<p style="margin:0;">Inizio</p>
@@ -125,7 +125,7 @@
 					   Click="@PulsantieraGeneraleViewModel.FineAttrezzaggioCommand.Execute"
 					   Enabled="@PulsantieraGeneraleViewModel.FineAttrezzaggioCommand.CanExecute(null)">
 			<div style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
-				<i class="icon icon-wrenchDone icon-blu" style="font-size:60px; margin-bottom:4px;"></i>
+				<i class="icon icon-wrenchDone blu" style="font-size:60px; margin-bottom:4px;"></i>
 				<div style="text-align:center; line-height:1.2; font-weight: bold"
 					 class="testo-medio">
 					<p style="margin:0;">Fine</p>
@@ -140,7 +140,7 @@
 					   Click="@PulsantieraGeneraleViewModel.AnnulaOperazioneCommand.Execute"
 					   Enabled="@PulsantieraGeneraleViewModel.AnnulaOperazioneCommand.CanExecute(null)">
 			<div style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
-				<i class="icon icon-cancel icon-arancione" style="font-size:60px; margin-bottom:4px;"></i>
+				<i class="icon icon-cancel arancione" style="font-size:60px; margin-bottom:4px;"></i>
 				<div style="text-align:center; line-height:1.2; font-weight: bold"
 					 class="testo-medio">
 					<p style="margin:0;">Annulla</p>
