@@ -14,15 +14,13 @@ namespace IMAR_DialogoOperatore.Commands
         private readonly ICercaAttivitaObserver _cercaAttivitaObserver;
         private readonly ICreaFaseNonPianificataHelper _creaFaseNonPianificataHelper;
         private readonly IMacchinaService _macchinaService;
-        private readonly GestoreFasiNonPianificateViewModel _gestoreFasiNonPianificateViewModel;
 
         public CreaFaseNonPianificataCommand(
             IDialogoOperatoreObserver dialogoOperatoreObserver,
             IPopupObserver popupObserver,
             ICercaAttivitaObserver cercaAttivitaObserver,
             ICreaFaseNonPianificataHelper creaFaseNonPianificataHelper,
-            IMacchinaService macchinaService,
-            GestoreFasiNonPianificateViewModel gestoreFasiNonPianificateViewModel)
+            IMacchinaService macchinaService)
         {
             _dialogoOperatoreObserver = dialogoOperatoreObserver;
             _popupObserver = popupObserver;
@@ -31,8 +29,6 @@ namespace IMAR_DialogoOperatore.Commands
             _creaFaseNonPianificataHelper = creaFaseNonPianificataHelper;
 
             _macchinaService = macchinaService;
-
-            _gestoreFasiNonPianificateViewModel = gestoreFasiNonPianificateViewModel;
         }
 
         public override bool CanExecute(object? parameter)
@@ -40,11 +36,7 @@ namespace IMAR_DialogoOperatore.Commands
             return _dialogoOperatoreObserver.AttivitaSelezionata != null &&
                    !string.IsNullOrWhiteSpace(_dialogoOperatoreObserver.OperazioneInCorso) &&
                    (_dialogoOperatoreObserver.OperazioneInCorso.Equals(Costanti.INIZIO_ATTREZZAGGIO) ||
-                        _dialogoOperatoreObserver.OperazioneInCorso.Equals(Costanti.INIZIO_LAVORO)) &&
-                   _gestoreFasiNonPianificateViewModel.FaseDiPartenza != null &&
-                   _gestoreFasiNonPianificateViewModel.FaseDiArrivo != null &&
-                   _gestoreFasiNonPianificateViewModel.QuantitaRilavorazione > 0 &&
-                   Int32.Parse(_gestoreFasiNonPianificateViewModel.FaseDiArrivo.Fase) >= Int32.Parse(_gestoreFasiNonPianificateViewModel.FaseDiPartenza.Fase);
+                        _dialogoOperatoreObserver.OperazioneInCorso.Equals(Costanti.INIZIO_LAVORO));
         }
 
         public override async void Execute(object? parameter)
@@ -72,22 +64,10 @@ namespace IMAR_DialogoOperatore.Commands
         private void EseguiOperazioneOMostraMessaggio()
         {
             string? result;
-            List<IAttivitaViewModel> rangeFasiAttivita = _cercaAttivitaObserver.AttivitaTrovate.OrderBy(a => a.Fase)
-                                                                                                      .Where(a => Int32.Parse(a.Fase) >= Int32.Parse(_gestoreFasiNonPianificateViewModel.FaseDiPartenza.Fase) &&
-                                                                                                                  Int32.Parse(a.Fase) < Int32.Parse(_gestoreFasiNonPianificateViewModel.FaseDiArrivo.Fase))
-                                                                                                      .ToList();
-            if (!rangeFasiAttivita.Any())
-                rangeFasiAttivita.Add(_gestoreFasiNonPianificateViewModel.FaseDiArrivo);
 
-            foreach (IAttivitaViewModel attivita in rangeFasiAttivita)
-            {
-                result = _creaFaseNonPianificataHelper.ApriFaseNonPianificata(attivita);
-                if (result != null)
-                {
-                    MostraPopupConTesto(result);
-                    break;
-                }
-            }
+            result = _creaFaseNonPianificataHelper.ApriFaseNonPianificata(_dialogoOperatoreObserver.AttivitaSelezionata);
+            if (result != null)
+                MostraPopupConTesto(result);
         }
 
         private void MostraPopupConTesto(string testo)

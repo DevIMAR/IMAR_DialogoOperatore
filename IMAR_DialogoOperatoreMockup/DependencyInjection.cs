@@ -45,7 +45,6 @@ namespace IMAR_DialogoOperatore
 			services.AddScoped<CronologiaAttivitaGridViewModel>();
 			services.AddScoped<DialogoOperatoreViewModel>();
 			services.AddScoped<DocumentaleViewModel>();
-			services.AddScoped<GestoreFasiNonPianificateViewModel>();
 			services.AddTransient<FasiAttivitaGridViewModel>();
 			services.AddScoped<FasiIndiretteGridViewModel>();
 			services.AddScoped<FasiIndirettePopupViewModel>();

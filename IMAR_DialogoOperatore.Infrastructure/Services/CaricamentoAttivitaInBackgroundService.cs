@@ -20,7 +20,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
         private List<string> _odpDatiMonitor;
         private IList<Attivita>? _attivitaAperte;
         private IList<stdMesIndTsk>? _attivitaIndirette;
-        private Dictionary<string, DateTime> _calFlOdpCache;
+        private Dictionary<(string, string), DateTime> _calFlOdpCache;
 
         public CaricamentoAttivitaInBackgroundService(
             IServiceProvider serviceProvider)
@@ -28,7 +28,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
             _serviceProvider = serviceProvider;
             _attivitaAperte = new List<Attivita>();
             _attivitaIndirette = new List<stdMesIndTsk>();
-            _calFlOdpCache = new Dictionary<string, DateTime>();
+            _calFlOdpCache = new Dictionary<(string, string), DateTime>();
 
             using var scope = _serviceProvider.CreateScope();
             _jmesApiClient = scope.ServiceProvider.GetRequiredService<IJmesApiClient>();
@@ -76,13 +76,12 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
                                                                                  GROUP BY NRBLCI, ORPRCI, CDARCI, DSARMA, CDFACI, DSFACI,
                                                                                           pf2.QORDCI, pf2.QPROCI, pf2.QSCACI, pf2.QRESCI");
 
-                    // Assegna DataSchedulata da cache CAL_FL_ODP
                     _lockCalFlOdp.EnterReadLock();
                     try
                     {
                         foreach (var attivita in batchAttivita)
                         {
-                            if (_calFlOdpCache.TryGetValue(attivita.Odp, out var dataSchedulata))
+                            if (_calFlOdpCache.TryGetValue((attivita.Odp, attivita.Fase), out var dataSchedulata))
                             {
                                 attivita.DataSchedulata = dataSchedulata;
                             }
@@ -135,15 +134,13 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
         {
             try
             {
-                // Crea un nuovo scope per accedere al DbContext
                 using var scope = _serviceProvider.CreateScope();
                 var imarSchedulatoreUoW = scope.ServiceProvider.GetRequiredService<IImarSchedulatoreUoW>();
 
-                // Recupera tutti i record da CAL_FL_ODP e prende il GIORNO minimo per ogni ODP
                 var calFlOdpData = imarSchedulatoreUoW.CalFlOdpRepository
                     .Get()
-                    .GroupBy(c => c.ODP)
-                    .ToDictionary(g => g.Key, g => g.Min(x => x.GIORNO));
+                    .GroupBy(c => new { c.ODP, c.FASE })
+                    .ToDictionary(g => (g.Key.ODP, g.Key.FASE.ToString().PadLeft(3, '0')), g => g.Min(x => x.GIORNO));
 
                 _lockCalFlOdp.EnterWriteLock();
                 try
@@ -154,12 +151,10 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
                 {
                     _lockCalFlOdp.ExitWriteLock();
                 }
-
-                Debug.WriteLine($"Cache CAL_FL_ODP aggiornata: {_calFlOdpCache.Count} ODP trovati");
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Errore nell'aggiornamento cache CAL_FL_ODP: {ex.Message}");
+                throw new Exception(ex.Message);
             }
         }
 

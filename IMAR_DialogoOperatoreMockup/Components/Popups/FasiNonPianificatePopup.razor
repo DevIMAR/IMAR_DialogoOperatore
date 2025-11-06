@@ -19,7 +19,14 @@
 		 @onmousemove="RestartAutoLogoutTimer"
 		 @onmousedown="RestartAutoLogoutTimer">
 	<BodyContentTemplate>
-		<GestoreFasiNonPianificate OnStateChanged="@(async () => await InvokeAsync(StateHasChanged))" />
+		<div>
+			<p class="testo-grande">
+				<label>Sei sicuro/a di voler aprire </label>
+				<label class="arancione">@FasiNonPianificatePopupViewModel.ModalitaDiRiapertura </label> 
+				<label>per la seguente fase?</label>
+			</p>
+			<p class="testo-medio arancione">@FasiNonPianificatePopupViewModel.FaseDaRiaprire</p>
+		</div>
 	</BodyContentTemplate>
 
 	<FooterContentTemplate>

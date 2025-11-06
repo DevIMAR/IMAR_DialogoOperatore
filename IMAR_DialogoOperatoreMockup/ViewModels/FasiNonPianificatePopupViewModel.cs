@@ -1,4 +1,5 @@
-﻿using IMAR_DialogoOperatore.Commands;
+﻿using IMAR_DialogoOperatore.Application;
+using IMAR_DialogoOperatore.Commands;
 using IMAR_DialogoOperatore.Interfaces.Observers;
 using System.Windows.Input;
 
@@ -10,6 +11,9 @@ namespace IMAR_DialogoOperatore.ViewModels
         private bool _mostraPopup;
 
         public ICommand ConfermaCommand { get; private set; }
+
+        public string? ModalitaDiRiapertura => _dialogoOperatoreObserver.OperazioneInCorso.Equals(Costanti.INIZIO_LAVORO) ? "il lavoro" : "l'attrezzaggio";
+        public string? FaseDaRiaprire => _dialogoOperatoreObserver.AttivitaSelezionata.Odp + " - " + _dialogoOperatoreObserver.AttivitaSelezionata.Fase + ": " + _dialogoOperatoreObserver.AttivitaSelezionata.DescrizioneFase;
 
         public bool MostraPopup
         {
