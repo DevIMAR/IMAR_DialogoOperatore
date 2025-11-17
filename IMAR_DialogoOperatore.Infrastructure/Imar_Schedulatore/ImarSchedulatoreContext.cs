@@ -2,31 +2,29 @@
 #nullable disable
 using System;
 using System.Collections.Generic;
-using IMAR_DialogoOperatore.Domain.Entities.Imar_Schdulazione;
+using IMAR_DialogoOperatore.Domain.Entities.Imar_Schedulazione;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 
 namespace IMAR_DialogoOperatore.Infrastructure.Imar_Schedulatore;
 
 public partial class ImarSchedulatoreContext : DbContext
 {
-    IConfiguration _configuration;
-
-    public ImarSchedulatoreContext(
-        DbContextOptions<ImarSchedulatoreContext> options,
-        IConfiguration configuration)
+    public ImarSchedulatoreContext(DbContextOptions<ImarSchedulatoreContext> options)
         : base(options)
     {
-        _configuration = configuration;
-    }
-
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        base.OnConfiguring(optionsBuilder);
-        optionsBuilder.UseSqlServer(_configuration["ConnectionStrings:imarSchedulatore"]);
     }
 
     public virtual DbSet<CAL_FL_ODP> CAL_FL_ODP { get; set; }
+
+    public virtual DbSet<DESCRIZIONE_FASI> DESCRIZIONE_FASI { get; set; }
+
+    public virtual DbSet<FASI> FASI { get; set; }
+
+    public virtual DbSet<ODC_ODP> ODC_ODP { get; set; }
+
+    public virtual DbSet<ORDINE_CLIENTE> ORDINE_CLIENTE { get; set; }
+
+    public virtual DbSet<ORDINE_PRODUZIONE> ORDINE_PRODUZIONE { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -44,6 +42,100 @@ public partial class ImarSchedulatoreContext : DbContext
             entity.Property(e => e.ODP).HasMaxLength(255);
             entity.Property(e => e.SOVRACCARICO).HasAnnotation("Relational:DefaultConstraintName", "DF__CAL/FL/OD__SOVRA__40058253");
             entity.Property(e => e.FLUSSO).HasMaxLength(255);
+
+            entity.HasOne(d => d.FASI).WithMany(p => p.CAL_FL_ODP)
+                .HasForeignKey(d => new { d.FASE, d.ODP })
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_CAL/FL/ODP_FASI");
+        });
+
+        modelBuilder.Entity<DESCRIZIONE_FASI>(entity =>
+        {
+            entity.HasKey(e => e.CODICE_FASE).HasName("DESCRIZIONE_FASI$PrimaryKey");
+
+            entity.HasIndex(e => e.CODICE_FASE, "DESCRIZIONE_FASI$CODICE_FASE");
+
+            entity.HasIndex(e => e.CODICE_MACCHINA, "DESCRIZIONE_FASI$CODICE_MACCHINA");
+
+            entity.Property(e => e.CODICE_FASE).HasMaxLength(255);
+            entity.Property(e => e.CODICE_MACCHINA).HasMaxLength(255);
+            entity.Property(e => e.DESCRIZIONE).HasMaxLength(255);
+        });
+
+        modelBuilder.Entity<FASI>(entity =>
+        {
+            entity.HasKey(e => new { e.SEQUENZA, e.ORDINE_PRODUZIONE_ODP }).HasName("PK_OrdineRiga");
+
+            entity.HasIndex(e => e.CODICE_FASE, "FASI$CODICE_FASE");
+
+            entity.HasIndex(e => e.FLUSSO, "FASI$FASIFLUSSO");
+
+            entity.Property(e => e.ORDINE_PRODUZIONE_ODP).HasMaxLength(255);
+            entity.Property(e => e.CODICE_FASE).HasMaxLength(255);
+            entity.Property(e => e.DATA_ARRIVO_MATE).HasColumnType("datetime");
+            entity.Property(e => e.DATA_MAT_UPDATER).HasMaxLength(255);
+            entity.Property(e => e.DATA_MAX).HasColumnType("datetime");
+            entity.Property(e => e.DATA_MIN).HasColumnType("datetime");
+            entity.Property(e => e.FISSO)
+                .HasDefaultValue(false)
+                .HasAnnotation("Relational:DefaultConstraintName", "DF__FASI__FISSO__42E1EEFE");
+            entity.Property(e => e.FLUSSO).HasMaxLength(255);
+            entity.Property(e => e.I_O)
+                .HasDefaultValue(false)
+                .HasAnnotation("Relational:DefaultConstraintName", "DF__FASI__I_O__43D61337");
+            entity.Property(e => e.OPERATORE).HasMaxLength(10);
+            entity.Property(e => e.URGENTE).HasMaxLength(255);
+        });
+
+        modelBuilder.Entity<ODC_ODP>(entity =>
+        {
+            entity.HasKey(e => new { e.ORDINE_RIGA, e.ODP }).HasName("ODC/ODP$PrimaryKey");
+
+            entity.ToTable("ODC/ODP");
+
+            entity.Property(e => e.ORDINE_RIGA)
+                .HasMaxLength(10)
+                .IsUnicode(false);
+            entity.Property(e => e.ODP).HasMaxLength(255);
+
+            entity.HasOne(d => d.ODPNavigation).WithMany(p => p.ODC_ODP)
+                .HasForeignKey(d => d.ODP)
+                .HasConstraintName("ODC/ODP$ORDINE_PRODUZIONEODC/ODP");
+
+            entity.HasOne(d => d.ORDINE_RIGANavigation).WithMany(p => p.ODC_ODP)
+                .HasForeignKey(d => d.ORDINE_RIGA)
+                .HasConstraintName("ODC/ODP$ORDINE_CLIENTEODC/ODP");
+        });
+
+        modelBuilder.Entity<ORDINE_CLIENTE>(entity =>
+        {
+            entity.HasKey(e => e.ORDINE_RIGA).HasName("ORDINE_CLIENTE$PrimaryKey");
+
+            entity.HasIndex(e => e.CODICE_CLIENTE, "ORDINE_CLIENTE$CODICE_CLIENTE");
+
+            entity.Property(e => e.ORDINE_RIGA)
+                .HasMaxLength(10)
+                .IsUnicode(false);
+            entity.Property(e => e.CODICE_CLIENTE).HasMaxLength(255);
+            entity.Property(e => e.DATA_CONSEGNA).HasColumnType("datetime");
+            entity.Property(e => e.DATA_FINE).HasColumnType("datetime");
+            entity.Property(e => e.DATA_INSERIMENTO).HasColumnType("datetime");
+            entity.Property(e => e.DATA_UPDATE).HasColumnType("datetime");
+            entity.Property(e => e.SALDATO).HasMaxLength(2);
+            entity.Property(e => e.TIPO_MOVIMENTO).HasMaxLength(3);
+        });
+
+        modelBuilder.Entity<ORDINE_PRODUZIONE>(entity =>
+        {
+            entity.HasKey(e => e.ODP).HasName("ORDINE_PRODUZIONE$PrimaryKey");
+
+            entity.Property(e => e.ODP).HasMaxLength(255);
+            entity.Property(e => e.ARTICOLO).HasMaxLength(255);
+            entity.Property(e => e.DATA_ARRIVO_MAT).HasColumnType("datetime");
+            entity.Property(e => e.DATA_FINE).HasMaxLength(255);
+            entity.Property(e => e.ELABORATO).HasMaxLength(2);
+            entity.Property(e => e.SALDATO).HasMaxLength(2);
+            entity.Property(e => e.STATO_ODP).HasMaxLength(255);
         });
 
         OnModelCreatingPartial(modelBuilder);

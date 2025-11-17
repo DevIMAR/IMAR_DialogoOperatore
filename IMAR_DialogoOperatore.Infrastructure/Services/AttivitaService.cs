@@ -1,4 +1,5 @@
 ﻿using IMAR_DialogoOperatore.Application;
+using IMAR_DialogoOperatore.Application.DTOs;
 using IMAR_DialogoOperatore.Application.Interfaces.Clients;
 using IMAR_DialogoOperatore.Application.Interfaces.Repositories;
 using IMAR_DialogoOperatore.Application.Interfaces.Services.Activities;
@@ -8,6 +9,7 @@ using IMAR_DialogoOperatore.Domain.Entities.JMES;
 using IMAR_DialogoOperatore.Domain.Models;
 using IMAR_DialogoOperatore.Infrastructure.Mappers;
 using IMAR_DialogoOperatore.Infrastructure.Services;
+using System.Net.Http.Json;
 
 namespace IMAR_DialogoOperatore.Services
 {
@@ -343,14 +345,34 @@ namespace IMAR_DialogoOperatore.Services
         {
             string codiceFase = GetCodiceFase(attivita); ;
 
-            return _jmesApiClient.RegistrazioneOperazioneSuDb(() => _jmesApiClient.MesEquipStartNotPln(operatore, attivita.Bolla, codiceFase));
+            HttpResponseMessage responseMessage = _jmesApiClient.MesEquipStartNotPln(operatore, attivita.Bolla, codiceFase);
+
+            string? errore = _jMesApiClientErrorUtility.GestioneEventualeErrore(responseMessage);
+            if (errore != null)
+                return errore;
+
+            var jsonData = responseMessage.Content.ReadFromJsonAsync<JMesResultDto>().GetAwaiter().GetResult();
+            if (jsonData != null)
+                return jsonData.result.instanceRef.model.diaOpe.evtUid.ToString();
+
+            return null;
         }
 
         public string? ApriLavoroFaseNonPianificata(Attivita attivita, Operatore operatore)
         {
             string codiceFase = GetCodiceFase(attivita);
 
-            return _jmesApiClient.RegistrazioneOperazioneSuDb(() => _jmesApiClient.MesWorkStartNotPln(operatore, attivita.Bolla, codiceFase));
+            HttpResponseMessage responseMessage = _jmesApiClient.MesWorkStartNotPln(operatore, attivita.Bolla, codiceFase);
+            var jsonData = responseMessage.Content.ReadFromJsonAsync<JMesResultDto>().GetAwaiter().GetResult();
+
+            string? errore = _jMesApiClientErrorUtility.GestioneEventualeErrore(jsonData);
+            if (errore != null)
+                return errore;
+
+            if (jsonData != null)
+                return jsonData.result.instanceRef.model.diaOpe.evtUid.ToString();
+
+            return null;
         }
 
         private string GetCodiceFase(Attivita attivita)

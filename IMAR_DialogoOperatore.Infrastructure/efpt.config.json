@@ -9,7 +9,7 @@
    "OutputContextPath": null,
    "OutputPath": "",
    "PreserveCasingWithRegex": true,
-   "ProjectRootNamespace": "IMAR_DialogoOperatore.Infrastructure.Imar_Schedulatore",
+   "ProjectRootNamespace": "IMAR_DialogoOperatore.Infrastructure.Imar_Produzione",
    "Schemas": null,
    "SelectedHandlebarsLanguage": 2,
    "SelectedToBeGenerated": 1,
@@ -17,6 +17,26 @@
    "Tables": [
       {
          "Name": "[dbo].[CAL\/FL\/ODP]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[DESCRIZIONE_FASI]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[FASI]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[ODC\/ODP]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[ORDINE_CLIENTE]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[ORDINE_PRODUZIONE]",
          "ObjectType": 0
       }
    ],

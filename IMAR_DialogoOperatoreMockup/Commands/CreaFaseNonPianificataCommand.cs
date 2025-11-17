@@ -2,8 +2,6 @@
 using IMAR_DialogoOperatore.Application.Interfaces.Services.Activities;
 using IMAR_DialogoOperatore.Interfaces.Helpers;
 using IMAR_DialogoOperatore.Interfaces.Observers;
-using IMAR_DialogoOperatore.Interfaces.ViewModels;
-using IMAR_DialogoOperatore.ViewModels;
 
 namespace IMAR_DialogoOperatore.Commands
 {
@@ -11,20 +9,17 @@ namespace IMAR_DialogoOperatore.Commands
     {
         private readonly IDialogoOperatoreObserver _dialogoOperatoreObserver;
         private readonly IPopupObserver _popupObserver;
-        private readonly ICercaAttivitaObserver _cercaAttivitaObserver;
         private readonly ICreaFaseNonPianificataHelper _creaFaseNonPianificataHelper;
         private readonly IMacchinaService _macchinaService;
 
         public CreaFaseNonPianificataCommand(
             IDialogoOperatoreObserver dialogoOperatoreObserver,
             IPopupObserver popupObserver,
-            ICercaAttivitaObserver cercaAttivitaObserver,
             ICreaFaseNonPianificataHelper creaFaseNonPianificataHelper,
             IMacchinaService macchinaService)
         {
             _dialogoOperatoreObserver = dialogoOperatoreObserver;
             _popupObserver = popupObserver;
-            _cercaAttivitaObserver = cercaAttivitaObserver;
 
             _creaFaseNonPianificataHelper = creaFaseNonPianificataHelper;
 

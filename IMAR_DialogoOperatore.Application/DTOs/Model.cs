@@ -2,6 +2,7 @@
 {
     public class Model
     {
+        public Diaope diaOpe { get; set; }
         public object[] errors { get; set; }
         public bool error { get; set; }
         public Paramsio paramsIO { get; set; }

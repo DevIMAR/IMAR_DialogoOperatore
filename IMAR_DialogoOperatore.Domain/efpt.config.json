@@ -7,9 +7,9 @@
    "MinimumProductVersion": "2.6.1186",
    "ModelNamespace": null,
    "OutputContextPath": null,
-   "OutputPath": "Entities",
+   "OutputPath": "",
    "PreserveCasingWithRegex": true,
-   "ProjectRootNamespace": "IMAR_DialogoOperatore.Domain",
+   "ProjectRootNamespace": "IMAR_DialogoOperatore.Domain.Entities.Imar_Schedulazione",
    "Schemas": null,
    "SelectedHandlebarsLanguage": 2,
    "SelectedToBeGenerated": 2,
@@ -17,6 +17,26 @@
    "Tables": [
       {
          "Name": "[dbo].[CAL\/FL\/ODP]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[DESCRIZIONE_FASI]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[FASI]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[ODC\/ODP]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[ORDINE_CLIENTE]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[ORDINE_PRODUZIONE]",
          "ObjectType": 0
       }
    ],

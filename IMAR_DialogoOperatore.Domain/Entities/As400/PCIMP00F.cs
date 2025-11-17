@@ -12,5 +12,7 @@
         public string DSFACI { get; set; }
         public string CDCLCI { get; set; }
         public string CDMUCI { get; set; }
+        public decimal OIAMCI { get; set; }
+        public decimal OILMCI {  get; set; }
     }
 }

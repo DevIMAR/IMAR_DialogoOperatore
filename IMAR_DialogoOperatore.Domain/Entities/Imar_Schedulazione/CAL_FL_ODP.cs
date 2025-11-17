@@ -3,7 +3,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace IMAR_DialogoOperatore.Domain.Entities.Imar_Schdulazione;
+namespace IMAR_DialogoOperatore.Domain.Entities.Imar_Schedulazione;
 
 public partial class CAL_FL_ODP
 {
@@ -22,4 +22,6 @@ public partial class CAL_FL_ODP
     public bool SOVRACCARICO { get; set; }
 
     public int? MANUALE { get; set; }
+
+    public virtual FASI FASI { get; set; }
 }

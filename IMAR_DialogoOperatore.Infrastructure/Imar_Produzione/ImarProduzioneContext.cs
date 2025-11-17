@@ -4,32 +4,44 @@ using System;
 using System.Collections.Generic;
 using IMAR_DialogoOperatore.Domain.Entities.Imar_Produzione;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 
-namespace IMAR_DialogoOperatore.Domain.Imar_Produzione;
+namespace IMAR_DialogoOperatore.Infrastructure.Imar_Produzione;
 
 public partial class ImarProduzioneContext : DbContext
 {
-    IConfiguration _configuration;
-
-    public ImarProduzioneContext(
-        DbContextOptions<ImarProduzioneContext> options,
-            IConfiguration configuration)
+    public ImarProduzioneContext(DbContextOptions<ImarProduzioneContext> options)
         : base(options)
     {
-        _configuration = configuration;
     }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        base.OnConfiguring(optionsBuilder);
-        optionsBuilder.UseSqlServer(_configuration["ConnectionStrings:ImarProduzione"]);
-    }
+    public virtual DbSet<Forzatura> Forzatura { get; set; }
+
+    public virtual DbSet<OrdineProduzioneForzato> OrdineProduzioneForzato { get; set; }
 
     public virtual DbSet<SegnalazioneDifformita> SegnalazioneDifformita { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<Forzatura>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK_Forzature");
+
+            entity.Property(e => e.Id).ValueGeneratedNever();
+        });
+
+        modelBuilder.Entity<OrdineProduzioneForzato>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK_OrdiniProduzioneForzati");
+
+            entity.HasIndex(e => e.ForzaturaId, "IX_OrdiniProduzioneForzati_ForzaturaId");
+
+            entity.Property(e => e.Id).ValueGeneratedNever();
+
+            entity.HasOne(d => d.Forzatura).WithMany(p => p.OrdineProduzioneForzato)
+                .HasForeignKey(d => d.ForzaturaId)
+                .HasConstraintName("FK_OrdiniProduzioneForzati_Forzature_ForzaturaId");
+        });
+
         modelBuilder.Entity<SegnalazioneDifformita>(entity =>
         {
             entity.Property(e => e.Id).ValueGeneratedNever();

@@ -10,6 +10,12 @@ namespace IMAR_DialogoOperatore.Infrastructure.Utilities
         {
             var jsonData = result.Content.ReadFromJsonAsync<JMesResultDto>().GetAwaiter().GetResult();
 
+            return GestioneEventualeErrore(jsonData);
+        }
+
+        public string? GestioneEventualeErrore(JMesResultDto? jsonData)
+        {
+
             if (jsonData != null && jsonData.result.instanceRef.model.error)
                 return ScritturaTestoErrore(jsonData);
 
