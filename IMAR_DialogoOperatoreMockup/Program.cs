@@ -20,7 +20,7 @@ namespace IMAR_DialogoOperatore
                             .AddCircuitOptions(options => { options.DetailedErrors = true; });
 
             builder.Services.AddApplicationServices();
-            builder.Services.AddInfrastructureServices();
+            builder.Services.AddInfrastructureServices(builder.Configuration);
             builder.Services.AddDialogoOperatoreServices();
 
 			var app = builder.Build();

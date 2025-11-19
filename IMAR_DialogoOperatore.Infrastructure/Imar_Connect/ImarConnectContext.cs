@@ -10,20 +10,10 @@ namespace IMAR_DialogoOperatore.Infrastructure.Imar_Connect;
 
 public partial class ImarConnectContext : DbContext
 {
-    IConfiguration _configuration;
-
     public ImarConnectContext(
-        DbContextOptions<ImarConnectContext> options,
-            IConfiguration configuration)
+        DbContextOptions<ImarConnectContext> options)
         : base(options)
     {
-        _configuration = configuration;
-    }
-
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        base.OnConfiguring(optionsBuilder);
-        optionsBuilder.UseSqlServer(_configuration["ConnectionStrings:ImarConnect"]);
     }
 
     public virtual DbSet<Interfaccia> Interfaccia { get; set; }

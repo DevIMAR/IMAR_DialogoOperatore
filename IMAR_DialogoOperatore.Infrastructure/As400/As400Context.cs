@@ -1,18 +1,14 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using System.Data;
 using System.Data.Odbc;
 
 namespace IMAR_DialogoOperatore.Infrastructure.As400
 {
-	public class As400Context : DbContext
+	public class As400Context
 	{
 		private readonly string _connectionString;
 
-		public As400Context(
-			DbContextOptions<As400Context> options,
-			IConfiguration configuration)
-			: base(options)
+		public As400Context(IConfiguration configuration)
 		{
 			_connectionString = configuration["ConnectionStrings:As400"];
 		}

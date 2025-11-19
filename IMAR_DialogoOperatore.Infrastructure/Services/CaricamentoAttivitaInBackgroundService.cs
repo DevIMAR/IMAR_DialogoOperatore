@@ -152,9 +152,9 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
                     _lockCalFlOdp.ExitWriteLock();
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                throw new Exception(ex.Message);
+                throw;
             }
         }
 

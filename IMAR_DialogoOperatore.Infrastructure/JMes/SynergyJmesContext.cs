@@ -10,19 +10,9 @@ namespace IMAR_DialogoOperatore.Infrastructure.JMes;
 
 public partial class SynergyJmesContext : DbContext
 {
-    IConfiguration _configuration;
-
-    public SynergyJmesContext(DbContextOptions<SynergyJmesContext> options,
-            IConfiguration configuration)
+    public SynergyJmesContext(DbContextOptions<SynergyJmesContext> options)
         : base(options)
     {
-        _configuration = configuration;
-    }
-
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        base.OnConfiguring(optionsBuilder);
-        optionsBuilder.UseSqlServer(_configuration["ConnectionStrings:SynergyJmes"]);
     }
 
     public virtual DbSet<AngBdg> AngBdg { get; set; }

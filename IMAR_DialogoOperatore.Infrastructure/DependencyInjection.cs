@@ -4,6 +4,7 @@ using IMAR_DialogoOperatore.Application.Interfaces.Services.Activities;
 using IMAR_DialogoOperatore.Application.Interfaces.Services.External;
 using IMAR_DialogoOperatore.Application.Interfaces.UoW;
 using IMAR_DialogoOperatore.Application.Interfaces.Utilities;
+using IMAR_DialogoOperatore.Application.Services;
 using IMAR_DialogoOperatore.Infrastructure.As400;
 using IMAR_DialogoOperatore.Infrastructure.Imar_Connect;
 using IMAR_DialogoOperatore.Infrastructure.Imar_Produzione;
@@ -13,19 +14,26 @@ using IMAR_DialogoOperatore.Infrastructure.JMes;
 using IMAR_DialogoOperatore.Infrastructure.Services;
 using IMAR_DialogoOperatore.Infrastructure.Utilities;
 using IMAR_DialogoOperatore.Services;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace IMAR_DialogoOperatore.Infrastructure
 {
     public static class DependencyInjection
 	{
-		public static IServiceCollection AddInfrastructureServices(this IServiceCollection services)
+		public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
 		{
-			services.AddDbContext<As400Context>();
-			services.AddDbContext<ImarConnectContext>();
-			services.AddDbContext<ImarProduzioneContext>();
-			services.AddDbContext<ImarSchedulatoreContext>();
-			services.AddDbContext<SynergyJmesContext>();
+			services.AddDbContext<ImarConnectContext>(options =>
+				options.UseSqlServer(configuration.GetConnectionString("ImarConnect")));
+			services.AddDbContext<ImarProduzioneContext>(options =>
+                options.UseSqlServer(configuration.GetConnectionString("ImarProduzione")));
+			services.AddDbContext<ImarSchedulatoreContext>(options =>
+                options.UseSqlServer(configuration.GetConnectionString("ImarSchedulatore")));
+			services.AddDbContext<SynergyJmesContext>(options =>
+                options.UseSqlServer(configuration.GetConnectionString("SynergyJmes")));
+		
+			services.AddScoped<As400Context>();
 
 			services.AddSingleton<CaricamentoAttivitaInBackgroundService>();
 
@@ -35,6 +43,7 @@ namespace IMAR_DialogoOperatore.Infrastructure
 			services.AddScoped<IImarSchedulatoreUoW, ImarSchedulatoreUoW>();
 
 			services.AddScoped<IAttivitaService, AttivitaService>();
+			services.AddScoped<IForzaturaService, ForzaturaService>();
 			services.AddScoped<IMorpheusApiService, MorpheusApiService>();
 			services.AddScoped<IOperatoreService, OperatoreService>();
 			services.AddScoped<IMacchinaService, MacchinaService>();
