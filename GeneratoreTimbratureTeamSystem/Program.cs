@@ -2,7 +2,6 @@
 using IMAR_DialogoOperatore.Application;
 using IMAR_DialogoOperatore.Application.Interfaces.Services.Activities;
 using IMAR_DialogoOperatore.Infrastructure;
-using IMAR_DialogoOperatore.Infrastructure.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -17,7 +16,7 @@ var host = Host.CreateDefaultBuilder(args).
                 ConfigureServices((context, services) =>
                 {
                     services.AddApplicationServices();
-                    services.AddInfrastructureServices();
+                    services.AddInfrastructureServices(configuration);
 
                     services.AddScoped<EncodingService>();
                     services.AddScoped<FileExportService>();

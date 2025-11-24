@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace IMAR_DialogoOperatore.Domain.Entities.Imar_Schedulazione;
 
-public partial class CAL_FL_ODP
+public record CAL_FL_ODP
 {
     public string FLUSSO { get; set; }
 

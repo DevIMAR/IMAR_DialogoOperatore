@@ -147,13 +147,13 @@ namespace IMAR_DialogoOperatore.Application.Services
 
         private void AggiungiNuoveFasiDaForzare(ref Forzatura forzatura)
         {
-            List<OrdineProduzioneForzato> ordiniProduzioneForzati = new List<OrdineProduzioneForzato>();
+            ICollection<OrdineProduzioneForzato> ordiniProduzioneForzati = new List<OrdineProduzioneForzato>();
             List<PCIMP00F> pCIMP00Fs;
             Forzatura forzaturaTemp = forzatura;
-            OrdineProduzioneForzato nuovaFaseDaForzare;
+            OrdineProduzioneForzato nuovaFaseDaForzare, fasePrecedente;
             decimal tempoMacchinaTotale = 0;
 
-            IQueryable<ODC_ODP> odcOdp = _imarSchedulatoreUoW.OdcOdpRepository.Get(x => x.ORDINE_RIGA == forzaturaTemp.RigaOrdine);
+            List<ODC_ODP> odcOdp = _imarSchedulatoreUoW.OdcOdpRepository.Get(x => x.ORDINE_RIGA == forzaturaTemp.RigaOrdine).ToList();
 
             foreach (string odp in odcOdp.Select(x => x.ODP))
             {
@@ -163,23 +163,35 @@ namespace IMAR_DialogoOperatore.Application.Services
                                                                     $"ORDER BY CDFACI")
                                             .ToList();
 
-                for (int i = 0; i < pCIMP00Fs.Count(); i++)
+                for (int i = 1; i < pCIMP00Fs.Count(); i++)
                 {
                     tempoMacchinaTotale += pCIMP00Fs[i].OIAMCI + pCIMP00Fs[i].OILMCI;
 
                     if (forzatura.OrdineProduzioneForzato.Select(x => x.Fase).Contains(Int32.Parse(pCIMP00Fs[i].CDFACI)))
                         continue;
 
-                    nuovaFaseDaForzare = forzatura.OrdineProduzioneForzato.Single(x => x.Fase == Int32.Parse(pCIMP00Fs[i - 1].CDFACI));
-                    nuovaFaseDaForzare.Fase = Int32.Parse(pCIMP00Fs[i].CDFACI);
-                    nuovaFaseDaForzare.Action = TypeAction.NUOVA.ToString();
+                    fasePrecedente = forzatura.OrdineProduzioneForzato.Single(x => x.Fase == Int32.Parse(pCIMP00Fs[i - 1].CDFACI));
+
+                    nuovaFaseDaForzare = fasePrecedente with
+                    {
+                        Fase = Int32.Parse(pCIMP00Fs[i].CDFACI),
+                        DescrizioneFase = pCIMP00Fs[i].DSFACI,
+                        Action = TypeAction.NUOVA.ToString(),
+                        Id = Guid.NewGuid()
+                    };
+
+                    RegistraNuovaFaseInSchedulatore(fasePrecedente, nuovaFaseDaForzare);
 
                     ordiniProduzioneForzati.Add(nuovaFaseDaForzare);
                 }
             }
+            _imarSchedulatoreUoW.Save();
 
             forzatura.OreAllocazioneGiornaliera = CalcolaAllocazioneTempoGiornaliera(tempoMacchinaTotale);
-            forzatura.OrdineProduzioneForzato = (ICollection<OrdineProduzioneForzato>)forzatura.OrdineProduzioneForzato.Union(ordiniProduzioneForzati);
+
+            List<OrdineProduzioneForzato> forzatureComplete = forzatura.OrdineProduzioneForzato.ToList();
+            forzatureComplete.AddRange(ordiniProduzioneForzati);
+            forzatura.OrdineProduzioneForzato = forzatureComplete;
         }
 
         private OrdineProduzioneForzato BuildOdpToLog(ODPSchedulazione odp, string action, Forzatura forzatura)
@@ -215,5 +227,23 @@ namespace IMAR_DialogoOperatore.Application.Services
                 >= 60 and < 81 => "8",
                 >= 81 => "9"
             };
+
+        private void RegistraNuovaFaseInSchedulatore(OrdineProduzioneForzato faseDaCopiare, OrdineProduzioneForzato nuovaFaseDaInserire)
+        {
+            CAL_FL_ODP calFlOdp = _imarSchedulatoreUoW.CalFlOdpRepository.Get(f => f.ODP.Equals(faseDaCopiare.OrdineProduzione))
+                                                       .Single(f => f.FASE == faseDaCopiare.Fase) with
+            {
+                FASE = nuovaFaseDaInserire.Fase
+            };
+            _imarSchedulatoreUoW.CalFlOdpRepository.Insert(calFlOdp);
+
+            FASI fase = _imarSchedulatoreUoW.FasiRepository.Get(f => f.ORDINE_PRODUZIONE_ODP.Equals(faseDaCopiare.OrdineProduzione))
+                                               .Single(x => x.SEQUENZA == faseDaCopiare.Fase) with
+            {
+                SEQUENZA = nuovaFaseDaInserire.Fase
+
+            };
+            _imarSchedulatoreUoW.FasiRepository.Insert(fase);
+        }
     }
 }

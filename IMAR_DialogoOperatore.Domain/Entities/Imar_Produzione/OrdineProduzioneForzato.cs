@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace IMAR_DialogoOperatore.Domain.Entities.Imar_Produzione;
 
-public partial class OrdineProduzioneForzato
+public record OrdineProduzioneForzato
 {
     public Guid Id { get; set; }
 
