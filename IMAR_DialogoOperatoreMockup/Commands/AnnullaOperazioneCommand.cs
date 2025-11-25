@@ -23,6 +23,8 @@ namespace IMAR_DialogoOperatore.Commands
 		public override bool CanExecute(object? parameter) =>
             _dialogoOperatoreObserver.OperatoreSelezionato != null
 			&& _dialogoOperatoreObserver.OperatoreSelezionato.Badge != null
+			&& _dialogoOperatoreObserver.OperatoreSelezionato.Stato != Costanti.ASSENTE
+			&& _dialogoOperatoreObserver.OperatoreSelezionato.Stato != Costanti.IN_PAUSA
             && base.CanExecute(parameter);
 
 		public override void Execute(object? parameter)

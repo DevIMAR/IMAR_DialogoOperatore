@@ -103,7 +103,7 @@ namespace IMAR_DialogoOperatore.Commands
 
             _toastDisplayerUtility.ShowRedToast("Uscita", $"Arrivederci {_dialogoOperatoreObserver.OperatoreSelezionato.Nome}!");
 
-            _autoLogoutUtility.StartLogoutTimer(3);
+            _autoLogoutUtility.StartLogoutTimer(2);
         }
 
         private async Task ChiudiAttivitaOperatore()
