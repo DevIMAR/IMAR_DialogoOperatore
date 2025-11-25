@@ -7,6 +7,7 @@ using IMAR_DialogoOperatore.Domain.Entities.Imar_Produzione;
 using IMAR_DialogoOperatore.Domain.Entities.Imar_Schedulazione;
 using IMAR_DialogoOperatore.Domain.Entities.JMES;
 using IMAR_DialogoOperatore.Domain.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace IMAR_DialogoOperatore.Application.Services
 {
@@ -230,20 +231,19 @@ namespace IMAR_DialogoOperatore.Application.Services
 
         private void RegistraNuovaFaseInSchedulatore(OrdineProduzioneForzato faseDaCopiare, OrdineProduzioneForzato nuovaFaseDaInserire)
         {
-            CAL_FL_ODP calFlOdp = _imarSchedulatoreUoW.CalFlOdpRepository.Get(f => f.ODP.Equals(faseDaCopiare.OrdineProduzione))
-                                                       .Single(f => f.FASE == faseDaCopiare.Fase) with
-            {
-                FASE = nuovaFaseDaInserire.Fase
-            };
-            _imarSchedulatoreUoW.CalFlOdpRepository.Insert(calFlOdp);
+            var faseSrc = _imarSchedulatoreUoW.FasiRepository
+                .Get(f => f.ORDINE_PRODUZIONE_ODP == faseDaCopiare.OrdineProduzione
+                          && f.SEQUENZA == faseDaCopiare.Fase)
+                .AsNoTracking()
+                .Single();
 
-            FASI fase = _imarSchedulatoreUoW.FasiRepository.Get(f => f.ORDINE_PRODUZIONE_ODP.Equals(faseDaCopiare.OrdineProduzione))
-                                               .Single(x => x.SEQUENZA == faseDaCopiare.Fase) with
+            var nuovaFase = faseSrc with
             {
-                SEQUENZA = nuovaFaseDaInserire.Fase
-
+                SEQUENZA = nuovaFaseDaInserire.Fase,
+                CAL_FL_ODP = new List<CAL_FL_ODP>()
             };
-            _imarSchedulatoreUoW.FasiRepository.Insert(fase);
+
+            _imarSchedulatoreUoW.FasiRepository.Insert(nuovaFase);
         }
     }
 }

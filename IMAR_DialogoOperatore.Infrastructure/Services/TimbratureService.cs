@@ -106,7 +106,8 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
         {
             List<string> badgeEsclusi = new List<string> {
                 "0010", "0046", "0056", "0072", "0078", "0084", "0086", "0091",
-                "0109", "0154", "0157", "0168", "0173", "0222", "0228", "0213"
+                "0109", "0154", "0157", "0168", "0173", "0222", "0228", "0213",
+                "0133", "0224"
             };
 
             var res = _synergyJmesUoW.AngRes.Get().ToList();
