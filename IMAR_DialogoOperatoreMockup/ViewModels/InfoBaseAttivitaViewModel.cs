@@ -21,9 +21,7 @@ namespace IMAR_DialogoOperatore.ViewModels
         public ICercaAttivitaHelper CercaAttivitaHelper { get; private set; }
         public ICommand ApriListaIndirette { get; private set; }
 
-        public string? Articolo => _attivitaSelezionata != null ? _attivitaSelezionata.Articolo : string.Empty;
-        public string? DescrizioneArticolo => _attivitaSelezionata != null ? _attivitaSelezionata.DescrizioneArticolo : string.Empty;
-        public string? DescrizioneFase => _attivitaSelezionata != null ? _attivitaSelezionata.DescrizioneFase : string.Empty;
+        public string? CodiceDescrizioneArticolo => _attivitaSelezionata != null ? _attivitaSelezionata.CodiceDescrizioneArticolo : string.Empty;
         public string? DataSchedulata => _attivitaSelezionata != null ? _attivitaSelezionata.DataSchedulata?.ToString("dd/MM/yyyy") : string.Empty;
         public bool IsAttivitaSelezionata => _dialogoOperatoreObserver.AttivitaSelezionata?.Bolla == Bolla &&
                                              _dialogoOperatoreObserver.AttivitaSelezionata?.Odp == Odp;
@@ -73,7 +71,7 @@ namespace IMAR_DialogoOperatore.ViewModels
             {
                 _faseSelezionata = value;
 
-                CercaAttivitaHelper.CercaAttivitaDaFase(value);
+                CercaAttivitaHelper.CercaAttivitaDaFase(value.Substring(0, 3));
 
                 OnNotifyStateChanged();
             }
@@ -110,7 +108,7 @@ namespace IMAR_DialogoOperatore.ViewModels
             if (!attivitaTrovate.Any())
                 return;
 
-            FasiPerAttivita = _cercaAttivitaObserver.AttivitaTrovate.Select(x => x.Fase);
+            FasiPerAttivita = _cercaAttivitaObserver.AttivitaTrovate.Select(x => x.CodiceDescrizioneFase);
         }
 
         private void DialogoOperatoreStore_OnAttivitaSelezionataChanged()
@@ -126,9 +124,9 @@ namespace IMAR_DialogoOperatore.ViewModels
             }
 
             if (!_cercaAttivitaObserver.IsAttivitaCercata)
-                _fasiPerAttivita = new List<string> { _attivitaSelezionata.Fase };
+                _fasiPerAttivita = new List<string> { _attivitaSelezionata.CodiceDescrizioneFase };
 
-            _faseSelezionata = _attivitaSelezionata.Fase;
+            _faseSelezionata = _attivitaSelezionata.CodiceDescrizioneFase;
             _odp = _attivitaSelezionata.Odp ?? string.Empty;
             _bolla = _attivitaSelezionata.Bolla ?? string.Empty;
 

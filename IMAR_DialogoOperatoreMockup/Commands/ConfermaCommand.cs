@@ -79,16 +79,16 @@ namespace IMAR_DialogoOperatore.Commands
 
         private async Task CreaEdInviaSegnalazioneDifformita()
         {
-            CostiArticoloDTO costiArticoloDTO = await _imarApiClient.GetCostiArticolo(_dialogoOperatoreObserver.AttivitaSelezionata.Articolo);
+            CostiArticoloDTO costiArticoloDTO = await _imarApiClient.GetCostiArticolo(_dialogoOperatoreObserver.AttivitaSelezionata.CodiceArticolo);
 
             _segnalazioniDifformitaService.InsertSegnalazione(new SegnalazioneDifformita
             {
                 OrigineSegnalazione = "I",
                 Richiedente = _dialogoOperatoreObserver.OperatoreSelezionato.Badge + " - " + _dialogoOperatoreObserver.OperatoreSelezionato.Cognome + " " + _dialogoOperatoreObserver.OperatoreSelezionato.Nome,
-                FaseDifformita = _dialogoOperatoreObserver.AttivitaSelezionata.Fase,
+                FaseDifformita = _dialogoOperatoreObserver.AttivitaSelezionata.CodiceFase,
                 DescrizioneFase = _dialogoOperatoreObserver.AttivitaSelezionata.DescrizioneFase,
                 Odp = _dialogoOperatoreObserver.AttivitaSelezionata.Odp,
-                Articolo = _dialogoOperatoreObserver.AttivitaSelezionata.Articolo,
+                Articolo = _dialogoOperatoreObserver.AttivitaSelezionata.CodiceArticolo,
                 DescrizioneArticolo = _dialogoOperatoreObserver.AttivitaSelezionata.DescrizioneArticolo,
                 QtaProdotta = _avanzamentoObserver.QuantitaProdotta,
                 QtaDifforme = _avanzamentoObserver.QuantitaScartata,

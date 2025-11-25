@@ -9,12 +9,10 @@
 	<Rows>
 		<DxGridLayoutRow Height="auto"/>
 		<DxGridLayoutRow Height="auto"/>
-		<DxGridLayoutRow Height="auto" Visible="@ShowArticolo"/>
+		<DxGridLayoutRow Height="auto" />
+		<DxGridLayoutRow Height="auto" />
 		<DxGridLayoutRow Height="auto" Visible="@ShowArticolo" />
-		<DxGridLayoutRow Height="auto" Visible="@ShowDescrizioni"/>
-		<DxGridLayoutRow Height="auto" Visible="@ShowDescrizioni"/>
-		<DxGridLayoutRow Height="auto" Visible="@ShowDescrizioni"/>
-		<DxGridLayoutRow Height="auto" Visible="@ShowDescrizioni"/>
+		<DxGridLayoutRow Height="auto" Visible="@ShowArticolo" />
 		<DxGridLayoutRow Height="auto" Visible="@ShowDataSchedulata"/>
 		<DxGridLayoutRow Height="auto" Visible="@ShowDataSchedulata" />
 	</Rows>
@@ -78,18 +76,8 @@
 			</Template>
 		</DxGridLayoutItem>
 
-		@if (ShowArticolo)
-		{
-			<DxGridLayoutItem Row="2" Column="0">
-				<Template>
-					<div class="d-flex justify-content-center align-items-center h-100 testo-piccolo mt-2">
-						<label>ARTICOLO</label>
-					</div>
-				</Template>
-			</DxGridLayoutItem>
-		}
-
-		<DxGridLayoutItem Row="2" Column="1">
+		<DxGridLayoutItem Row="2"
+						  Column="0" ColumnSpan="2">
 			<Template>
 				<div class="d-flex justify-content-center align-items-center h-100 testo-piccolo mt-2">
 					<label>FASE</label>
@@ -97,18 +85,8 @@
 			</Template>
 		</DxGridLayoutItem>
 
-		@if (ShowArticolo)
-		{
-			<DxGridLayoutItem Row="3" Column="0">
-				<Template>
-					<DxTextBox Enabled="false"
-							   Text="@(InfoBaseAttivitaViewModel.Articolo)"
-							   CssClass="dxbl-text-edit mt-2" />
-				</Template>
-			</DxGridLayoutItem>
-		}
-
-		<DxGridLayoutItem Row="3" Column="1">
+		<DxGridLayoutItem Row="3"
+						  Column="0" ColumnSpan="2">
 			<Template>
 				<DxComboBox Data="@InfoBaseAttivitaViewModel.FasiPerAttivita"
 							@bind-Value="@(InfoBaseAttivitaViewModel.FaseSelezionata)"
@@ -125,7 +103,7 @@
 							  Column="0" ColumnSpan="2">
 				<Template>
 					<div class="d-flex justify-content-center align-items-center h-100 testo-piccolo mt-2">
-						<label>DESCRIZIONE ARTICOLO</label>
+						<label>ARTICOLO</label>
 					</div>
 				</Template>
 			</DxGridLayoutItem>
@@ -133,25 +111,7 @@
 			<DxGridLayoutItem Row="5"
 							  Column="0" ColumnSpan="2">
 				<Template>
-					<DxTextBox Text="@(InfoBaseAttivitaViewModel.DescrizioneArticolo)"
-							   Enabled="false"
-							   CssClass="dxbl-text-edit mt-2" />
-				</Template>
-			</DxGridLayoutItem>
-
-			<DxGridLayoutItem Row="6"
-							  Column="0" ColumnSpan="2">
-				<Template>
-					<div class="d-flex justify-content-center align-items-center h-100 testo-piccolo mt-2">
-						<label>DESCRIZIONE FASE</label>
-					</div>
-				</Template>
-			</DxGridLayoutItem>
-
-			<DxGridLayoutItem Row="7"
-							  Column="0" ColumnSpan="2">
-				<Template>
-					<DxTextBox Text="@(InfoBaseAttivitaViewModel.DescrizioneFase)"
+					<DxTextBox Text="@(InfoBaseAttivitaViewModel.CodiceDescrizioneArticolo)"
 							   Enabled="false"
 							   CssClass="dxbl-text-edit mt-2" />
 				</Template>
@@ -160,7 +120,7 @@
 
 		@if (ShowDataSchedulata)
 		{
-			<DxGridLayoutItem Row="8"
+			<DxGridLayoutItem Row="6"
 							  Column="0">
 				<Template>
 					<div class="d-flex justify-content-center align-items-center h-100 testo-piccolo mt-2">
@@ -169,7 +129,7 @@
 				</Template>
 			</DxGridLayoutItem>
 
-			<DxGridLayoutItem Row="9"
+			<DxGridLayoutItem Row="7"
 							  Column="0">
 				<Template>
 					<DxTextBox Text="@(InfoBaseAttivitaViewModel.DataSchedulata)"
@@ -178,7 +138,7 @@
 				</Template>
 			</DxGridLayoutItem>
 
-			<DxGridLayoutItem Row="8" RowSpan="2"
+			<DxGridLayoutItem Row="6" RowSpan="2"
 							  Column="1"
 							  Visible="@(InfoBaseAttivitaViewModel.IsDataSchedulataLontana)">
 				<Template>

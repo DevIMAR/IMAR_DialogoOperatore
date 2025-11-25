@@ -24,7 +24,7 @@ namespace IMAR_DialogoOperatore.Commands
 
         public override bool CanExecute(object? parameter)
         {
-            IAttivitaViewModel? primaFase = _cercaAttivitaObserver.AttivitaTrovate?.OrderBy(a => a.Fase).FirstOrDefault();
+            IAttivitaViewModel? primaFase = _cercaAttivitaObserver.AttivitaTrovate?.OrderBy(a => a.CodiceFase).FirstOrDefault();
 
             return _dialogoOperatoreObserver.AttivitaSelezionata != null &&
                    !string.IsNullOrWhiteSpace(_dialogoOperatoreObserver.OperazioneInCorso) &&

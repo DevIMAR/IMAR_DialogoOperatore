@@ -4,12 +4,14 @@ namespace IMAR_DialogoOperatore.Interfaces.ViewModels
 {
     public interface IAttivitaViewModel
     {
-        string? Articolo { get; }
+        string? CodiceArticolo { get; }
         string? Bolla { get; }
         string Causale { get; set; }
         string? DescrizioneArticolo { get; }
+        string? CodiceDescrizioneArticolo { get; }
         string? DescrizioneFase { get; }
-        string? Fase { get; }
+        string? CodiceFase { get; }
+        string? CodiceDescrizioneFase { get; }
         string? Odp { get; }
         int QuantitaOrdine { get; }
         int QuantitaProdotta { get; }

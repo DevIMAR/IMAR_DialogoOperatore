@@ -34,7 +34,7 @@
 				</CellDisplayTemplate>
 			</DxGridDataColumn>
 
-			<DxGridDataColumn FieldName="@(nameof(AttivitaViewModel.Articolo))"
+			<DxGridDataColumn FieldName="@(nameof(AttivitaViewModel.CodiceArticolo))"
 							  Caption="Articolo"
 							  TextAlignment="GridTextAlignment.Left"
 							  Width="13%">
@@ -42,9 +42,9 @@
 					@{
 						AttivitaViewModel itemRow = (AttivitaViewModel)context.DataItem;
 
-						if (itemRow.Articolo != null && !itemRow.Articolo.Equals(string.Empty))
+						if (itemRow.CodiceArticolo != null && !itemRow.CodiceArticolo.Equals(string.Empty))
 						{
-							<DocumentaleView ProprietaDaCercare="articolo" Codice="@itemRow.Articolo" ShowIcon="false" />
+							<DocumentaleView ProprietaDaCercare="articolo" Codice="@itemRow.CodiceArticolo" ShowIcon="false" />
 						}
 					}
 				</CellDisplayTemplate>
@@ -56,7 +56,7 @@
 							  Width="28%">
 			</DxGridDataColumn>
 
-			<DxGridDataColumn FieldName="@(nameof(AttivitaViewModel.Fase))"
+			<DxGridDataColumn FieldName="@(nameof(AttivitaViewModel.CodiceFase))"
 							  Caption="Fase"
 							  TextAlignment="GridTextAlignment.Left"
 							  Width="5%"
