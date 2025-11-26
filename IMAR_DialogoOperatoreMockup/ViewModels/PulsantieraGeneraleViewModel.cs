@@ -58,36 +58,21 @@ namespace IMAR_DialogoOperatore.ViewModels
 			FineLavoroCommand = fineLavoroCommand;
 			AnnulaOperazioneCommand = annullaOperazioneCommand;
 
-			_dialogoOperatoreObserver.OnAttivitaSelezionataChanged += DialogoOperatoreObserver_OnAttivitaSelezionataChanged;
+			_dialogoOperatoreObserver.OnAttivitaSelezionataChanged += OnNotifyStateChanged;
 			_dialogoOperatoreObserver.OnOperatoreSelezionatoChanged += DialogoOperatoreObserver_OnOperatoreSelezionatoChanged;
-            _dialogoOperatoreObserver.OnIsDettaglioAttivitaOpenChanged += DialogoOperatoreObserver_OnIsDettaglioAttivitaOpenChanged;
+            _dialogoOperatoreObserver.OnIsDettaglioAttivitaOpenChanged += OnNotifyStateChanged;
+            _dialogoOperatoreObserver.OnIsExitingChanged += OnNotifyStateChanged;
         }
-
-		private void DialogoOperatoreObserver_OnAttivitaSelezionataChanged()
-		{
-			OnNotifyStateChanged();
-		}
 
 		private void DialogoOperatoreObserver_OnOperatoreSelezionatoChanged()
 		{
 			OperatoreSelezionato = _dialogoOperatoreObserver.OperatoreSelezionato;
 		}
 
-		private void DialogoOperatoreObserver_OnIsDettaglioAttivitaOpenChanged()
-        {
-            OnNotifyStateChanged();
-        }
-
-
-        private void OperatoreSelezionato_NotifyStateChanged()
-		{
-			OnNotifyStateChanged();
-		}
-
 		private void UnsubscribeEventoOperatore()
 		{
 			if (OperatoreSelezionato != null)
-				((OperatoreViewModel)OperatoreSelezionato).NotifyStateChanged -= OperatoreSelezionato_NotifyStateChanged;
+				((OperatoreViewModel)OperatoreSelezionato).NotifyStateChanged -= OnNotifyStateChanged;
 		}
 
 		private void UpdateOperatoreSelezionato(IOperatoreViewModel? value)
@@ -96,15 +81,16 @@ namespace IMAR_DialogoOperatore.ViewModels
 
 			if (OperatoreSelezionato != null)
 			{
-				((OperatoreViewModel)OperatoreSelezionato).NotifyStateChanged += OperatoreSelezionato_NotifyStateChanged;
+				((OperatoreViewModel)OperatoreSelezionato).NotifyStateChanged += OnNotifyStateChanged;
 			}
 		}
 
 		public override void Dispose()
 		{
-			_dialogoOperatoreObserver.OnAttivitaSelezionataChanged -= DialogoOperatoreObserver_OnAttivitaSelezionataChanged;
+			_dialogoOperatoreObserver.OnAttivitaSelezionataChanged -= OnNotifyStateChanged;
 			_dialogoOperatoreObserver.OnOperatoreSelezionatoChanged -= DialogoOperatoreObserver_OnOperatoreSelezionatoChanged;
-            _dialogoOperatoreObserver.OnIsDettaglioAttivitaOpenChanged -= DialogoOperatoreObserver_OnIsDettaglioAttivitaOpenChanged;
+            _dialogoOperatoreObserver.OnIsDettaglioAttivitaOpenChanged -= OnNotifyStateChanged;
+            _dialogoOperatoreObserver.OnIsExitingChanged -= OnNotifyStateChanged;
         }
 	}
 }

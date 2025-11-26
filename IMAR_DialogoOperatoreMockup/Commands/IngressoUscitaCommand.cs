@@ -45,6 +45,7 @@ namespace IMAR_DialogoOperatore.Commands
         {
             _infoOperatoreViewModel.Badge = null;
             _dialogoOperatoreObserver.IsUscita = false;
+            _dialogoOperatoreObserver.IsExiting = false;
         }
 
         public override bool CanExecute(object? parameter)
@@ -77,7 +78,7 @@ namespace IMAR_DialogoOperatore.Commands
 
             _dialogoOperatoreObserver.OperatoreSelezionato.Stato = Costanti.PRESENTE;
 
-            _toastDisplayerUtility.ShowGreenToast("Entrata", $"Benvenuto {_dialogoOperatoreObserver.OperatoreSelezionato.Nome}!");
+            _toastDisplayerUtility.ShowGreenToast("Entrata", $"Benvenuto/a {_dialogoOperatoreObserver.OperatoreSelezionato.Nome}!");
         }
 
         private async Task EffettuaUscitaOperatore()
@@ -98,6 +99,8 @@ namespace IMAR_DialogoOperatore.Commands
             _jmesApiClient.MesAutoClock(_dialogoOperatoreObserver.OperatoreSelezionato.Badge.ToString(), false);
 
             _dialogoOperatoreObserver.IsLoaderVisibile = false;
+            _dialogoOperatoreObserver.IsExiting = true;
+            await Task.Delay(1);
 
             _dialogoOperatoreObserver.OperatoreSelezionato.Stato = Costanti.ASSENTE;
 

@@ -15,6 +15,7 @@ namespace IMAR_DialogoOperatore.Interfaces.Observers
 		bool IsRiaperturaAttiva { get; set; }
 		bool IsAperturaLavoroAutomaticaAttiva { get; set; }
 		bool IsOperazioneGestita { get; set; }
+		bool IsExiting { get; set; }
 
 		event Action? OnIsUscitaChanged;
 		event Action? OnIsLoaderVisibileChanged;
@@ -27,5 +28,6 @@ namespace IMAR_DialogoOperatore.Interfaces.Observers
 		event Action? OnIsRiaperturaAttivaChanged;
 		event Action? OnIsAperturaLavoroAutomaticaAttivaChanged;
 		event Action? OnIsOperazioneGestitaChanged;
+		event Action? OnIsExitingChanged;
 	}
 }

@@ -16,6 +16,7 @@ namespace IMAR_DialogoOperatore.Observers
 		private bool _isRiaperturaAttiva;
 		private bool _isOperazioneGestita;
 		private bool _isAperturaLavoroAutomaticaAttiva;
+		private bool _isExiting;
 
 		public IEnumerable<IAttivitaViewModel>? ListaAttivita
 		{
@@ -122,6 +123,16 @@ namespace IMAR_DialogoOperatore.Observers
             }
 		}
 
+        public bool IsExiting 
+		{ 
+			get { return _isExiting; }
+			set
+			{
+                _isExiting = value;
+				InvokeAsync(OnIsExitingChanged);
+            }
+		}
+
         public event Action? OnListaAttivitaChanged;
 		public event Action? OnAttivitaSelezionataChanged;
 		public event Action? OnOperatoreSelezionatoChanged;
@@ -133,5 +144,6 @@ namespace IMAR_DialogoOperatore.Observers
         public event Action? OnIsRiaperturaAttivaChanged;
         public event Action? OnIsOperazioneGestitaChanged;
         public event Action? OnIsAperturaLavoroAutomaticaAttivaChanged;
+        public event Action? OnIsExitingChanged;
     }
 }

@@ -45,6 +45,7 @@ namespace IMAR_DialogoOperatore.Commands
         {
             _infoOperatoreViewModel.Badge = null;
             _dialogoOperatoreObserver.IsUscita = false;
+            _dialogoOperatoreObserver.IsExiting = false;
         }
 
         public override bool CanExecute(object? parameter)
@@ -79,7 +80,7 @@ namespace IMAR_DialogoOperatore.Commands
             _dialogoOperatoreObserver.IsLoaderVisibile = false;
 
             _dialogoOperatoreObserver.OperatoreSelezionato.Stato = Costanti.PRESENTE;
-            _toastDisplayerUtility.ShowGreenToast("Rientro", $"Bentornato {_dialogoOperatoreObserver.OperatoreSelezionato.Nome}!");
+            _toastDisplayerUtility.ShowGreenToast("Rientro", $"Bentornato/a {_dialogoOperatoreObserver.OperatoreSelezionato.Nome}!");
         }
 
         private async Task InizioPausa()
@@ -98,7 +99,10 @@ namespace IMAR_DialogoOperatore.Commands
             await Task.Delay(1);
             _jmesApiClient.MesBreakStart(_dialogoOperatoreObserver.OperatoreSelezionato.Badge.ToString());
             _dialogoOperatoreObserver.OperatoreSelezionato = new OperatoreViewModel(_operatoriService.OttieniOperatore(_dialogoOperatoreObserver.OperatoreSelezionato.Badge));
+           
             _dialogoOperatoreObserver.IsLoaderVisibile = false;
+            _dialogoOperatoreObserver.IsExiting = true;
+            await Task.Delay(1);
 
             _dialogoOperatoreObserver.OperatoreSelezionato.Stato = Costanti.IN_PAUSA;
             _toastDisplayerUtility.ShowYellowToast("Pausa", $"Buona pausa {_dialogoOperatoreObserver.OperatoreSelezionato.Nome}!");
