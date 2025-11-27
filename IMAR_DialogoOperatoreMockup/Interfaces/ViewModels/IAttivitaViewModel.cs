@@ -28,5 +28,6 @@ namespace IMAR_DialogoOperatore.Interfaces.ViewModels
         DateTime? DataSchedulata { get; }
         DateTime? InizioAttivita { get; }
         DateTime? FineAttivita { get; }
+        List<Nota> Note { get; set; }
     }
 }

@@ -28,8 +28,19 @@
 				  RenderStyle="ButtonRenderStyle.Warning"
 				  RenderStyleMode="ButtonRenderStyleMode.Outline"
 				  Enabled="@GestoreAttivitaViewModel.CreaFaseNonPianificataCommand.CanExecute(null)"
-				  Click="@GestoreAttivitaViewModel.CreaFaseNonPianificataCommand.Execute" 
-				  CssClass="d-flex justify-content-center align-items-center conferma-dettagli" />*@
+				  Click="@GestoreAttivitaViewModel.CreaFaseNonPianificataCommand.Execute"
+				  CssClass="d-flex justify-content-center align-items-center conferma-dettagli" /> *@
+
+		<DxButton style="margin-right: 3%;"
+				  RenderStyle="ButtonRenderStyle.Warning"
+				  RenderStyleMode="ButtonRenderStyleMode.Outline"
+				  Enabled="@GestoreAttivitaViewModel.CreaFaseNonPianificataCommand.CanExecute(null)"
+				  Click="@GestoreAttivitaViewModel.CreaFaseNonPianificataCommand.Execute"
+				  CssClass="d-flex justify-content-center align-items-center conferma-dettagli">
+			<label>
+				Note: @GestoreAttivitaViewModel.CounterNote
+			</label>
+		</DxButton>
 
 		<DxButton Text="Conferma"
 				  RenderStyle="ButtonRenderStyle.Warning"

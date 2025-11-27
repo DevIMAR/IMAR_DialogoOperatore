@@ -31,7 +31,7 @@ namespace IMAR_DialogoOperatore.ViewModels
         public DateTime? DataSchedulata => _attivita?.DataSchedulata;
         public DateTime? InizioAttivita => _attivita?.InizioAttivita;
 		public DateTime? FineAttivita => _attivita?.FineAttivita;
-
+		public List<Nota> Note { get; set; }
 
         public string Causale
 		{
@@ -56,6 +56,7 @@ namespace IMAR_DialogoOperatore.ViewModels
 			QuantitaScartataNonContabilizzata = _attivita.QuantitaScartataNonContabilizzata;
             QuantitaScartataContabilizzata = _attivita.QuantitaScartataContabilizzata;
 			SaldoAcconto = _attivita.SaldoAcconto;
+			Note = _attivita.Note;
 		}
 	}
 }
