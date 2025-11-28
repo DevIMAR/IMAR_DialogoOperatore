@@ -8,7 +8,7 @@ namespace IMAR_DialogoOperatore.ViewModels
         private Nota _nota;
 
         public string? Operatore => _nota.Operatore;
-        public DateTime DataImmissione => _nota.DataImmissione;
+        public DateTime DataImmissione => DateTime.ParseExact(_nota.DataImmissione.ToString(), "dd/MM/yyyy", null);
         public string Odp => _nota.Odp;
         public string Fase => _nota.Fase;
         public string Bolla => _nota.Bolla;

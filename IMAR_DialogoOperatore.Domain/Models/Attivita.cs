@@ -24,6 +24,6 @@
         public DateTime DataSchedulata { get; set; }
         public DateTime InizioAttivita { get; set; }
         public DateTime? FineAttivita { get; set; }
-        public List<Nota> Note { get; set; }
+        public IEnumerable<Nota> Note { get; set; }
     }
 }

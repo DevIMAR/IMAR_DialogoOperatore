@@ -227,9 +227,7 @@
 		if (string.IsNullOrWhiteSpace(BollaRef.Value) || InfoBaseAttivitaViewModel.IsAttivitaSelezionata)
 			return;
 
-		InfoBaseAttivitaViewModel.Odp = string.Empty;
-
-		InfoBaseAttivitaViewModel.CercaAttivitaHelper.CercaAttivitaDaBolla(BollaRef.Value);
+		InfoBaseAttivitaViewModel.CercaAttivitaDaBolla(BollaRef.Value);
 	}
 
 	private async void HandleOdpKeyPress(KeyboardEventArgs e)
@@ -253,12 +251,9 @@
 		if (string.IsNullOrWhiteSpace(OdpRef.Value) || InfoBaseAttivitaViewModel.IsAttivitaSelezionata)
 			return;
 
-		while (OdpRef.Value.Length < 8)
-			OdpRef.Value = "0" + OdpRef.Value;
+		OdpRef.Value = OdpRef.Value.PadLeft(8, '0');
 
-		InfoBaseAttivitaViewModel.Bolla = string.Empty;
-
-		InfoBaseAttivitaViewModel.CercaAttivitaHelper.CercaAttivitaDaOdp(OdpRef.Value);
+		InfoBaseAttivitaViewModel.CercaAttivitaDaOdp(OdpRef.Value);
 	}
 
 	private async Task SetFocusToFasi()

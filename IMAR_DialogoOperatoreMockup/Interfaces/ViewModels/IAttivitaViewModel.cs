@@ -2,7 +2,7 @@
 
 namespace IMAR_DialogoOperatore.Interfaces.ViewModels
 {
-    public interface IAttivitaViewModel
+    public interface IAttivitaViewModel : IViewModelBase
     {
         string? CodiceArticolo { get; }
         string? Bolla { get; }
@@ -28,6 +28,6 @@ namespace IMAR_DialogoOperatore.Interfaces.ViewModels
         DateTime? DataSchedulata { get; }
         DateTime? InizioAttivita { get; }
         DateTime? FineAttivita { get; }
-        List<Nota> Note { get; set; }
+        IEnumerable<Nota> Note { get; set; }
     }
 }

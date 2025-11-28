@@ -103,15 +103,13 @@ namespace IMAR_DialogoOperatore.Services
                                                                             pf2.QSCACI AS QUANTITASCARTATACONTABILIZZATA,
                                                                             COALESCE(SUM(jf.QTNCOJM), 0) AS QTANONCONFORMENONCONTABILIZZATA,
                                                                             pf2.QRESCI AS QTANONCONFORMECONTABILIZZATA,
-                                                                            pm.COMMPM AS NOTA,
                                                                             CASE WHEN MAX(SAACCJM) IS NULL THEN max(TIRECI) ELSE  MAX(SAACCJM) end AS SALDOACCONTO
                                                                             FROM IMA90DAT.PCIMP00F pf2 
                                                                             JOIN IMA90DAT.MGART00F mf ON pf2.CDARCI = mf.CDARMA 
                                                                             LEFT JOIN IMA90DAT.JMRILM00F jf ON NRBLCI = NRTSKJM AND jf.QCONTJM = ''
-                                                                                 LEFT JOIN IMA90DAT.PMNOT00F pm ON ORPRPM = ORPRCI AND CDFAPM = CDFACI
                                                                             WHERE NRBLCI = '" + bolla + @"'
                                                                             GROUP BY NRBLCI, ORPRCI, CDARCI, DSARMA, CDFACI, DSFACI,
-                                                                                    pf2.QORDCI, pf2.QPROCI, pf2.QSCACI, pf2.QRESCI, pm.COMMPM")
+                                                                                    pf2.QORDCI, pf2.QPROCI, pf2.QSCACI, pf2.QRESCI")
                                                   .SingleOrDefault();
                                                                             
             return attivitaTrovata;
@@ -132,15 +130,13 @@ namespace IMAR_DialogoOperatore.Services
                                                                             pf2.QSCACI AS QUANTITASCARTATACONTABILIZZATA,
                                                                             COALESCE(SUM(jf.QTNCOJM), 0) AS QTANONCONFORMENONCONTABILIZZATA,
                                                                             pf2.QRESCI AS QTANONCONFORMECONTABILIZZATA,
-                                                                            pm.COMMPM AS NOTA,
                                                                             CASE WHEN MAX(SAACCJM) IS NULL THEN max(TIRECI) ELSE  MAX(SAACCJM) end AS SALDOACCONTO
                                                                             FROM IMA90DAT.PCIMP00F pf2 
                                                                             JOIN IMA90DAT.MGART00F mf ON pf2.CDARCI = mf.CDARMA 
                                                                             LEFT JOIN IMA90DAT.JMRILM00F jf ON NRBLCI = NRTSKJM AND jf.QCONTJM = ''
-                                                                            LEFT JOIN IMA90DAT.PMNOT00F pm ON ORPRPM = ORPRCI AND CDFAPM = CDFACI
                                                                             WHERE ORPRCI = '" + odp + @"'
                                                                             GROUP BY NRBLCI, ORPRCI, CDARCI, DSARMA, CDFACI, DSFACI,
-                                                                                    pf2.QORDCI, pf2.QPROCI, pf2.QSCACI, pf2.QRESCI, pm.COMMPM");
+                                                                                    pf2.QORDCI, pf2.QPROCI, pf2.QSCACI, pf2.QRESCI");
 
             return attivitaFiltrate.OrderBy(x => x.Bolla);
         }

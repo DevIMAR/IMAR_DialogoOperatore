@@ -1,4 +1,5 @@
 ﻿using IMAR_DialogoOperatore.Application;
+using IMAR_DialogoOperatore.Application.Interfaces.Services.Activities;
 using IMAR_DialogoOperatore.Commands;
 using IMAR_DialogoOperatore.Interfaces.Helpers;
 using IMAR_DialogoOperatore.Interfaces.Observers;
@@ -11,6 +12,8 @@ namespace IMAR_DialogoOperatore.ViewModels
     {
         private readonly IDialogoOperatoreObserver _dialogoOperatoreObserver;
         private readonly ICercaAttivitaObserver _cercaAttivitaObserver;
+        private readonly ICercaAttivitaHelper _cercaAttivitaHelper;
+        private readonly INotaService _notaService;
 
         private IAttivitaViewModel? _attivitaSelezionata;
         private string? _bolla;
@@ -18,14 +21,13 @@ namespace IMAR_DialogoOperatore.ViewModels
         private IEnumerable<string>? _fasiPerAttivita;
         private string _faseSelezionata;
 
-        public ICercaAttivitaHelper CercaAttivitaHelper { get; private set; }
         public ICommand ApriListaIndirette { get; private set; }
 
         public string? CodiceDescrizioneArticolo => _attivitaSelezionata != null ? _attivitaSelezionata.CodiceDescrizioneArticolo : string.Empty;
         public string? DataSchedulata => _attivitaSelezionata != null ? _attivitaSelezionata.DataSchedulata?.ToString("dd/MM/yyyy") : string.Empty;
         public bool IsAttivitaSelezionata => _dialogoOperatoreObserver.AttivitaSelezionata?.Bolla == Bolla &&
                                              _dialogoOperatoreObserver.AttivitaSelezionata?.Odp == Odp;
-        public bool IsDataSchedulataLontana => _attivitaSelezionata?.DataSchedulata > DateTime.Today.AddDays(10);
+        public bool IsDataSchedulataLontana => _attivitaSelezionata?.DataSchedulata > DateTime.Today.AddDays(Costanti.LIMITE_GIORNO_VICINO);
 
         public string TestoDataLontana => Costanti.TESTO_DATA_LONTANA;
 
@@ -71,7 +73,8 @@ namespace IMAR_DialogoOperatore.ViewModels
             {
                 _faseSelezionata = value;
 
-                CercaAttivitaHelper.CercaAttivitaDaFase(value.Substring(0, 3));
+                _cercaAttivitaHelper.CercaAttivitaDaFase(value.Substring(0, 3));
+                GetNoteAttivita();
 
                 OnNotifyStateChanged();
             }
@@ -81,13 +84,16 @@ namespace IMAR_DialogoOperatore.ViewModels
             IDialogoOperatoreObserver dialogoOperatoreObserver,
             ICercaAttivitaObserver cercaAttivitaObserver,
             ICercaAttivitaHelper cercaAttivitaHelper,
-            MostraIndiretteCommand mostraIndiretteCommand)
+            MostraIndiretteCommand mostraIndiretteCommand,
+            INotaService notaService)
         {
             _dialogoOperatoreObserver = dialogoOperatoreObserver;
             _cercaAttivitaObserver = cercaAttivitaObserver;
 
-            CercaAttivitaHelper = cercaAttivitaHelper;
+            _cercaAttivitaHelper = cercaAttivitaHelper;
             ApriListaIndirette = mostraIndiretteCommand;
+
+            _notaService = notaService;
 
             _dialogoOperatoreObserver.OnIsDettaglioAttivitaOpenChanged += DialogoOperatoreObserver_OnIsDettaglioAttivitaOpenChanged;
             _dialogoOperatoreObserver.OnAttivitaSelezionataChanged += DialogoOperatoreStore_OnAttivitaSelezionataChanged;
@@ -129,6 +135,37 @@ namespace IMAR_DialogoOperatore.ViewModels
             _faseSelezionata = _attivitaSelezionata.CodiceDescrizioneFase;
             _odp = _attivitaSelezionata.Odp ?? string.Empty;
             _bolla = _attivitaSelezionata.Bolla ?? string.Empty;
+
+            OnNotifyStateChanged();
+        }
+
+        public void CercaAttivitaDaBolla(string bolla)
+        {
+            Odp = string.Empty;
+
+            _cercaAttivitaHelper.CercaAttivitaDaBolla(bolla);
+            GetNoteAttivita();
+        }
+
+        public void CercaAttivitaDaOdp(string odp)
+        {
+            Bolla = string.Empty;
+
+            _cercaAttivitaHelper.CercaAttivitaDaOdp(odp.Trim());
+            GetNoteAttivita();
+        }
+
+        public void GetNoteAttivita()
+        {
+            IAttivitaViewModel? attivita = _dialogoOperatoreObserver.AttivitaSelezionata;
+
+            if (attivita == null)
+                return;
+
+            if (attivita.Bolla.Contains("AI"))
+                _dialogoOperatoreObserver.AttivitaSelezionata.Note = _notaService.GetNoteDaBolla(attivita.Bolla);
+            else
+                _dialogoOperatoreObserver.AttivitaSelezionata.Note = _notaService.GetNoteDaOdpFase(attivita.Odp, attivita.CodiceFase);
 
             OnNotifyStateChanged();
         }

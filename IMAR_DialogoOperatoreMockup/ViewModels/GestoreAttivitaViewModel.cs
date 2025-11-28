@@ -13,7 +13,7 @@ namespace IMAR_DialogoOperatore.ViewModels
 
 		public bool IsOpen => IsOpenCondition();
 		public string? OperazioneInCorso => _dialogoOperatoreObserver.OperazioneInCorso;
-		public int CounterNote => _dialogoOperatoreObserver.AttivitaSelezionata?.Note.Count ?? 0;
+		public int CounterNote => _dialogoOperatoreObserver.AttivitaSelezionata?.Note?.Count() ?? 0;
 
 		public ICommand ConfermaCommand { get; set; }
 		public ICommand CreaFaseNonPianificataCommand { get; set; }
@@ -30,11 +30,10 @@ namespace IMAR_DialogoOperatore.ViewModels
 			ConfermaCommand = confermaCommand;
 			CreaFaseNonPianificataCommand = creaFaseNonPianificataCommand;
 
-
             _dialogoOperatoreObserver.OnAttivitaSelezionataChanged += AttivitaStore_OnAttivitaSelezionataChanged;
 			_dialogoOperatoreObserver.OnOperazioneInCorsoChanged += DialogoOperatoreStore_OnOperazioneInCorsoChanged;
             _dialogoOperatoreObserver.OnOperatoreSelezionatoChanged += DialogoOperatoreObserver_OnOperatoreSelezionatoChanged;
-		}
+        }
 
         private void DialogoOperatoreStore_OnOperazioneInCorsoChanged()
 		{
@@ -82,9 +81,10 @@ namespace IMAR_DialogoOperatore.ViewModels
 		}
 
 		public override void Dispose()
-		{
-			_dialogoOperatoreObserver.OnAttivitaSelezionataChanged -= AttivitaStore_OnAttivitaSelezionataChanged;
-			_dialogoOperatoreObserver.OnOperazioneInCorsoChanged -= DialogoOperatoreStore_OnOperazioneInCorsoChanged;
-		}
+        {
+            _dialogoOperatoreObserver.OnAttivitaSelezionataChanged -= AttivitaStore_OnAttivitaSelezionataChanged;
+            _dialogoOperatoreObserver.OnOperazioneInCorsoChanged -= DialogoOperatoreStore_OnOperazioneInCorsoChanged;
+            _dialogoOperatoreObserver.OnOperatoreSelezionatoChanged -= DialogoOperatoreObserver_OnOperatoreSelezionatoChanged;
+        }
 	}
 }
