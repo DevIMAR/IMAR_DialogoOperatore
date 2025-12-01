@@ -24,7 +24,7 @@ namespace IMAR_DialogoOperatore.Commands
         public override void Execute(object? parameter)
         {
             if (parameter is bool isVisibile)
-                _taskPopupViewModel.Visible = isVisibile;
+                _taskPopupViewModel.IsVisible = isVisibile;
         }
     }
 }

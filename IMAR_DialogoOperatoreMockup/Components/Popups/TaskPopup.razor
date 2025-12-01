@@ -8,7 +8,7 @@
 @inject IDialogoOperatoreObserver DialogoOperatoreObserver
 @inject IAutoLogoutUtility AutoLogoutUtility
 
-<DxPopup @bind-Visible="@TaskPopupViewModel.Visible"
+<DxPopup @bind-Visible="@TaskPopupViewModel.IsVisible"
 		 HeaderText="Invio notifica errore"
 		 ShowHeader="true"
 		 ShowCloseButton="true"
@@ -109,6 +109,6 @@
 
 	private void ChiudiPopup()
 	{
-		TaskPopupViewModel.Visible = false;
+		TaskPopupViewModel.IsVisible = false;
 	}
 }

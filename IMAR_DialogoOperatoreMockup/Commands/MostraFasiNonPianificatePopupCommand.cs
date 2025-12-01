@@ -38,7 +38,7 @@ namespace IMAR_DialogoOperatore.Commands
 
         public override void Execute(object? parameter)
         {
-            _fasiNonPianificatePopupViewModel.MostraPopup = true;
+            _fasiNonPianificatePopupViewModel.IsVisible = true;
         }
     }
 }

@@ -2,12 +2,13 @@
 
 namespace IMAR_DialogoOperatore.ViewModels
 {
-    public class PopupTimbratureViewModel : PopupViewModelBase
+    public class NotePopupViewModel : PopupViewModelBase
     {
-        public PopupTimbratureViewModel(
+        public NotePopupViewModel(
             IDialogoOperatoreObserver dialogoOperatoreObserver)
-            :base(dialogoOperatoreObserver)
+            :base(dialogoOperatoreObserver) 
         {
+            
         }
     }
 }

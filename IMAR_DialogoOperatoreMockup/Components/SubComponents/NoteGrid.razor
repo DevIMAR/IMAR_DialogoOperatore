@@ -1,0 +1,97 @@
+﻿@using IMAR_DialogoOperatore.Interfaces.ViewModels
+@using IMAR_DialogoOperatore.ViewModels
+
+@inject NoteGridViewModel NoteGridViewModel
+
+<DxGrid @bind-Data="@NoteGridViewModel.Note"
+		AllowSort="false"
+		AllowSelectRowByClick="true"
+		SelectionMode="GridSelectionMode.Single"
+        PageSize="25"
+        EditModelSaving="Grid_EditModelSaving"
+        CustomizeEditModel="Grid_CustomizeEditModel"
+        @ref="Grid"
+        id="grid-id">
+    <ToolbarTemplate>
+        <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
+            <DxToolbarItem Text="Aggiungi" 
+                           Click="NewItem_Click"
+                           RenderStyle="ButtonRenderStyle.Warning"
+                           RenderStyleMode="ToolbarItemRenderStyleMode.Plain"
+                           CssClass="d-flex justify-content-center align-items-center testo-piccolo p-3" />
+        </DxToolbar>
+    </ToolbarTemplate>
+
+    <Columns>
+        <DxGridDataColumn FieldName="DataImmissione" Width="15%" />
+        <DxGridDataColumn FieldName="Operatore" Width="20%" />
+        <DxGridDataColumn FieldName="Bolla" Width="10%" />
+        <DxGridDataColumn FieldName="Testo" />
+	</Columns>
+
+    <EditFormTemplate Context="EditFormContext">
+        <DxFormLayout CssClass="w-100">
+            <DxFormLayoutItem Caption="Testo:" ColSpanMd="12">
+                @EditFormContext.GetEditor("Testo")
+            </DxFormLayoutItem>
+        </DxFormLayout>
+    </EditFormTemplate>
+</DxGrid>
+
+@code {
+    IGrid Grid { get; set; }
+    bool EditItemsEnabled { get; set; }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        NoteGridViewModel.NotifyStateChanged += NoteGridViewModel_NotifyStateChanged;
+    }
+
+    protected override Task OnParametersSetAsync()
+    {
+        StateHasChanged();
+        return base.OnParametersSetAsync();
+    }
+
+    async void NoteGridViewModel_NotifyStateChanged()
+    {
+        await InvokeAsync(StateHasChanged);
+    }
+
+    async Task NewItem_Click()
+    {
+        await Grid.StartEditNewRowAsync();
+    }
+
+    void Grid_CustomizeEditModel(GridCustomizeEditModelEventArgs e)
+    {
+        if (e.IsNew)
+        {
+            if (e.EditModel == null)
+                e.EditModel = new NotaViewModel(null);
+            INotaViewModel nuovaNota = (INotaViewModel)e.EditModel;
+            nuovaNota.Testo = "";
+        }
+    }
+
+    async Task Grid_EditModelSaving(GridEditModelSavingEventArgs e)
+    {
+        if (e.IsNew)
+        {
+            NoteGridViewModel.InsertNuovaNota((INotaViewModel)e.EditModel);
+            UpdateEditItemsEnabled(true);
+        }
+        await LoadGridDataAsync();
+    }
+
+    void UpdateEditItemsEnabled(bool enabled)
+    {
+        EditItemsEnabled = enabled;
+    }
+
+    async Task LoadGridDataAsync()
+    {
+        NoteGridViewModel.Note = NoteGridViewModel.GetNoteAttivita();
+    }
+}

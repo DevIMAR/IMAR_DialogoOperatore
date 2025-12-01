@@ -147,6 +147,16 @@
 					</div>
 				</Template>
 			</DxGridLayoutItem>
+
+			<DxGridLayoutItem Row="6" RowSpan="2"
+							  Column="1"
+							  Visible="@(InfoBaseAttivitaViewModel.IsAttivitaNonSchedulata)">
+				<Template>
+					<div class="d-flex justify-content-center align-items-center h-100 testo-piccolo ms-2 mt-2 giallo">
+						@InfoBaseAttivitaViewModel.TestoAttivitaNonSchedulata
+					</div>
+				</Template>
+			</DxGridLayoutItem>
 		}
 	</Items>
 </DxGridLayout>

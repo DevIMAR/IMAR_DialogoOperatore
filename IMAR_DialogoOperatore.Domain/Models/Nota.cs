@@ -4,8 +4,8 @@
     {
         public decimal DataImmissione { get; set; }
         public string? Operatore { get; set; }
-        public required string Odp {  get; set; }
-        public required string Fase { get; set; }
+        public string? Odp {  get; set; }
+        public string? Fase { get; set; }
         public required decimal Riga { get; set; }
         public required string Testo { get; set; }
         public string? Bolla { get; set; }
