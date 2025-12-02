@@ -23,7 +23,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
 
         public IEnumerable<Nota> GetNoteAttivita(Attivita? attivita)
         { 
-            if (attivita == null)
+            if (attivita == null || attivita.Bolla.Length == 5)
                 return new List<Nota>();
 
             if (attivita.Bolla.Contains("AI"))
@@ -50,6 +50,9 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
         }
         public void AggiungiNota(Attivita? attivita, string? testo)
         {
+            if (attivita == null || (attivita.Bolla.Length == 5 && !attivita.Bolla.Contains("AI")))
+                return;
+
             try
             {
                 ArgumentNullException.ThrowIfNull(attivita);
