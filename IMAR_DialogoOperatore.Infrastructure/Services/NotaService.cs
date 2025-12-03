@@ -23,7 +23,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
 
         public IEnumerable<Nota> GetNoteAttivita(Attivita? attivita)
         { 
-            if (attivita == null || attivita.Bolla.Length == 5)
+            if (attivita == null || (attivita.Bolla.Length == 5 && !attivita.Bolla.Contains("AI")))
                 return new List<Nota>();
 
             if (attivita.Bolla.Contains("AI"))

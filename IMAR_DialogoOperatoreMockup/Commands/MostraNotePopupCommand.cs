@@ -19,8 +19,10 @@ namespace IMAR_DialogoOperatore.Commands
         public override bool CanExecute(object? parameter)
         {
             return _dialogoOperatoreObserver.AttivitaSelezionata != null &&
-                    (_dialogoOperatoreObserver.AttivitaSelezionata.Bolla.Length == 5 
-                        && _dialogoOperatoreObserver.AttivitaSelezionata.Bolla.Contains("AI"));
+                    _dialogoOperatoreObserver.AttivitaSelezionata.Bolla != null &&
+                    (_dialogoOperatoreObserver.AttivitaSelezionata.Bolla.Length == 6 ||
+                        (_dialogoOperatoreObserver.AttivitaSelezionata.Bolla.Length == 5 
+                            && _dialogoOperatoreObserver.AttivitaSelezionata.Bolla.Contains("AI")));
         }
 
         public override void Execute(object? parameter)
