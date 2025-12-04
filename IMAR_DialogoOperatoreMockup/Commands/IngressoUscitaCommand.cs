@@ -3,8 +3,10 @@ using IMAR_DialogoOperatore.Application.Interfaces.Clients;
 using IMAR_DialogoOperatore.Application.Interfaces.Services.Activities;
 using IMAR_DialogoOperatore.Application.Interfaces.Utilities;
 using IMAR_DialogoOperatore.Domain.Models;
+using IMAR_DialogoOperatore.Enums;
 using IMAR_DialogoOperatore.Interfaces.Helpers;
 using IMAR_DialogoOperatore.Interfaces.Observers;
+using IMAR_DialogoOperatore.Interfaces.Services;
 using IMAR_DialogoOperatore.Interfaces.ViewModels;
 using IMAR_DialogoOperatore.Utilities;
 using IMAR_DialogoOperatore.ViewModels;
@@ -20,6 +22,7 @@ namespace IMAR_DialogoOperatore.Commands
         private readonly IAutoLogoutUtility _autoLogoutUtility;
         private readonly ToastDisplayerUtility _toastDisplayerUtility;
         private readonly IOperatoreService _operatoreService;
+        private readonly IMessageBoxService _messageBoxService;
 
         public IngressoUscitaCommand(
 			InfoOperatoreViewModel infoOperatoreViewModel,
@@ -28,7 +31,8 @@ namespace IMAR_DialogoOperatore.Commands
 			IJmesApiClient jmesApiClient,
             IAutoLogoutUtility autoLogoutUtility,
             ToastDisplayerUtility toastDisplayerUtility,
-            IOperatoreService operatoreService)
+            IOperatoreService operatoreService,
+            IMessageBoxService messageBoxService)
         {
 			_infoOperatoreViewModel = infoOperatoreViewModel;
             _dialogoOperatoreObserver = dialogoOperatoreObserver;
@@ -37,6 +41,7 @@ namespace IMAR_DialogoOperatore.Commands
             _autoLogoutUtility = autoLogoutUtility;
             _toastDisplayerUtility = toastDisplayerUtility;
             _operatoreService = operatoreService;
+            _messageBoxService = messageBoxService;
 
             _autoLogoutUtility.OnLogoutTriggered += AutoLogoutUtility_OnLogoutTriggered;
         }
@@ -83,6 +88,13 @@ namespace IMAR_DialogoOperatore.Commands
 
         private async Task EffettuaUscitaOperatore()
         {
+            if (!_dialogoOperatoreObserver.OperatoreSelezionato.AttivitaAperte.Any())
+            {
+                MessageBoxResult result = await _messageBoxService.ShowModalAsync("Sei sicuro di voler uscire?", null, Enums.MessageBoxButtons.YesNo);
+                if (result != MessageBoxResult.Yes)
+                    return;
+            }
+
             _dialogoOperatoreObserver.IsUscita = true;
 
             await ChiudiAttivitaOperatore();

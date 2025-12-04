@@ -164,6 +164,8 @@
 }
 
 .conferma-dettagli {
+    min-width: 4dvw !important;
+    height: 2dvh !important;
     margin-left: 3px;
     padding-top: 3% !important;
     padding-bottom: 3% !important;

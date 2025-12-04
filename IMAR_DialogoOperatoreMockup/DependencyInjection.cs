@@ -3,9 +3,11 @@ using IMAR_DialogoOperatore.Helpers;
 using IMAR_DialogoOperatore.Interfaces.Helpers;
 using IMAR_DialogoOperatore.Interfaces.Mappers;
 using IMAR_DialogoOperatore.Interfaces.Observers;
+using IMAR_DialogoOperatore.Interfaces.Services;
 using IMAR_DialogoOperatore.Managers;
 using IMAR_DialogoOperatore.Mappers;
 using IMAR_DialogoOperatore.Observers;
+using IMAR_DialogoOperatore.Services;
 using IMAR_DialogoOperatore.Utilities;
 using IMAR_DialogoOperatore.ViewModels;
 
@@ -36,6 +38,8 @@ namespace IMAR_DialogoOperatore
 
 			services.AddScoped<ToastDisplayerUtility>();
 
+			services.AddScoped<IMessageBoxService, MessageBoxService>();
+
 			services.AddScoped<LogoutTimerManager>();
 
 			services.AddScoped<AttivitaDetailsViewModel>();
@@ -55,6 +59,7 @@ namespace IMAR_DialogoOperatore
 			services.AddScoped<InfoBaseAttivitaViewModel>();
 			services.AddScoped<InfoOperatoreViewModel>();
 			services.AddScoped<InfoTaskOperatoreViewModel>();
+			services.AddScoped<MessageBoxViewModel>();
 			services.AddScoped<PopupDiConfermaViewModel>();
 			services.AddScoped<PopupTimbratureViewModel>();
 			services.AddScoped<PulsantieraGeneraleViewModel>();
