@@ -8,7 +8,7 @@
 @inject IDialogoOperatoreObserver DialogoOperatoreObserver
 @inject IAutoLogoutUtility AutoLogoutUtility
 
-<DxPopup Visible="@FasiIndirettePopupViewModel.MostraPopup"
+<DxPopup Visible="@FasiIndirettePopupViewModel.IsVisible"
 		 ShowCloseButton="false"
 		 CloseOnEscape="false"
 		 CloseOnOutsideClick="false"
@@ -65,12 +65,12 @@
 
 	void AnnullaHandler()
 	{
-		FasiIndirettePopupViewModel.MostraPopup = false;
+		FasiIndirettePopupViewModel.IsVisible = false;
 	}
 
 	void ConfermaHandler()
 	{
 		FasiIndirettePopupViewModel.ConfermaCommand.Execute(null);
-		FasiIndirettePopupViewModel.MostraPopup = false;
+		FasiIndirettePopupViewModel.IsVisible = false;
 	}
 }

@@ -4,24 +4,13 @@ using System.Windows.Input;
 
 namespace IMAR_DialogoOperatore.ViewModels
 {
-	public class PopupDiConfermaViewModel : ViewModelBase
+	public class PopupDiConfermaViewModel : PopupViewModelBase
 	{
 		private readonly IDialogoOperatoreObserver _dialogoOperatoreObserver;
 		private IPopupObserver _popupStore;
-		private bool _isVisibile;
 		private string _testo;
 
 		public ICommand RispostaPopupDiConfermaCommand { get; set; }
-
-		public bool IsVisible
-		{
-			get { return _isVisibile; }
-			set
-			{
-				_isVisibile = value;
-				OnNotifyStateChanged();
-			}
-		}
 		public string Testo
 		{
 			get { return _testo; }
@@ -36,6 +25,7 @@ namespace IMAR_DialogoOperatore.ViewModels
 			IDialogoOperatoreObserver dialogoOperatoreObserver,
 			IPopupObserver popupStore,
 			RispostaPopupDiConfermaCommand rispostaPopupDiConfermaCommand)
+			: base(dialogoOperatoreObserver)
         {
 			_dialogoOperatoreObserver = dialogoOperatoreObserver;
             _popupStore = popupStore;
@@ -48,7 +38,7 @@ namespace IMAR_DialogoOperatore.ViewModels
 			_popupStore.OnTestoPopupChanged += PopupStore_OnTestoPopupChanged;
         }
 
-        private void DialogoOperatoreObserver_OnOperatoreSelezionatoChanged()
+        public override void DialogoOperatoreObserver_OnOperatoreSelezionatoChanged()
         {
 			RispostaPopupDiConfermaCommand.Execute(false);
         }

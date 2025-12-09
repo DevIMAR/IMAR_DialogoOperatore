@@ -147,6 +147,16 @@
 					</div>
 				</Template>
 			</DxGridLayoutItem>
+
+			<DxGridLayoutItem Row="6" RowSpan="2"
+							  Column="1"
+							  Visible="@(InfoBaseAttivitaViewModel.IsAttivitaNonSchedulata)">
+				<Template>
+					<div class="d-flex justify-content-center align-items-center h-100 testo-piccolo ms-2 mt-2 giallo">
+						@InfoBaseAttivitaViewModel.TestoAttivitaNonSchedulata
+					</div>
+				</Template>
+			</DxGridLayoutItem>
 		}
 	</Items>
 </DxGridLayout>
@@ -227,9 +237,7 @@
 		if (string.IsNullOrWhiteSpace(BollaRef.Value) || InfoBaseAttivitaViewModel.IsAttivitaSelezionata)
 			return;
 
-		InfoBaseAttivitaViewModel.Odp = string.Empty;
-
-		InfoBaseAttivitaViewModel.CercaAttivitaHelper.CercaAttivitaDaBolla(BollaRef.Value);
+		InfoBaseAttivitaViewModel.CercaAttivitaDaBolla(BollaRef.Value);
 	}
 
 	private async void HandleOdpKeyPress(KeyboardEventArgs e)
@@ -253,12 +261,9 @@
 		if (string.IsNullOrWhiteSpace(OdpRef.Value) || InfoBaseAttivitaViewModel.IsAttivitaSelezionata)
 			return;
 
-		while (OdpRef.Value.Length < 8)
-			OdpRef.Value = "0" + OdpRef.Value;
+		OdpRef.Value = OdpRef.Value.PadLeft(8, '0');
 
-		InfoBaseAttivitaViewModel.Bolla = string.Empty;
-
-		InfoBaseAttivitaViewModel.CercaAttivitaHelper.CercaAttivitaDaOdp(OdpRef.Value);
+		InfoBaseAttivitaViewModel.CercaAttivitaDaOdp(OdpRef.Value);
 	}
 
 	private async Task SetFocusToFasi()

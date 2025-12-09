@@ -29,15 +29,6 @@ namespace IMAR_DialogoOperatore.Helpers
 			_attivitaMapper = attivitaMapper;
 		}
 
-		public void CercaAttivita(string? bolla = null, string? odp = null)
-		{
-            if (bolla != null)
-				CercaAttivitaDaBolla(bolla);
-
-			if (odp != null)
-				CercaAttivitaDaOdp(odp);
-		}
-
 		public void CercaAttivitaDaBolla(string bolla)
 		{
 			_cercaAttivitaObserver.IsAttivitaCercata = true;

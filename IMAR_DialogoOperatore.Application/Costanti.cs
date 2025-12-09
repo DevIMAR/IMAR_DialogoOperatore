@@ -2,6 +2,8 @@
 {
 	public static class Costanti
 	{
+		public const int LIMITE_GIORNO_VICINO = 10;
+
 		public const string ASSENTE = "Assente";
 		public const string PRESENTE = "Presente";
 		public const string IN_PAUSA = "In pausa";
@@ -45,6 +47,7 @@
 		public const string TAGLIO = "LASER";
 		public const string SPELATURA = "SPELATURA";
 
-		public const string TESTO_DATA_LONTANA = "L'odp selezionato ha una data schedulata maggiore di 10 giorni";
+		public const string TESTO_DATA_LONTANA = $"L'odp selezionato ha una data schedulata maggiore di 10 giorni";
+		public const string TESTO_ATTIVITA_NON_SCHEDULATA = $"L'attività non risulta essere schedulata!";
     }
 }

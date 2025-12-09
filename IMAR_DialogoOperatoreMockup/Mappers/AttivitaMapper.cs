@@ -8,8 +8,11 @@ namespace IMAR_DialogoOperatore.Mappers
 {
     public class AttivitaMapper : IAttivitaMapper
 	{
-        public Attivita AttivitaViewModelToAttivita(IAttivitaViewModel attivitaViewModel)
+        public Attivita? AttivitaViewModelToAttivita(IAttivitaViewModel? attivitaViewModel)
 		{
+            if (attivitaViewModel == null)
+                return null;
+
 			return new Attivita
 			{
                 Causale = attivitaViewModel.Causale,
@@ -30,8 +33,12 @@ namespace IMAR_DialogoOperatore.Mappers
                 QuantitaResidua = attivitaViewModel.QuantitaResidua,
                 SaldoAcconto = attivitaViewModel.SaldoAcconto,
                 CodiceJMes = attivitaViewModel.CodiceJMes,
-                Macchina = attivitaViewModel.Macchina
-            };
+                Macchina = attivitaViewModel.Macchina,
+                DataSchedulata = attivitaViewModel.DataSchedulata,
+                InizioAttivita = attivitaViewModel.InizioAttivita,
+                FineAttivita = attivitaViewModel.FineAttivita,
+                Note = attivitaViewModel.Note,
+        };
 		}
 
 		public IEnumerable<IAttivitaViewModel> ListaAttivitaToListaAttivitaViewModel(IEnumerable<Attivita> attivitaList)

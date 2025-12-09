@@ -33,6 +33,7 @@ namespace IMAR_DialogoOperatore
 			services.AddScoped<ITaskCompilerHelper, AsanaTaskCompilerHelper>();
 
 			services.AddScoped<IAttivitaMapper, AttivitaMapper>();
+			services.AddScoped<INotaMapper, NotaMapper>();
 			services.AddScoped<IOperatoreMapper, OperatoreMapper>();
 			services.AddScoped<ITimbraturaMapper, TimbraturaMapper>();
 
@@ -59,6 +60,8 @@ namespace IMAR_DialogoOperatore
 			services.AddScoped<InfoBaseAttivitaViewModel>();
 			services.AddScoped<InfoOperatoreViewModel>();
 			services.AddScoped<InfoTaskOperatoreViewModel>();
+			services.AddScoped<NoteGridViewModel>();
+			services.AddScoped<NotePopupViewModel>();
 			services.AddScoped<MessageBoxViewModel>();
 			services.AddScoped<PopupDiConfermaViewModel>();
 			services.AddScoped<PopupTimbratureViewModel>();
@@ -77,8 +80,9 @@ namespace IMAR_DialogoOperatore
 			services.AddScoped<InizioFinePausaCommand>();
 			services.AddScoped<InizioLavoroCommand>();
 			services.AddScoped<InviaTaskCommand>();
-			services.AddScoped<MostraIndiretteCommand>();
 			services.AddScoped<MostraFasiNonPianificatePopupCommand>();
+			services.AddScoped<MostraIndiretteCommand>();
+			services.AddScoped<MostraNotePopupCommand>();
 			services.AddScoped<RispostaPopupDiConfermaCommand>();
 			services.AddScoped<ShowEntrateUscitePauseCommand>();
 			services.AddScoped<ShowTaskPopupCommand>();

@@ -8,7 +8,10 @@ namespace IMAR_DialogoOperatore.ViewModels
 		private readonly Attivita? _attivita;
 
 		private string _causale;
-		public string? Bolla => _attivita?.Bolla;
+		private IEnumerable<Nota> _note;
+
+
+        public string? Bolla => _attivita?.Bolla;
 		public string? Odp => _attivita?.Odp;
 		public string? CodiceArticolo => _attivita?.Articolo;
 		public string? DescrizioneArticolo => _attivita?.DescrizioneArticolo;
@@ -32,7 +35,6 @@ namespace IMAR_DialogoOperatore.ViewModels
         public DateTime? InizioAttivita => _attivita?.InizioAttivita;
 		public DateTime? FineAttivita => _attivita?.FineAttivita;
 
-
         public string Causale
 		{
 			get { return _causale; }
@@ -41,7 +43,16 @@ namespace IMAR_DialogoOperatore.ViewModels
 				_causale = value;
 				OnNotifyStateChanged();
 			}
-		}
+        }
+        public IEnumerable<Nota> Note
+        {
+            get { return _note; }
+            set
+            {
+                _note = value;
+                OnNotifyStateChanged();
+            }
+        }
 
 
         public AttivitaViewModel(Attivita? attivita)
@@ -56,6 +67,7 @@ namespace IMAR_DialogoOperatore.ViewModels
 			QuantitaScartataNonContabilizzata = _attivita.QuantitaScartataNonContabilizzata;
             QuantitaScartataContabilizzata = _attivita.QuantitaScartataContabilizzata;
 			SaldoAcconto = _attivita.SaldoAcconto;
+			Note = _attivita.Note;
 		}
 	}
 }

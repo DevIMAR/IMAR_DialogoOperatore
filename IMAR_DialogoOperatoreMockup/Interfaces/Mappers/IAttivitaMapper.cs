@@ -6,7 +6,7 @@ namespace IMAR_DialogoOperatore.Interfaces.Mappers
 {
     public interface IAttivitaMapper
     {
-        Attivita AttivitaViewModelToAttivita(IAttivitaViewModel attivitaViewModel);
+        Attivita? AttivitaViewModelToAttivita(IAttivitaViewModel? attivitaViewModel);
         IEnumerable<IAttivitaViewModel> ListaAttivitaToListaAttivitaViewModel(IEnumerable<Attivita> attivitaList);
         TimbraturaAttivitaViewModel AttivitaToTimbraturaAttivitaViewModel(Attivita attivitaList);
         IList<TimbraturaAttivitaViewModel> ListAttivitaToListTimbraturaAttivitaViewModel(IList<Attivita>? attivitaList);

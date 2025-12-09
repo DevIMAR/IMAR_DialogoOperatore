@@ -13,27 +13,27 @@ namespace IMAR_DialogoOperatore.ViewModels
 
 		public bool IsOpen => IsOpenCondition();
 		public string? OperazioneInCorso => _dialogoOperatoreObserver.OperazioneInCorso;
+		public int CounterNote => _dialogoOperatoreObserver.AttivitaSelezionata?.Note?.Count() ?? 0;
 
 		public ICommand ConfermaCommand { get; set; }
-		public ICommand CreaFaseNonPianificataCommand { get; set; }
+		public ICommand MostraNotePopupCommand { get; set; }
 
 		public GestoreAttivitaViewModel(
 			IDialogoOperatoreObserver dialogoOperatoreObserver,
 			ICercaAttivitaObserver cercaAttivitaObserver,
 			ConfermaCommand confermaCommand,
-			MostraFasiNonPianificatePopupCommand creaFaseNonPianificataCommand)
+            MostraNotePopupCommand mostraNotePopupCommand)
         {
 			_dialogoOperatoreObserver = dialogoOperatoreObserver;
 			_cercaAttivitaObserver = cercaAttivitaObserver;
 
 			ConfermaCommand = confermaCommand;
-			CreaFaseNonPianificataCommand = creaFaseNonPianificataCommand;
-
+            MostraNotePopupCommand = mostraNotePopupCommand;
 
             _dialogoOperatoreObserver.OnAttivitaSelezionataChanged += AttivitaStore_OnAttivitaSelezionataChanged;
 			_dialogoOperatoreObserver.OnOperazioneInCorsoChanged += DialogoOperatoreStore_OnOperazioneInCorsoChanged;
             _dialogoOperatoreObserver.OnOperatoreSelezionatoChanged += DialogoOperatoreObserver_OnOperatoreSelezionatoChanged;
-		}
+        }
 
         private void DialogoOperatoreStore_OnOperazioneInCorsoChanged()
 		{
@@ -81,9 +81,10 @@ namespace IMAR_DialogoOperatore.ViewModels
 		}
 
 		public override void Dispose()
-		{
-			_dialogoOperatoreObserver.OnAttivitaSelezionataChanged -= AttivitaStore_OnAttivitaSelezionataChanged;
-			_dialogoOperatoreObserver.OnOperazioneInCorsoChanged -= DialogoOperatoreStore_OnOperazioneInCorsoChanged;
-		}
+        {
+            _dialogoOperatoreObserver.OnAttivitaSelezionataChanged -= AttivitaStore_OnAttivitaSelezionataChanged;
+            _dialogoOperatoreObserver.OnOperazioneInCorsoChanged -= DialogoOperatoreStore_OnOperazioneInCorsoChanged;
+            _dialogoOperatoreObserver.OnOperatoreSelezionatoChanged -= DialogoOperatoreObserver_OnOperatoreSelezionatoChanged;
+        }
 	}
 }
