@@ -17,7 +17,7 @@
 		<DxGridDataColumn FieldName="@nameof(Timbratura.Timestamp)"
 						  Caption="Data e ora"
 						  TextAlignment="GridTextAlignment.Left"
-						  DisplayFormat="g"
+						  DisplayFormat="G"
 						  SortIndex="0" />
 
 		<DxGridDataColumn FieldName="Timestamp" Caption=""
@@ -27,12 +27,14 @@
 	<TotalSummary>
 		<DxGridSummaryItem SummaryType="GridSummaryItemType.Custom"
 						   FieldName="Timestamp"
-						   Name="PauseSummary" />
+						   Name="PauseSummary"/>
 	</TotalSummary>
 </DxGrid>
 
 @code {
 	DxGrid Grid { get; set; }
+
+	private DxGridSummaryItem Summary;
 
 	protected override void OnInitialized()
 	{
@@ -69,7 +71,7 @@
 		if (e.Item.Name == "PauseSummary")
 		{
 			var ts = (TimeSpan)e.Value;
-			e.DisplayText = $"Tempo trascorso in pausa: {ts:hh\\:mm}";
+			e.DisplayText = $"Tempo trascorso in pausa: {ts:hh\\:mm\\:ss}";
 		}
 	}
 }

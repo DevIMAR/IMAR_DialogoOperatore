@@ -19,17 +19,19 @@ namespace IMAR_DialogoOperatore.Infrastructure
 		public async Task<IQueryable<TEntity>> GetAsync(
 			Expression<Func<TEntity, bool>> filter = null,
 			Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
-			string includeProperties = null)
+			string includeProperties = null,
+			bool asNoTracking = false)
 		{
 			return await Task.Run(() =>
 			{
-				return Get(filter, orderBy, includeProperties);
+				return Get(filter, orderBy, includeProperties, asNoTracking);
 			});
 		}
 
 		public virtual IQueryable<TEntity> Get(Expression<Func<TEntity, bool>> filter = null,
 			Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
-			string includeProperties = null)
+			string includeProperties = null,
+			bool asNoTracking = false)
 		{
 			IQueryable<TEntity> query = dbSet;
 
@@ -42,9 +44,12 @@ namespace IMAR_DialogoOperatore.Infrastructure
 				{
 					query = query.Include(includeProperty);
 				}
-			}
+            }
 
-			if (orderBy != null)
+            if (asNoTracking)
+                query = query.AsNoTracking();
+
+            if (orderBy != null)
 				return orderBy(query);
 			else
 				return query;
