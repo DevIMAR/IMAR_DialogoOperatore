@@ -39,23 +39,25 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
             string format = "yyyyMMddHHmmss";
             CultureInfo provider = CultureInfo.InvariantCulture;
 
-            IList<mesOpeClk>? ingressiUscite;
-            IList<stdTblResBrk>? iniziFiniPause;
+            IQueryable<TblResClk>? ingressiUscite = null;
+            IQueryable<TblResBrk>? iniziFiniPause = null;
+            AngRes? risorsa = null;
 
             GetTimbratureOperatore(out ingressiUscite, out iniziFiniPause);
 
-            AngRes? risorsa = _synergyJmesUoW.AngRes.Get(x => !string.IsNullOrEmpty(x.ResNam + x.ResSur))
-                                                    .ToList()
-                                                    .SingleOrDefault(x => x.ResCod.TrimStart('0').Trim() == badge.ToString().TrimStart('0').Trim());
+            risorsa = _synergyJmesUoW.AngRes.Get(x => !string.IsNullOrEmpty(x.ResNam + x.ResSur))
+                                            .ToList()
+                                            .SingleOrDefault(x => x.ResCod.TrimStart('0').Trim() == badge.ToString().TrimStart('0').Trim());
+
             if (risorsa == null)
                 return null;
 
             Operatore = GetOperatoreFromAngRes(risorsa);
 
-            Operatore.Ingresso = DateTime.ParseExact(ingressiUscite.Where(x => x.ID_AngRes368 == risorsa.ResCod).Select(x => x.ID_ClkRes2365).Max() ?? "19000101000000", format, provider);
-            Operatore.Uscita = DateTime.ParseExact(ingressiUscite.Where(x => x.ID_AngRes368 == risorsa.ResCod).Select(x => x.ID_ClkRes2366).Max() ?? "19000101000000", format, provider);
-            Operatore.InizioPausa = DateTime.ParseExact(iniziFiniPause.Where(x => x.ID_Res368 == risorsa.ResCod).Select(x => x.ID_ResBrk2426).Max() ?? "19000101000000", format, provider);
-            Operatore.FinePausa = DateTime.ParseExact(iniziFiniPause.Where(x => x.ID_Res368 == risorsa.ResCod).Select(x => x.ID_ResBrk2427).Max() ?? "19000101000000", format, provider);
+            Operatore.Ingresso = ingressiUscite?.Where(x => x.ResUid == risorsa.Uid)?.Select(x => x.ClkInnTss)?.Max() ?? new DateTime(1900, 1, 1);
+            Operatore.Uscita = ingressiUscite?.Where(x => x.ResUid == risorsa.Uid)?.Select(x => x.ClkOutTss)?.Max() ?? new DateTime(1900, 1, 1);
+            Operatore.InizioPausa = iniziFiniPause?.Where(x => x.ResUid == risorsa.Uid)?.Select(x => x.TssStr)?.Max() ?? new DateTime(1900, 1, 1);
+            Operatore.FinePausa = iniziFiniPause?.Where(x => x.ResUid == risorsa.Uid)?.Select(x => x.TssEnd).Max() ?? new DateTime(1900, 1, 1);
             Operatore.AttivitaAperte = _attivitaService.OttieniAttivitaOperatore(Operatore);
 
             AssegnaMacchinaAdOperatore();
@@ -76,10 +78,10 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
             };
         }
 
-        public void GetTimbratureOperatore(out IList<mesOpeClk>? ingressiUscite, out IList<stdTblResBrk>? iniziFiniPause)
+        public void GetTimbratureOperatore(out IQueryable<TblResClk>? ingressiUscite, out IQueryable<TblResBrk>? iniziFiniPause)
         {
-            ingressiUscite = _jmesApiClient.ChiamaQueryGetJmes<mesOpeClk>();
-            iniziFiniPause = _jmesApiClient.ChiamaQueryGetJmes<stdTblResBrk>();
+            ingressiUscite = _synergyJmesUoW.TblResClk.Get();
+            iniziFiniPause = _synergyJmesUoW.TblResBrk.Get();
         }
 
         private void AssegnaMacchinaAdOperatore()
