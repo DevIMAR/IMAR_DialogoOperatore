@@ -41,7 +41,8 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
 
             IQueryable<TblResClk>? ingressiUscite = null;
             IQueryable<TblResBrk>? iniziFiniPause = null;
-            AngRes? risorsa = null;
+            AngRes? risorsa = null; 
+            DateTime fallback = new DateTime(1900, 1, 1);
 
             GetTimbratureOperatore(out ingressiUscite, out iniziFiniPause);
 
@@ -54,10 +55,10 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
 
             Operatore = GetOperatoreFromAngRes(risorsa);
 
-            Operatore.Ingresso = ingressiUscite?.Where(x => x.ResUid == risorsa.Uid)?.Select(x => x.ClkInnTss)?.Max() ?? new DateTime(1900, 1, 1);
-            Operatore.Uscita = ingressiUscite?.Where(x => x.ResUid == risorsa.Uid)?.Select(x => x.ClkOutTss)?.Max() ?? new DateTime(1900, 1, 1);
-            Operatore.InizioPausa = iniziFiniPause?.Where(x => x.ResUid == risorsa.Uid)?.Select(x => x.TssStr)?.Max() ?? new DateTime(1900, 1, 1);
-            Operatore.FinePausa = iniziFiniPause?.Where(x => x.ResUid == risorsa.Uid)?.Select(x => x.TssEnd).Max() ?? new DateTime(1900, 1, 1);
+            Operatore.Ingresso = ingressiUscite != null && ingressiUscite.Any(x => x.ResUid == risorsa.Uid) ? ingressiUscite.Where(x => x.ResUid == risorsa.Uid).Max(x => x.ClkInnTss) ?? fallback : fallback;
+            Operatore.Uscita = ingressiUscite != null && ingressiUscite.Any(x => x.ResUid == risorsa.Uid) ? ingressiUscite.Where(x => x.ResUid == risorsa.Uid).Max(x => x.ClkOutTss) ?? fallback : fallback;
+            Operatore.InizioPausa = iniziFiniPause != null && iniziFiniPause.Any(x => x.ResUid == risorsa.Uid) ? iniziFiniPause.Where(x => x.ResUid == risorsa.Uid).Max(x => x.TssStr) ?? fallback : fallback;
+            Operatore.FinePausa = iniziFiniPause != null && iniziFiniPause.Any(x => x.ResUid == risorsa.Uid) ? iniziFiniPause.Where(x => x.ResUid == risorsa.Uid).Max(x => x.TssEnd) ?? fallback : fallback;
             Operatore.AttivitaAperte = _attivitaService.OttieniAttivitaOperatore(Operatore);
 
             AssegnaMacchinaAdOperatore();
