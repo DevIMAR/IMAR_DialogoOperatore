@@ -50,7 +50,8 @@ namespace IMAR_DialogoOperatore.ViewModels
 			set 
 			{ 
 				_isFaseCompletabile = _dialogoOperatoreObserver.AttivitaSelezionata.SaldoAcconto == Costanti.SALDO ? true :
-                                        !(QuantitaProdotta + QuantitaScartata <= 0) && value;
+                                        !(_dialogoOperatoreObserver.AttivitaSelezionata.QuantitaProdotta + _dialogoOperatoreObserver.AttivitaSelezionata.QuantitaScartata <= 0) && value;
+
 				_avanzamentoObserver.SaldoAcconto = _isFaseCompletabile ? Costanti.SALDO : Costanti.ACCONTO;
 
                 OnNotifyStateChanged();
