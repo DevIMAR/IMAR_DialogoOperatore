@@ -101,7 +101,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
         public Macchina? GetMacchinaFittiziaDaAttivitaAttrezzata(Attivita attivitaDaAggiungere)
         {
 			mesEvtToEndMac? macchina = _jmesApiClient.ChiamaQueryGetJmes<mesEvtToEndMac>()?
-                                                     .SingleOrDefault(x => x.ID_Det3350.Equals(attivitaDaAggiungere.Bolla)
+                                                     .FirstOrDefault(x => x.ID_Det3350.Equals(attivitaDaAggiungere.Bolla)
                                                                            && x.ID_Sts3130.Equals(Costanti.JMES_ATTREZZAGGIO_COMPLETATO));
 
             if (macchina == null)
