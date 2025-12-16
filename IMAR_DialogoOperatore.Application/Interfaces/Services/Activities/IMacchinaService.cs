@@ -8,5 +8,6 @@ namespace IMAR_DialogoOperatore.Application.Interfaces.Services.Activities
         int GetCodiceJmesByCodice(string codiceMacchinaCompleto);
         Macchina? GetMacchinaFittiziaByFirstAttivitaAperta(Attivita attivitaAperta, int idJMesOperatore);
         Macchina? GetPrimaMacchinaFittiziaNonUtilizzata();
+        Macchina? GetMacchinaFittiziaDaAttivitaAttrezzata(Attivita attivitaDaAggiungere);
     }
 }

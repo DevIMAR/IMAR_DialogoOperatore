@@ -29,7 +29,8 @@ namespace IMAR_DialogoOperatore.ViewModels
 		public int QuantitaResidua => QuantitaOrdine - QuantitaProdotta;
 		public string SaldoAcconto { get; set; }
 		public double? CodiceJMes => _attivita?.CodiceJMes;
-		public Macchina? Macchina => _attivita?.Macchina;
+		public Macchina? MacchinaFittizia => _attivita?.MacchinaFittizia;
+		public Macchina? MacchinaReale => _attivita?.MacchinaReale;
 		public string CausaleEstesa => _attivita?.CausaleEstesa;
         public DateTime? DataSchedulata => _attivita?.DataSchedulata;
         public DateTime? InizioAttivita => _attivita?.InizioAttivita;

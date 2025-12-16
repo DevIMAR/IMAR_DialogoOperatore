@@ -8,7 +8,7 @@ namespace IMAR_DialogoOperatore.Interfaces.ViewModels
         string Nome { get; }
         string Cognome { get; }
         int? IdJMes { get; }
-        Macchina? MacchinaAssegnata { get; set; }
+        IList<Macchina?> MacchineAssegnate { get; set; }
         string Stato { get; set; }
         IList<Attivita> AttivitaAperte { get; set; }
     }

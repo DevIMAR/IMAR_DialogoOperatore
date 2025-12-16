@@ -23,7 +23,8 @@ namespace IMAR_DialogoOperatore.Interfaces.ViewModels
         int QuantitaScartataContabilizzata { get; set; }
         string SaldoAcconto { get; set; }
         double? CodiceJMes { get; }
-        Macchina? Macchina { get; }
+        Macchina? MacchinaFittizia { get; }
+        Macchina? MacchinaReale { get; }
         string CausaleEstesa { get; }
         DateTime? DataSchedulata { get; }
         DateTime? InizioAttivita { get; }

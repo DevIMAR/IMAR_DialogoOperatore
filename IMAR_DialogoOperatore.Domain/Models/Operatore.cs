@@ -11,7 +11,7 @@
 		public DateTime InizioPausa { get; set; }
 		public DateTime FinePausa { get; set; }
 		public IList<Attivita> AttivitaAperte { get; set; }
-		public Macchina? MacchinaAssegnata { get; set; }
+		public IList<Macchina?> MacchineAssegnate { get; set; }
 		public int IdJMes { get; set; }
     }
 }

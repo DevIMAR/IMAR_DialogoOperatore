@@ -120,7 +120,7 @@ namespace IMAR_DialogoOperatore.Services
             IEnumerable<Attivita> attivitaFiltrate = _caricamentoAttivitaInBackroundService.GetAttivitaAperte()
                                                                 .Where(x => x.Odp == odp);
 
-            if (attivitaFiltrate == null || attivitaFiltrate.Count() == 0)
+            if (attivitaFiltrate == null || !attivitaFiltrate.Any())
                 attivitaFiltrate = _as400Repository.ExecuteQuery<Attivita>(@"SELECT
                                                                             NRBLCI AS BOLLA, ORPRCI AS ODP, CDARCI AS ARTICOLO, trim(DSARMA) AS DESCRIZIONEARTICOLO, 
                                                                             CDFACI AS FASE, DSFACI AS DESCRIZIONEFASE, PF2.QORDCI AS QUANTITAORDINE, 
@@ -138,7 +138,7 @@ namespace IMAR_DialogoOperatore.Services
                                                                             GROUP BY NRBLCI, ORPRCI, CDARCI, DSARMA, CDFACI, DSFACI,
                                                                                     pf2.QORDCI, pf2.QPROCI, pf2.QSCACI, pf2.QRESCI");
 
-            return attivitaFiltrate.OrderBy(x => x.Bolla);
+            return attivitaFiltrate.OrderBy(x => x.Fase);
         }
 
         public string? AvanzaAttivita(Operatore operatore, Attivita attivitaDaAvanzare, int quantitaProdotta, int quantitaScartata)
@@ -198,7 +198,7 @@ namespace IMAR_DialogoOperatore.Services
                 attivitaOperatoreAperte.AddRange(OttieniAttivitaIndiretteOperatoreAperte(attivitaAperte, attivitaIndiretteOperatore));
 
             foreach (Attivita attivita in attivitaOperatoreAperte)
-                attivita.Macchina = _macchinaService.GetMacchinaRealeByAttivita(attivita);
+                attivita.MacchinaReale = _macchinaService.GetMacchinaRealeByAttivita(attivita);
 
             return attivitaOperatoreAperte;
         }

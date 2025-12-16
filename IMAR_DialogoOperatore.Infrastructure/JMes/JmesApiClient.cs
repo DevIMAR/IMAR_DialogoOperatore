@@ -153,7 +153,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.JMes
                         producedQuantity = quantitaProdotta,
                         rejectedQuantity = quantitaScartata,
                         defDecAdv = attivita.SaldoAcconto == Costanti.ACCONTO,
-                        clkMacUid = operatore.MacchinaAssegnata.CodiceJMes
+                        clkMacUid = attivita.MacchinaFittizia.CodiceJMes
                     }
                 }
             };
@@ -163,7 +163,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.JMes
             return result;
         }
 
-        public HttpResponseMessage MesWorkStart(Operatore operatore, string bolla)
+        public HttpResponseMessage MesWorkStart(Operatore operatore, Attivita attivita)
         {
             string wizardPath = "?wzdCod=MesWorkStart";
 
@@ -175,8 +175,8 @@ namespace IMAR_DialogoOperatore.Infrastructure.JMes
                     {
                         qck = true,
                         clkBdgCod = operatore.Badge,
-                        notCod = bolla,
-                        clkMacUid = operatore.MacchinaAssegnata.CodiceJMes
+                        notCod = attivita.Bolla,
+                        clkMacUid = attivita.MacchinaFittizia.CodiceJMes
                     }
                 }
             };
@@ -200,7 +200,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.JMes
                         clkBdgCod = operatore.Badge,
                         notPlnCod = codiceFase,
                         notPlnNotCod = bolla,
-                        clkMacUid = operatore.MacchinaAssegnata.CodiceJMes
+                        clkMacUid = operatore.MacchineAssegnate.First().CodiceJMes
                     }
                 }
             };
@@ -363,7 +363,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.JMes
                         qck = true,
                         clkBdgCod = operatore.Badge,
                         notCod = bolla,
-                        clkMacUid = operatore.MacchinaAssegnata.CodiceJMes
+                        clkMacUid = operatore.MacchineAssegnate.First().CodiceJMes
                     }
                 }
             };
@@ -386,7 +386,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.JMes
                         clkBdgCod = operatore.Badge,
                         notPlnCod = codiceFase,
                         notPlnNotCod = bolla,
-                        clkMacUid = operatore.MacchinaAssegnata.CodiceJMes
+                        clkMacUid = operatore.MacchineAssegnate.First().CodiceJMes
                     }
                 }
             };

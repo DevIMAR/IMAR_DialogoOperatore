@@ -20,7 +20,8 @@
         public int QuantitaResidua { get; set; }
         public string SaldoAcconto { get; set; }
         public double? CodiceJMes { get; set; }
-        public Macchina Macchina { get; set; }
+        public Macchina MacchinaFittizia { get; set; }
+        public Macchina MacchinaReale { get; set; }
         public DateTime? DataSchedulata { get; set; }
         public DateTime? InizioAttivita { get; set; }
         public DateTime? FineAttivita { get; set; }

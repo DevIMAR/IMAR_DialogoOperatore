@@ -145,8 +145,8 @@ namespace IMAR_DialogoOperatore.Commands
             if (!CanAssegnareMacchinaFittiziaAdOperatore())
                 return;
 
-            _dialogoOperatoreObserver.OperatoreSelezionato.MacchinaAssegnata = _macchinaService.GetPrimaMacchinaFittiziaNonUtilizzata();
-            if (_dialogoOperatoreObserver.OperatoreSelezionato.MacchinaAssegnata == null)
+            _dialogoOperatoreObserver.OperatoreSelezionato.MacchineAssegnate.Add(_macchinaService.GetPrimaMacchinaFittiziaNonUtilizzata());
+            if (!_dialogoOperatoreObserver.OperatoreSelezionato.MacchineAssegnate.Any())
                 MostraPopupConTesto(Costanti.ERRORE_MACCHINE_FINITE);
         }
 
@@ -154,7 +154,7 @@ namespace IMAR_DialogoOperatore.Commands
         {
             return (_dialogoOperatoreObserver.OperazioneInCorso == Costanti.INIZIO_ATTREZZAGGIO ||
                     _dialogoOperatoreObserver.OperazioneInCorso == Costanti.INIZIO_LAVORO) &&
-                    _dialogoOperatoreObserver.OperatoreSelezionato.MacchinaAssegnata == null;
+                    !_dialogoOperatoreObserver.OperatoreSelezionato.MacchineAssegnate.Any();
         }
 
         private void EseguiOperazioneOMostraMessaggio()
