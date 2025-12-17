@@ -153,7 +153,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.JMes
                         producedQuantity = quantitaProdotta,
                         rejectedQuantity = quantitaScartata,
                         defDecAdv = attivita.SaldoAcconto == Costanti.ACCONTO,
-                        clkMacUid = attivita.MacchinaFittizia.CodiceJMes
+                        clkMacUid = operatore.MacchineAssegnate.First().CodiceJMes
                     }
                 }
             };

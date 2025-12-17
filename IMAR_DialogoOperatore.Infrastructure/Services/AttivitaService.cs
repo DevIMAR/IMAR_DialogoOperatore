@@ -232,6 +232,7 @@ namespace IMAR_DialogoOperatore.Services
             if (attivitaDaAvanzare.SaldoAcconto != "S")
                 attivitaDaAvanzare.QuantitaResidua = attivitaDaAvanzare.QuantitaOrdine - attivitaDaAvanzare.QuantitaProdottaNonContabilizzata;
 
+
             HttpResponseMessage result = _jmesApiClient.MesAdvanceDeclaration(operatore, attivitaDaAvanzare, quantitaProdotta, quantitaScartata);
 
             string? errore = _jMesApiClientErrorUtility.GestioneEventualeErrore(result);
