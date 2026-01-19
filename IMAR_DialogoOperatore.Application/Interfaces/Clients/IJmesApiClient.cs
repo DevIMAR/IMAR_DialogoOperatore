@@ -17,9 +17,10 @@ namespace IMAR_DialogoOperatore.Application.Interfaces.Clients
 		HttpResponseMessage MesWorkResume(string badge, Attivita attivita);
         HttpResponseMessage MesSuspensionStart(string badge, int codiceJmesMacchina);
 		HttpResponseMessage MesSuspensionEnd(string badge, int codiceJmesMacchina);
-        HttpResponseMessage MesEquipStart(Operatore operatore, string bolla);
+        HttpResponseMessage MesEquipStart(Operatore operatore, string bolla, Macchina? macchina = null);
 		HttpResponseMessage MesEquipStartNotPln(Operatore operatore, string bolla, string codiceFase);
         HttpResponseMessage MesEquipEnd(string badge, double? idJmesAttrezzaggio);
+        HttpResponseMessage MesEquipRemove(string badge, double? idJmesAttrezzaggio);
 		HttpResponseMessage MesEquipSuspension(string badge, double? idJmesAttrezzaggio);
 
         HttpResponseMessage MesBreakStart(string badge);

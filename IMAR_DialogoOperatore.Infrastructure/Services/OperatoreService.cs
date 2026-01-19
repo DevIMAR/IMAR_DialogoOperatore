@@ -119,7 +119,12 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
 				if (isSospeso)
 					errore = _jmesApiClient.RegistrazioneOperazioneSuDb(() => _jmesApiClient.MesEquipSuspension(operatore.Badge, (double)attivitaDaRimuovere.CodiceJMes));
 				else
+				{
 					errore = _jmesApiClient.RegistrazioneOperazioneSuDb(() => _jmesApiClient.MesEquipEnd(operatore.Badge, (double)attivitaDaRimuovere.CodiceJMes));
+
+                    if (errore == null)
+						errore = _jmesApiClient.RegistrazioneOperazioneSuDb(() => _jmesApiClient.MesEquipRemove(operatore.Badge, (double)attivitaDaRimuovere.CodiceJMes));
+				}
 			}
 			else
 			{
@@ -145,7 +150,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
 				if (isCambioCausaleApertura)
 					return "Non è possibile aprire l'attrezzaggio di una fase se se ne è già aperto il lavoro!";
 
-				errore = _jmesApiClient.RegistrazioneOperazioneSuDb(() => _jmesApiClient.MesEquipStart(operatore, attivitaDaAggiungere.Bolla));
+				errore = GestisciAperturaAttrezzaggio(operatore, attivitaDaAggiungere);
 			}
 			else
 				errore = GestisciAperturaLavoro(operatore, attivitaDaAggiungere, isCambioCausaleApertura, isAttivitaIndiretta);
@@ -154,6 +159,16 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
 				return errore;
 
 			return null;
+		}
+
+		private string? GestisciAperturaAttrezzaggio(Operatore operatore, Attivita attivita)
+		{
+			string? errore = null;
+
+			Macchina? macchinaDaAttivitaAttrezzata = _macchinaService.GetMacchinaFittiziaDaAttivitaAttrezzata(attivita);
+			errore = _jmesApiClient.RegistrazioneOperazioneSuDb(() => _jmesApiClient.MesEquipStart(operatore, attivita.Bolla, macchinaDaAttivitaAttrezzata));
+
+			return errore;
 		}
 
 		private string? GestisciAperturaLavoro(Operatore operatore, Attivita attivitaDaAggiungere, bool isCambioCausaleApertura, bool isAttivitaIndiretta)
