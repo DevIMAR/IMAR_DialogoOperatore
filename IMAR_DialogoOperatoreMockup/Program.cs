@@ -2,6 +2,9 @@ using DevExpress.Blazor;
 using IMAR_DialogoOperatore.Components;
 using IMAR_DialogoOperatore.Infrastructure;
 using IMAR_DialogoOperatore.Application;
+using log4net;
+using log4net.Config;
+using System.Reflection;
 
 namespace IMAR_DialogoOperatore
 {
@@ -9,6 +12,10 @@ namespace IMAR_DialogoOperatore
     {
         public static void Main(string[] args)
         {
+            // Configurazione Log4Net
+            var logRepository = LogManager.GetRepository(Assembly.GetEntryAssembly());
+            XmlConfigurator.Configure(logRepository, new FileInfo("log4net.config"));
+
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.

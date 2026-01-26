@@ -1,0 +1,24 @@
+@using IMAR_DialogoOperatore.Application.Interfaces.Utilities
+@inherits ErrorBoundary
+@inject ILoggingService LoggingService
+
+@if (CurrentException is not null)
+{
+    <div class="alert alert-danger m-3" role="alert">
+        <h4>Si è verificato un errore</h4>
+        <p>L'applicazione ha riscontrato un problema. Per favore ricarica la pagina.</p>
+        <button class="btn btn-primary" @onclick="Recover">Riprova</button>
+    </div>
+}
+else
+{
+    @ChildContent
+}
+
+@code {
+    protected override Task OnErrorAsync(Exception exception)
+    {
+        LoggingService.LogError("Errore non gestito in Blazor", exception);
+        return base.OnErrorAsync(exception);
+    }
+}

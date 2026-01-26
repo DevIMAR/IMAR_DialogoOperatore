@@ -1,5 +1,6 @@
 ﻿using IMAR_DialogoOperatore.Application.Interfaces.Services.External;
 using IMAR_DialogoOperatore.Application.Interfaces.UoW;
+using IMAR_DialogoOperatore.Application.Interfaces.Utilities;
 using IMAR_DialogoOperatore.Domain.Entities.Imar_Produzione;
 
 namespace IMAR_DialogoOperatore.Infrastructure.Services
@@ -7,11 +8,14 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
     public class SegnalazioniDifformitaService : ISegnalazioniDifformitaService
     {
         private readonly IImarProduzioneUoW _imarProduzioneUoW;
+        private readonly ILoggingService _loggingService;
+
         public SegnalazioniDifformitaService(
-            IImarProduzioneUoW imarProduzioneUoW
-            )
+            IImarProduzioneUoW imarProduzioneUoW,
+            ILoggingService loggingService)
         {
             _imarProduzioneUoW = imarProduzioneUoW;
+            _loggingService = loggingService;
         }
 
         public int InsertSegnalazione(SegnalazioneDifformita segnalazione)
@@ -51,7 +55,8 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                _loggingService.LogError("Errore nella generazione codice segnalazione difformità", ex);
+                throw;
             }
         }
 

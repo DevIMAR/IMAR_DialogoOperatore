@@ -23,6 +23,7 @@ namespace IMAR_DialogoOperatore.Commands
         private readonly ToastDisplayerUtility _toastDisplayerUtility;
         private readonly IOperatoreService _operatoreService;
         private readonly IMessageBoxService _messageBoxService;
+        private readonly ILoggingService _loggingService;
 
         public IngressoUscitaCommand(
 			InfoOperatoreViewModel infoOperatoreViewModel,
@@ -32,7 +33,8 @@ namespace IMAR_DialogoOperatore.Commands
             IAutoLogoutUtility autoLogoutUtility,
             ToastDisplayerUtility toastDisplayerUtility,
             IOperatoreService operatoreService,
-            IMessageBoxService messageBoxService)
+            IMessageBoxService messageBoxService,
+            ILoggingService loggingService)
         {
 			_infoOperatoreViewModel = infoOperatoreViewModel;
             _dialogoOperatoreObserver = dialogoOperatoreObserver;
@@ -42,6 +44,7 @@ namespace IMAR_DialogoOperatore.Commands
             _toastDisplayerUtility = toastDisplayerUtility;
             _operatoreService = operatoreService;
             _messageBoxService = messageBoxService;
+            _loggingService = loggingService;
 
             _autoLogoutUtility.OnLogoutTriggered += AutoLogoutUtility_OnLogoutTriggered;
         }
@@ -140,8 +143,7 @@ namespace IMAR_DialogoOperatore.Commands
             }
             catch (Exception ex)
             {
-                // Log dell'errore
-                Console.WriteLine($"Errore durante la chiusura delle attività: {ex.Message}");
+                _loggingService.LogError($"Errore durante la chiusura delle attività operatore {_dialogoOperatoreObserver.OperatoreSelezionato?.Badge}", ex);
             }
         }
 

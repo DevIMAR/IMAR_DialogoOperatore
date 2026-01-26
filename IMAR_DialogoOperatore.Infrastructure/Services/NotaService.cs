@@ -1,8 +1,8 @@
 ﻿using Dapper;
 using IMAR_DialogoOperatore.Application.Interfaces.Repositories;
 using IMAR_DialogoOperatore.Application.Interfaces.Services.Activities;
+using IMAR_DialogoOperatore.Application.Interfaces.Utilities;
 using IMAR_DialogoOperatore.Domain.Models;
-using System.Diagnostics;
 
 namespace IMAR_DialogoOperatore.Infrastructure.Services
 {
@@ -12,13 +12,16 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
 
         private readonly IAs400Repository _as400Repository;
         private readonly IOperatoreService _operatoreService;
+        private readonly ILoggingService _loggingService;
 
         public NotaService(
             IAs400Repository as400Repository,
-            IOperatoreService operatoreService)
+            IOperatoreService operatoreService,
+            ILoggingService loggingService)
         {
             _as400Repository = as400Repository;
             _operatoreService = operatoreService;
+            _loggingService = loggingService;
         }
 
         public IEnumerable<Nota> GetNoteAttivita(Attivita? attivita)
@@ -100,7 +103,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(ex);
+                _loggingService.LogError($"Errore nell'aggiunta nota per attività {attivita?.Bolla}", ex);
                 throw;
             }
         }

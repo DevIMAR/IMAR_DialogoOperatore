@@ -1,9 +1,9 @@
 ﻿using IMAR_DialogoOperatore.Application.Interfaces.Clients;
 using IMAR_DialogoOperatore.Application.Interfaces.Repositories;
 using IMAR_DialogoOperatore.Application.Interfaces.UoW;
+using IMAR_DialogoOperatore.Application.Interfaces.Utilities;
 using IMAR_DialogoOperatore.Domain.Models;
 using Microsoft.Extensions.DependencyInjection;
-using System.Diagnostics;
 
 namespace IMAR_DialogoOperatore.Infrastructure.Services
 {
@@ -16,6 +16,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
         private readonly ReaderWriterLockSlim _lockCalFlOdp = new ReaderWriterLockSlim();
         private readonly IJmesApiClient _jmesApiClient;
         private readonly IAs400Repository _as400Repository;
+        private readonly ILoggingService _loggingService;
 
         private List<string> _odpDatiMonitor;
         private IList<Attivita>? _attivitaAperte;
@@ -33,6 +34,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
             using var scope = _serviceProvider.CreateScope();
             _jmesApiClient = scope.ServiceProvider.GetRequiredService<IJmesApiClient>();
             _as400Repository = scope.ServiceProvider.GetRequiredService<IAs400Repository>();
+            _loggingService = scope.ServiceProvider.GetRequiredService<ILoggingService>();
 
             // Aggiorna attività ogni 10 secondi
             _timer = new Timer(UpdateAttivita, null, TimeSpan.Zero, TimeSpan.FromSeconds(15));
@@ -153,7 +155,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Errore nell'aggiornamento delle attività: {ex.Message}");
+                _loggingService.LogError("Errore nell'aggiornamento delle attività in background", ex);
             }
         }
 
@@ -197,7 +199,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                _loggingService.LogError("Errore nell'aggiornamento cache CalFlOdp", ex);
             }
         }
 

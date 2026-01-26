@@ -292,9 +292,13 @@ namespace IMAR_DialogoOperatore.Services
 
         private List<Attivita> GetAttivitaOperatore(int idJmesOperatore)
         {
-            List<Attivita> attivitaOperatore = _synergyJmesUoW.MesEvt
-                                                               .Get(x => (int)x.ResEffStrUid == idJmesOperatore)
+            List<Attivita> attivitaOperatore = _synergyJmesUoW.MesEvtOpe
+                                                               .Get(x => (int)x.ResUid == idJmesOperatore)
                                                                .Where(x => x.TssEnd == null)
+                                                               .Join(_synergyJmesUoW.MesEvt.Get(),
+                                                                        meo => meo.EvtUid,
+                                                                        me => me.Uid,
+                                                                        (meo, me) => me)
                                                                .Join(_synergyJmesUoW.MesEvtDet.Get(),
                                                                         me => me.Uid,
                                                                         med => med.EvtUid,

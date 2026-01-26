@@ -23,16 +23,19 @@ namespace IMAR_DialogoOperatore.Infrastructure.JMes
         private IJSonUtility _jsonUtility;
         private IHttpClientUtility _httpClientUtility;
         private readonly IJMesApiClientErrorUtility _jMesApiClientErrorUtility;
+        private readonly ILoggingService _loggingService;
 
         public JmesApiClient(
             IJSonUtility jSonUtility,
             IHttpClientUtility httpClientUtility,
-            IJMesApiClientErrorUtility jMesApiClientErrorUtility)
+            IJMesApiClientErrorUtility jMesApiClientErrorUtility,
+            ILoggingService loggingService)
         {
             _jsonUtility = jSonUtility;
             _httpClientUtility = httpClientUtility;
 
             _jMesApiClientErrorUtility = jMesApiClientErrorUtility;
+            _loggingService = loggingService;
 
             Task jmesClientTask = Task.Run(async () => _jmesClient = await _httpClientUtility.BuildAuthenticatedClient(SERVER + JMES_LOGIN_PATH + JMES_LOGIN_TOKEN));
             Task diaopeClientTask = Task.Run(async () => _diaopeClient = await _httpClientUtility.BuildAuthenticatedClient(SERVER + DIAOPE_LOGIN_PATH + DIAOPE_LOGIN_TOKEN));
@@ -74,8 +77,9 @@ namespace IMAR_DialogoOperatore.Infrastructure.JMes
 
                 return json["result"]?.ToObject<int>();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _loggingService.LogError($"Errore nel recupero QueryId per query '{queryName}'", ex);
                 return null;
             }
         }
@@ -130,7 +134,10 @@ namespace IMAR_DialogoOperatore.Infrastructure.JMes
 
             string? errore = _jMesApiClientErrorUtility.GestioneEventualeErrore(result);
             if (errore != null)
+            {
+                _loggingService.LogError($"Errore operazione JMES: {errore}");
                 return errore;
+            }
 
             return null;
         }
