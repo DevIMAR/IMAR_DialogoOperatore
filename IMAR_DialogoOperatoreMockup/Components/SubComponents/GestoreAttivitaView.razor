@@ -23,13 +23,24 @@
 	</BodyTemplate>
 
 	<FooterTemplate>
-		<DxButton Text="Rilavorazione/Ritaglio"
+@* 		<DxButton Text="Rilavorazione/Ritaglio"
 				  style="margin-right: 3%;"
 				  RenderStyle="ButtonRenderStyle.Warning"
 				  RenderStyleMode="ButtonRenderStyleMode.Outline"
 				  Enabled="@GestoreAttivitaViewModel.CreaFaseNonPianificataCommand.CanExecute(null)"
 				  Click="@GestoreAttivitaViewModel.CreaFaseNonPianificataCommand.Execute"
-				  CssClass="d-flex justify-content-center align-items-center conferma-dettagli" />
+				  CssClass="d-flex justify-content-center align-items-center conferma-dettagli" /> *@
+
+		<DxButton style="margin-right: 3%;"
+				  RenderStyle="ButtonRenderStyle.Warning"
+				  RenderStyleMode="ButtonRenderStyleMode.Outline"
+				  Enabled="@GestoreAttivitaViewModel.MostraNotePopupCommand.CanExecute(null)"
+				  Click="@GestoreAttivitaViewModel.MostraNotePopupCommand.Execute"
+				  CssClass="d-flex justify-content-center align-items-center conferma-dettagli">
+			<label>
+				Note: @GestoreAttivitaViewModel.CounterNote
+			</label>
+		</DxButton>
 
 		<DxButton Text="Conferma"
 				  RenderStyle="ButtonRenderStyle.Warning"

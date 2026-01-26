@@ -1,4 +1,5 @@
 ﻿using IMAR_DialogoOperatore.Application;
+using IMAR_DialogoOperatore.Application.Interfaces.Utilities;
 using IMAR_DialogoOperatore.Interfaces.Helpers;
 using IMAR_DialogoOperatore.Interfaces.Observers;
 using IMAR_DialogoOperatore.Interfaces.ViewModels;
@@ -8,13 +9,16 @@ namespace IMAR_DialogoOperatore.Helpers
     public class InterruzioneAttivitaHelper : IInterruzioneAttivitaHelper
 	{
 		private readonly IDialogoOperatoreObserver _dialogoOperatoreObserver;
+		private readonly ILoggingService _loggingService;
 
 		private TaskCompletionSource<bool> _tcs;
 
 		public InterruzioneAttivitaHelper(
-			IDialogoOperatoreObserver dialogoOperatoreObserver)
+			IDialogoOperatoreObserver dialogoOperatoreObserver,
+			ILoggingService loggingService)
 		{
 			_dialogoOperatoreObserver = dialogoOperatoreObserver;
+			_loggingService = loggingService;
 		}
 
 		public async Task GestisciInterruzioneAttivita(IAttivitaViewModel attivita, bool isUscita)
@@ -33,7 +37,7 @@ namespace IMAR_DialogoOperatore.Helpers
 			}
 			catch (Exception ex)
 			{
-				Console.WriteLine($"Errore durante l'interruzione dell'attività: {ex.Message}");
+				_loggingService.LogError($"Errore durante l'interruzione dell'attività {attivita?.Bolla}", ex);
 			}
 			finally
 			{

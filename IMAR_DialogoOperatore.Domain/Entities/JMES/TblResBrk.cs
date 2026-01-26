@@ -15,7 +15,7 @@ public partial class TblResBrk
 
     public decimal BrkUid { get; set; }
 
-    public DateTime TssStr { get; set; }
+    public DateTime? TssStr { get; set; }
 
     public DateTime? TssEnd { get; set; }
 

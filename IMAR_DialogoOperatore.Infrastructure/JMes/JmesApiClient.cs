@@ -23,16 +23,19 @@ namespace IMAR_DialogoOperatore.Infrastructure.JMes
         private IJSonUtility _jsonUtility;
         private IHttpClientUtility _httpClientUtility;
         private readonly IJMesApiClientErrorUtility _jMesApiClientErrorUtility;
+        private readonly ILoggingService _loggingService;
 
         public JmesApiClient(
             IJSonUtility jSonUtility,
             IHttpClientUtility httpClientUtility,
-            IJMesApiClientErrorUtility jMesApiClientErrorUtility)
+            IJMesApiClientErrorUtility jMesApiClientErrorUtility,
+            ILoggingService loggingService)
         {
             _jsonUtility = jSonUtility;
             _httpClientUtility = httpClientUtility;
 
             _jMesApiClientErrorUtility = jMesApiClientErrorUtility;
+            _loggingService = loggingService;
 
             Task jmesClientTask = Task.Run(async () => _jmesClient = await _httpClientUtility.BuildAuthenticatedClient(SERVER + JMES_LOGIN_PATH + JMES_LOGIN_TOKEN));
             Task diaopeClientTask = Task.Run(async () => _diaopeClient = await _httpClientUtility.BuildAuthenticatedClient(SERVER + DIAOPE_LOGIN_PATH + DIAOPE_LOGIN_TOKEN));
@@ -74,8 +77,9 @@ namespace IMAR_DialogoOperatore.Infrastructure.JMes
 
                 return json["result"]?.ToObject<int>();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _loggingService.LogError($"Errore nel recupero QueryId per query '{queryName}'", ex);
                 return null;
             }
         }
@@ -130,7 +134,10 @@ namespace IMAR_DialogoOperatore.Infrastructure.JMes
 
             string? errore = _jMesApiClientErrorUtility.GestioneEventualeErrore(result);
             if (errore != null)
+            {
+                _loggingService.LogError($"Errore operazione JMES: {errore}");
                 return errore;
+            }
 
             return null;
         }
@@ -153,7 +160,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.JMes
                         producedQuantity = quantitaProdotta,
                         rejectedQuantity = quantitaScartata,
                         defDecAdv = attivita.SaldoAcconto == Costanti.ACCONTO,
-                        clkMacUid = operatore.MacchinaAssegnata.CodiceJMes
+                        clkMacUid = operatore.MacchineAssegnate.First().CodiceJMes
                     }
                 }
             };
@@ -163,7 +170,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.JMes
             return result;
         }
 
-        public HttpResponseMessage MesWorkStart(Operatore operatore, string bolla)
+        public HttpResponseMessage MesWorkStart(Operatore operatore, Attivita attivita)
         {
             string wizardPath = "?wzdCod=MesWorkStart";
 
@@ -175,8 +182,8 @@ namespace IMAR_DialogoOperatore.Infrastructure.JMes
                     {
                         qck = true,
                         clkBdgCod = operatore.Badge,
-                        notCod = bolla,
-                        clkMacUid = operatore.MacchinaAssegnata.CodiceJMes
+                        notCod = attivita.Bolla,
+                        clkMacUid = attivita.MacchinaFittizia.CodiceJMes
                     }
                 }
             };
@@ -200,7 +207,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.JMes
                         clkBdgCod = operatore.Badge,
                         notPlnCod = codiceFase,
                         notPlnNotCod = bolla,
-                        clkMacUid = operatore.MacchinaAssegnata.CodiceJMes
+                        clkMacUid = operatore.MacchineAssegnate.First().CodiceJMes
                     }
                 }
             };
@@ -350,9 +357,11 @@ namespace IMAR_DialogoOperatore.Infrastructure.JMes
             return result;
         }
 
-        public HttpResponseMessage MesEquipStart(Operatore operatore, string bolla)
+        public HttpResponseMessage MesEquipStart(Operatore operatore, string bolla, Macchina? macchina = null)
         {
-            string wizardPath = "?wzdCod=MesEquipStart";
+            macchina = macchina ?? operatore.MacchineAssegnate.First();
+
+			string wizardPath = "?wzdCod=MesEquipStart";
 
             var entity = new
             {
@@ -363,7 +372,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.JMes
                         qck = true,
                         clkBdgCod = operatore.Badge,
                         notCod = bolla,
-                        clkMacUid = operatore.MacchinaAssegnata.CodiceJMes
+                        clkMacUid = macchina.CodiceJMes
                     }
                 }
             };
@@ -372,6 +381,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.JMes
             var result = _jmesClient.PostAsync(urlStartWork, _jsonUtility.BuildJsonContent(entity)).GetAwaiter().GetResult();
             return result;
         }
+
         public HttpResponseMessage MesEquipStartNotPln(Operatore operatore, string bolla, string codiceFase)
         {
             string wizardPath = "?wzdCod=MesEquipStart";
@@ -386,7 +396,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.JMes
                         clkBdgCod = operatore.Badge,
                         notPlnCod = codiceFase,
                         notPlnNotCod = bolla,
-                        clkMacUid = operatore.MacchinaAssegnata.CodiceJMes
+                        clkMacUid = operatore.MacchineAssegnate.First().CodiceJMes
                     }
                 }
             };
@@ -399,6 +409,28 @@ namespace IMAR_DialogoOperatore.Infrastructure.JMes
         public HttpResponseMessage MesEquipEnd(string badge, double? idJmesAttrezzaggio)
         {
             string wizardPath = "?wzdCod=MesEquipEnd";
+
+            var entity = new
+            {
+                entity = new
+                {
+                    paramsIO = new
+                    {
+                        qck = true,
+                        clkBdgCod = badge,
+                        clkDiaOpeUid = idJmesAttrezzaggio
+                    }
+                }
+            };
+
+            var urlStartWork = SERVER + WIZARD_WORK_PATH + wizardPath;
+            var result = _jmesClient.PostAsync(urlStartWork, _jsonUtility.BuildJsonContent(entity)).GetAwaiter().GetResult();
+            return result;
+        }
+
+        public HttpResponseMessage MesEquipRemove(string badge, double? idJmesAttrezzaggio)
+        {
+            string wizardPath = "?wzdCod=MesEquipRemove";
 
             var entity = new
             {

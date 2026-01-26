@@ -1,0 +1,62 @@
+﻿@using IMAR_DialogoOperatore.Application.Interfaces.Utilities
+@using IMAR_DialogoOperatore.Components.SubComponents
+@using IMAR_DialogoOperatore.ViewModels
+
+@inject NotePopupViewModel NotePopupViewModel
+@inject IAutoLogoutUtility AutoLogoutUtility
+
+<DxPopup @bind-Visible="@NotePopupViewModel.IsVisible"
+		 HeaderText="Note"
+		 ShowHeader="true"
+		 ShowCloseButton="true"
+		 CloseOnOutsideClick="false"
+		 ShowFooter="true"
+		 EnableAdaptivity="true"
+		 Width="45%"
+		 @onkeydown="RestartAutoLogoutTimer"
+		 @onclick="RestartAutoLogoutTimer"
+		 @onmousemove="RestartAutoLogoutTimer"
+		 @onmousedown="RestartAutoLogoutTimer">
+	<BodyContentTemplate>
+		<NoteGrid />
+	</BodyContentTemplate>
+</DxPopup>
+
+@code {
+	protected override void OnInitialized()
+	{
+		base.OnInitialized();
+		NotePopupViewModel.NotifyStateChanged += NotePopupViewModel_NotifyStateChanged;
+	}
+
+	async void NotePopupViewModel_NotifyStateChanged()
+	{
+		await InvokeAsync(StateHasChanged);
+	}
+
+	private void RestartAutoLogoutTimer()
+	{
+		if (isRestartTimerActive())
+			AutoLogoutUtility.RestartTimer();
+	}
+
+	private bool isRestartTimerActive()
+	{
+		return AutoLogoutUtility.IsActive;
+	}
+
+	private void AnnullaHandler()
+	{
+		ChiudiPopup();
+	}
+
+	private void ConfermaHandler()
+	{
+		ChiudiPopup();
+	}
+
+	private void ChiudiPopup()
+	{
+		NotePopupViewModel.IsVisible = false;
+	}
+}

@@ -12,6 +12,6 @@ namespace IMAR_DialogoOperatore.ViewModels
         public string? Fase { get; set; }
         public int? QuantitaProdotta { get; set; }
         public int? QuantitaScartata { get; set; }
-        public DateTime Timestamp { get; set; }
+        public DateTime? Timestamp { get; set; }
     }
 }

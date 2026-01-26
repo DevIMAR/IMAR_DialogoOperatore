@@ -25,6 +25,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\IMAR_DialogoOperatoreMockup\IMAR_DialogoOperatore.csproj" />
+    <ProjectReference Include="..\IMAR_DialogoOperatore.Infrastructure\IMAR_DialogoOperatore.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -3,8 +3,10 @@ using IMAR_DialogoOperatore.Application.Interfaces.Clients;
 using IMAR_DialogoOperatore.Application.Interfaces.Services.Activities;
 using IMAR_DialogoOperatore.Application.Interfaces.Utilities;
 using IMAR_DialogoOperatore.Domain.Models;
+using IMAR_DialogoOperatore.Enums;
 using IMAR_DialogoOperatore.Interfaces.Helpers;
 using IMAR_DialogoOperatore.Interfaces.Observers;
+using IMAR_DialogoOperatore.Interfaces.Services;
 using IMAR_DialogoOperatore.Interfaces.ViewModels;
 using IMAR_DialogoOperatore.Utilities;
 using IMAR_DialogoOperatore.ViewModels;
@@ -20,6 +22,8 @@ namespace IMAR_DialogoOperatore.Commands
         private readonly IAutoLogoutUtility _autoLogoutUtility;
         private readonly ToastDisplayerUtility _toastDisplayerUtility;
         private readonly IOperatoreService _operatoreService;
+        private readonly IMessageBoxService _messageBoxService;
+        private readonly ILoggingService _loggingService;
 
         public IngressoUscitaCommand(
 			InfoOperatoreViewModel infoOperatoreViewModel,
@@ -28,7 +32,9 @@ namespace IMAR_DialogoOperatore.Commands
 			IJmesApiClient jmesApiClient,
             IAutoLogoutUtility autoLogoutUtility,
             ToastDisplayerUtility toastDisplayerUtility,
-            IOperatoreService operatoreService)
+            IOperatoreService operatoreService,
+            IMessageBoxService messageBoxService,
+            ILoggingService loggingService)
         {
 			_infoOperatoreViewModel = infoOperatoreViewModel;
             _dialogoOperatoreObserver = dialogoOperatoreObserver;
@@ -37,6 +43,8 @@ namespace IMAR_DialogoOperatore.Commands
             _autoLogoutUtility = autoLogoutUtility;
             _toastDisplayerUtility = toastDisplayerUtility;
             _operatoreService = operatoreService;
+            _messageBoxService = messageBoxService;
+            _loggingService = loggingService;
 
             _autoLogoutUtility.OnLogoutTriggered += AutoLogoutUtility_OnLogoutTriggered;
         }
@@ -45,6 +53,7 @@ namespace IMAR_DialogoOperatore.Commands
         {
             _infoOperatoreViewModel.Badge = null;
             _dialogoOperatoreObserver.IsUscita = false;
+            _dialogoOperatoreObserver.IsExiting = false;
         }
 
         public override bool CanExecute(object? parameter)
@@ -77,11 +86,18 @@ namespace IMAR_DialogoOperatore.Commands
 
             _dialogoOperatoreObserver.OperatoreSelezionato.Stato = Costanti.PRESENTE;
 
-            _toastDisplayerUtility.ShowGreenToast("Entrata", $"Benvenuto {_dialogoOperatoreObserver.OperatoreSelezionato.Nome}!");
+            _toastDisplayerUtility.ShowGreenToast("Entrata", $"Benvenuto/a {_dialogoOperatoreObserver.OperatoreSelezionato.Nome}!");
         }
 
         private async Task EffettuaUscitaOperatore()
         {
+            if (!_dialogoOperatoreObserver.OperatoreSelezionato.AttivitaAperte.Any())
+            {
+                MessageBoxResult result = await _messageBoxService.ShowModalAsync("Sei sicuro di voler uscire?", null, Enums.MessageBoxButtons.YesNo);
+                if (result != MessageBoxResult.Yes)
+                    return;
+            }
+
             _dialogoOperatoreObserver.IsUscita = true;
 
             await ChiudiAttivitaOperatore();
@@ -98,12 +114,14 @@ namespace IMAR_DialogoOperatore.Commands
             _jmesApiClient.MesAutoClock(_dialogoOperatoreObserver.OperatoreSelezionato.Badge.ToString(), false);
 
             _dialogoOperatoreObserver.IsLoaderVisibile = false;
+            _dialogoOperatoreObserver.IsExiting = true;
+            await Task.Delay(1);
 
             _dialogoOperatoreObserver.OperatoreSelezionato.Stato = Costanti.ASSENTE;
 
             _toastDisplayerUtility.ShowRedToast("Uscita", $"Arrivederci {_dialogoOperatoreObserver.OperatoreSelezionato.Nome}!");
 
-            _autoLogoutUtility.StartLogoutTimer(3);
+            _autoLogoutUtility.StartLogoutTimer(2);
         }
 
         private async Task ChiudiAttivitaOperatore()
@@ -125,8 +143,7 @@ namespace IMAR_DialogoOperatore.Commands
             }
             catch (Exception ex)
             {
-                // Log dell'errore
-                Console.WriteLine($"Errore durante la chiusura delle attività: {ex.Message}");
+                _loggingService.LogError($"Errore durante la chiusura delle attività operatore {_dialogoOperatoreObserver.OperatoreSelezionato?.Badge}", ex);
             }
         }
 

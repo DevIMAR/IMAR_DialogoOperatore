@@ -96,22 +96,65 @@ namespace IMAR_DialogoOperatore.Services
                                                     .SingleOrDefault(x => x.Bolla == bolla);
 
             if (attivitaTrovata == null)
-                attivitaTrovata = _as400Repository.ExecuteQuery<Attivita>(@"SELECT
-                                                                            NRBLCI AS BOLLA, ORPRCI AS ODP, CDARCI AS ARTICOLO, trim(DSARMA) AS DESCRIZIONEARTICOLO, 
-                                                                            CDFACI AS FASE, DSFACI AS DESCRIZIONEFASE, PF2.QORDCI AS QUANTITAORDINE, 
-                                                                            COALESCE(SUM(jf.QTVERJM), 0) AS QUANTITAPRODOTTANONCONTABILIZZATA, 
-                                                                            pf2.QPROCI AS QUANTITAPRODOTTACONTABILIZZATA,
-                                                                            COALESCE(SUM(jf.QTSCAJM), 0) AS QUNATITASCARTATANONCONTABILIZZATA, 
-                                                                            pf2.QSCACI AS QUANTITASCARTATACONTABILIZZATA,
-                                                                            COALESCE(SUM(jf.QTNCOJM), 0) AS QTANONCONFORMENONCONTABILIZZATA,
-                                                                            pf2.QRESCI AS QTANONCONFORMECONTABILIZZATA,
-                                                                            CASE WHEN MAX(SAACCJM) IS NULL THEN max(TIRECI) ELSE  MAX(SAACCJM) end AS SALDOACCONTO
-                                                                            FROM IMA90DAT.PCIMP00F pf2 
-                                                                            JOIN IMA90DAT.MGART00F mf ON pf2.CDARCI = mf.CDARMA 
-                                                                            LEFT JOIN IMA90DAT.JMRILM00F jf ON NRBLCI = NRTSKJM AND jf.QCONTJM = ''
-                                                                            WHERE NRBLCI = '" + bolla + @"'
-                                                                            GROUP BY NRBLCI, ORPRCI, CDARCI, DSARMA, CDFACI, DSFACI,
-                                                                                    pf2.QORDCI, pf2.QPROCI, pf2.QSCACI, pf2.QRESCI")
+                attivitaTrovata = _as400Repository.ExecuteQuery<Attivita>(@"WITH
+                                                                                NONCONTABILIZZATE AS (
+                                                                                    SELECT
+                                                                                        NRTSKJM,
+                                                                                        SUM(QTVERJM) AS TOT_QTA_NC,
+                                                                                        SUM(QTSCAJM) AS TOT_SCARTO_NC,
+                                                                                        SUM(QTNCOJM) AS TOT_NONCONF_NC,
+                                                                                        MAX(SAACCJM) AS MAX_SAACCJM
+                                                                                    FROM IMA90DAT.JMRILM00F
+                                                                                    WHERE QCONTJM = ''
+                                                                                    GROUP BY NRTSKJM
+                                                                                ),
+                                                                                FASE_PREC AS (
+                                                                                    SELECT
+                                                                                        p1.NRBLCI,
+                                                                                        p1.ORPRCI,
+                                                                                        p1.CDFACI,
+                                                                                        prec.NRBLCI AS NRBLCI_PREV,
+                                                                                        prec.TIRECI AS TIRECI_PREV,
+                                                                                        prec.QPROCI AS QPROCI_PREV,
+                                                                                        nc_prec.TOT_QTA_NC AS QTA_NC_PREV,
+                                                                                        nc_prec.MAX_SAACCJM AS SAACCJM_PREV,
+                                                                                        ROW_NUMBER() OVER (PARTITION BY p1.NRBLCI ORDER BY prec.CDFACI DESC) AS RN
+                                                                                    FROM IMA90DAT.PCIMP00F p1
+                                                                                    INNER JOIN IMA90DAT.PCIMP00F prec
+                                                                                        ON prec.ORPRCI = p1.ORPRCI
+                                                                                        AND prec.CDFACI < p1.CDFACI
+                                                                                    LEFT JOIN NONCONTABILIZZATE nc_prec
+                                                                                        ON nc_prec.NRTSKJM = prec.NRBLCI
+                                                                                    WHERE p1.NRBLCI = '" + bolla + @"' 
+                                                                                )
+                                                                                SELECT
+                                                                                    pf2.NRBLCI AS BOLLA,
+                                                                                    pf2.ORPRCI AS ODP,
+                                                                                    pf2.CDARCI AS ARTICOLO,
+                                                                                    TRIM(mf.DSARMA) AS DESCRIZIONEARTICOLO,
+                                                                                    pf2.CDFACI AS FASE,
+                                                                                    pf2.DSFACI AS DESCRIZIONEFASE,
+                                                                                    CASE
+                                                                                        WHEN fp.NRBLCI_PREV IS NULL THEN pf2.QORDCI
+                                                                                        WHEN fp.TIRECI_PREV = 'S' OR COALESCE(fp.SAACCJM_PREV, '') = 'S'
+                                                                                            THEN COALESCE(fp.QPROCI_PREV, 0) + COALESCE(fp.QTA_NC_PREV, 0)
+                                                                                        ELSE pf2.QORDCI
+                                                                                    END AS QUANTITAORDINE,
+                                                                                    COALESCE(ra.TOT_QTA_NC, 0) AS QUANTITAPRODOTTANONCONTABILIZZATA,
+                                                                                    pf2.QPROCI AS QUANTITAPRODOTTACONTABILIZZATA,
+                                                                                    COALESCE(ra.TOT_SCARTO_NC, 0) AS QUANTITASCARTATANONCONTABILIZZATA,
+                                                                                    pf2.QSCACI AS QUANTITASCARTATACONTABILIZZATA,
+                                                                                    COALESCE(ra.TOT_NONCONF_NC, 0) AS QTANONCONFORMENONCONTABILIZZATA,
+                                                                                    pf2.QRESCI AS QTANONCONFORMECONTABILIZZATA,
+                                                                                    CASE
+                                                                                        WHEN ra.MAX_SAACCJM IS NULL THEN pf2.TIRECI
+                                                                                        ELSE ra.MAX_SAACCJM
+                                                                                    END AS SALDOACCONTO   
+                                                                                FROM IMA90DAT.PCIMP00F pf2
+                                                                                JOIN IMA90DAT.MGART00F mf ON pf2.CDARCI = mf.CDARMA
+                                                                                LEFT JOIN NONCONTABILIZZATE ra ON ra.NRTSKJM = pf2.NRBLCI
+                                                                                LEFT JOIN FASE_PREC fp ON fp.NRBLCI = pf2.NRBLCI AND fp.RN = 1
+                                                                                WHERE pf2.NRBLCI = '" + bolla + @"'")
                                                   .SingleOrDefault();
                                                                             
             return attivitaTrovata;
@@ -122,31 +165,75 @@ namespace IMAR_DialogoOperatore.Services
             IEnumerable<Attivita> attivitaFiltrate = _caricamentoAttivitaInBackroundService.GetAttivitaAperte()
                                                                 .Where(x => x.Odp == odp);
 
-            if (attivitaFiltrate == null || attivitaFiltrate.Count() == 0)
-                attivitaFiltrate = _as400Repository.ExecuteQuery<Attivita>(@"SELECT
-                                                                            NRBLCI AS BOLLA, ORPRCI AS ODP, CDARCI AS ARTICOLO, trim(DSARMA) AS DESCRIZIONEARTICOLO, 
-                                                                            CDFACI AS FASE, DSFACI AS DESCRIZIONEFASE, PF2.QORDCI AS QUANTITAORDINE, 
-                                                                            COALESCE(SUM(jf.QTVERJM), 0) AS QUANTITAPRODOTTANONCONTABILIZZATA, 
-                                                                            pf2.QPROCI AS QUANTITAPRODOTTACONTABILIZZATA,
-                                                                            COALESCE(SUM(jf.QTSCAJM), 0) AS QUNATITASCARTATANONCONTABILIZZATA, 
-                                                                            pf2.QSCACI AS QUANTITASCARTATACONTABILIZZATA,
-                                                                            COALESCE(SUM(jf.QTNCOJM), 0) AS QTANONCONFORMENONCONTABILIZZATA,
-                                                                            pf2.QRESCI AS QTANONCONFORMECONTABILIZZATA,
-                                                                            CASE WHEN MAX(SAACCJM) IS NULL THEN max(TIRECI) ELSE  MAX(SAACCJM) end AS SALDOACCONTO
-                                                                            FROM IMA90DAT.PCIMP00F pf2 
-                                                                            JOIN IMA90DAT.MGART00F mf ON pf2.CDARCI = mf.CDARMA 
-                                                                            LEFT JOIN IMA90DAT.JMRILM00F jf ON NRBLCI = NRTSKJM AND jf.QCONTJM = ''
-                                                                            WHERE ORPRCI = '" + odp + @"'
-                                                                            GROUP BY NRBLCI, ORPRCI, CDARCI, DSARMA, CDFACI, DSFACI,
-                                                                                    pf2.QORDCI, pf2.QPROCI, pf2.QSCACI, pf2.QRESCI");
+            if (attivitaFiltrate == null || !attivitaFiltrate.Any())
+                attivitaFiltrate = _as400Repository.ExecuteQuery<Attivita>(@"WITH
+                                                                                NONCONTABILIZZATE AS (
+                                                                                    SELECT
+                                                                                        NRTSKJM,
+                                                                                        SUM(QTVERJM) AS TOT_QTA_NC,
+                                                                                        SUM(QTSCAJM) AS TOT_SCARTO_NC,
+                                                                                        SUM(QTNCOJM) AS TOT_NONCONF_NC,
+                                                                                        MAX(SAACCJM) AS MAX_SAACCJM
+                                                                                    FROM IMA90DAT.JMRILM00F
+                                                                                    WHERE QCONTJM = ''
+                                                                                    GROUP BY NRTSKJM
+                                                                                ),
+                                                                                FASE_PREC AS (
+                                                                                    SELECT
+                                                                                        p1.NRBLCI,
+                                                                                        p1.ORPRCI,
+                                                                                        p1.CDFACI,
+                                                                                        prec.NRBLCI AS NRBLCI_PREV,
+                                                                                        prec.TIRECI AS TIRECI_PREV,
+                                                                                        prec.QPROCI AS QPROCI_PREV,
+                                                                                        nc_prec.TOT_QTA_NC AS QTA_NC_PREV,
+                                                                                        nc_prec.MAX_SAACCJM AS SAACCJM_PREV,
+                                                                                        ROW_NUMBER() OVER (PARTITION BY p1.NRBLCI ORDER BY prec.CDFACI DESC) AS RN
+                                                                                    FROM IMA90DAT.PCIMP00F p1
+                                                                                    INNER JOIN IMA90DAT.PCIMP00F prec
+                                                                                        ON prec.ORPRCI = p1.ORPRCI
+                                                                                        AND prec.CDFACI < p1.CDFACI
+                                                                                    LEFT JOIN NONCONTABILIZZATE nc_prec
+                                                                                        ON nc_prec.NRTSKJM = prec.NRBLCI
+                                                                                    WHERE p1.ORPRCI = '" + odp + @"' 
+                                                                                )
+                                                                                SELECT
+                                                                                    pf2.NRBLCI AS BOLLA,
+                                                                                    pf2.ORPRCI AS ODP,
+                                                                                    pf2.CDARCI AS ARTICOLO,
+                                                                                    TRIM(mf.DSARMA) AS DESCRIZIONEARTICOLO,
+                                                                                    pf2.CDFACI AS FASE,
+                                                                                    pf2.DSFACI AS DESCRIZIONEFASE,
+                                                                                    CASE
+                                                                                        WHEN fp.NRBLCI_PREV IS NULL THEN pf2.QORDCI
+                                                                                        WHEN fp.TIRECI_PREV = 'S' OR COALESCE(fp.SAACCJM_PREV, '') = 'S'
+                                                                                            THEN COALESCE(fp.QPROCI_PREV, 0) + COALESCE(fp.QTA_NC_PREV, 0)
+                                                                                        ELSE pf2.QORDCI
+                                                                                    END AS QUANTITAORDINE,
+                                                                                    COALESCE(ra.TOT_QTA_NC, 0) AS QUANTITAPRODOTTANONCONTABILIZZATA,
+                                                                                    pf2.QPROCI AS QUANTITAPRODOTTACONTABILIZZATA,
+                                                                                    COALESCE(ra.TOT_SCARTO_NC, 0) AS QUANTITASCARTATANONCONTABILIZZATA,
+                                                                                    pf2.QSCACI AS QUANTITASCARTATACONTABILIZZATA,
+                                                                                    COALESCE(ra.TOT_NONCONF_NC, 0) AS QTANONCONFORMENONCONTABILIZZATA,
+                                                                                    pf2.QRESCI AS QTANONCONFORMECONTABILIZZATA,
+                                                                                    CASE
+                                                                                        WHEN ra.MAX_SAACCJM IS NULL THEN pf2.TIRECI
+                                                                                        ELSE ra.MAX_SAACCJM
+                                                                                    END AS SALDOACCONTO   
+                                                                                FROM IMA90DAT.PCIMP00F pf2
+                                                                                JOIN IMA90DAT.MGART00F mf ON pf2.CDARCI = mf.CDARMA
+                                                                                LEFT JOIN NONCONTABILIZZATE ra ON ra.NRTSKJM = pf2.NRBLCI
+                                                                                LEFT JOIN FASE_PREC fp ON fp.NRBLCI = pf2.NRBLCI AND fp.RN = 1
+                                                                                WHERE pf2.ORPRCI = '" + odp + @"'");
 
-            return attivitaFiltrate.OrderBy(x => x.Bolla);
+            return attivitaFiltrate.OrderBy(x => x.Fase);
         }
 
         public string? AvanzaAttivita(Operatore operatore, Attivita attivitaDaAvanzare, int quantitaProdotta, int quantitaScartata)
         {
             if (attivitaDaAvanzare.SaldoAcconto != "S")
                 attivitaDaAvanzare.QuantitaResidua = attivitaDaAvanzare.QuantitaOrdine - attivitaDaAvanzare.QuantitaProdottaNonContabilizzata;
+
 
             HttpResponseMessage result = _jmesApiClient.MesAdvanceDeclaration(operatore, attivitaDaAvanzare, quantitaProdotta, quantitaScartata);
 
@@ -200,16 +287,20 @@ namespace IMAR_DialogoOperatore.Services
                 attivitaOperatoreAperte.AddRange(OttieniAttivitaIndiretteOperatoreAperte(attivitaAperte, attivitaIndiretteOperatore));
 
             foreach (Attivita attivita in attivitaOperatoreAperte)
-                attivita.Macchina = _macchinaService.GetMacchinaRealeByAttivita(attivita);
+                attivita.MacchinaReale = _macchinaService.GetMacchinaRealeByAttivita(attivita);
 
             return attivitaOperatoreAperte;
         }
 
         private List<Attivita> GetAttivitaOperatore(int idJmesOperatore)
         {
-            List<Attivita> attivitaOperatore = _synergyJmesUoW.MesEvt
-                                                               .Get(x => (int)x.ResEffStrUid == idJmesOperatore)
+            List<Attivita> attivitaOperatore = _synergyJmesUoW.MesEvtOpe
+                                                               .Get(x => (int)x.ResUid == idJmesOperatore)
                                                                .Where(x => x.TssEnd == null)
+                                                               .Join(_synergyJmesUoW.MesEvt.Get(),
+                                                                        meo => meo.EvtUid,
+                                                                        me => me.Uid,
+                                                                        (meo, me) => me)
                                                                .Join(_synergyJmesUoW.MesEvtDet.Get(),
                                                                         me => me.Uid,
                                                                         med => med.EvtUid,

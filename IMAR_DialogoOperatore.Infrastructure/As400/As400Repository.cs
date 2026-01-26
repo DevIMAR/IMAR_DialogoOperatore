@@ -22,7 +22,16 @@ namespace IMAR_DialogoOperatore.Infrastructure.As400
             }
         }
 
-		public IEnumerable<T> GetAll<T>()
+        public int ExecuteCommand(string sql, object? param = null)
+        {
+            using (var connection = (OdbcConnection)_as400Context.CreateConnection())
+            {
+                connection.Open();
+                return connection.Execute(sql, param);
+            }
+        }
+
+        public IEnumerable<T> GetAll<T>()
 		{
 			string query = $" select * from IMA90DAT.{typeof(T).Name} ";
             return ExecuteQuery<T>(query);

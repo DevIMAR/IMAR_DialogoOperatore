@@ -58,7 +58,6 @@ namespace IMAR_DialogoOperatore.Commands
 				   && _dialogoOperatoreObserver.OperatoreSelezionato.Stato == Costanti.PRESENTE
 				   && _dialogoOperatoreObserver.OperazioneInCorso != Costanti.NESSUNA
 				   && _dialogoOperatoreObserver.AttivitaSelezionata != null
-                   //&& _dialogoOperatoreObserver.AttivitaSelezionata.SaldoAcconto != Costanti.SALDO
 				   && base.CanExecute(parameter);
 		}
 
@@ -79,16 +78,16 @@ namespace IMAR_DialogoOperatore.Commands
 
         private async Task CreaEdInviaSegnalazioneDifformita()
         {
-            CostiArticoloDTO costiArticoloDTO = await _imarApiClient.GetCostiArticolo(_dialogoOperatoreObserver.AttivitaSelezionata.Articolo);
+            CostiArticoloDTO costiArticoloDTO = await _imarApiClient.GetCostiArticolo(_dialogoOperatoreObserver.AttivitaSelezionata.CodiceArticolo);
 
             _segnalazioniDifformitaService.InsertSegnalazione(new SegnalazioneDifformita
             {
                 OrigineSegnalazione = "I",
                 Richiedente = _dialogoOperatoreObserver.OperatoreSelezionato.Badge + " - " + _dialogoOperatoreObserver.OperatoreSelezionato.Cognome + " " + _dialogoOperatoreObserver.OperatoreSelezionato.Nome,
-                FaseDifformita = _dialogoOperatoreObserver.AttivitaSelezionata.Fase,
+                FaseDifformita = _dialogoOperatoreObserver.AttivitaSelezionata.CodiceFase,
                 DescrizioneFase = _dialogoOperatoreObserver.AttivitaSelezionata.DescrizioneFase,
                 Odp = _dialogoOperatoreObserver.AttivitaSelezionata.Odp,
-                Articolo = _dialogoOperatoreObserver.AttivitaSelezionata.Articolo,
+                Articolo = _dialogoOperatoreObserver.AttivitaSelezionata.CodiceArticolo,
                 DescrizioneArticolo = _dialogoOperatoreObserver.AttivitaSelezionata.DescrizioneArticolo,
                 QtaProdotta = _avanzamentoObserver.QuantitaProdotta,
                 QtaDifforme = _avanzamentoObserver.QuantitaScartata,
@@ -146,8 +145,8 @@ namespace IMAR_DialogoOperatore.Commands
             if (!CanAssegnareMacchinaFittiziaAdOperatore())
                 return;
 
-            _dialogoOperatoreObserver.OperatoreSelezionato.MacchinaAssegnata = _macchinaService.GetPrimaMacchinaFittiziaNonUtilizzata();
-            if (_dialogoOperatoreObserver.OperatoreSelezionato.MacchinaAssegnata == null)
+            _dialogoOperatoreObserver.OperatoreSelezionato.MacchineAssegnate.Add(_macchinaService.GetPrimaMacchinaFittiziaNonUtilizzata());
+            if (!_dialogoOperatoreObserver.OperatoreSelezionato.MacchineAssegnate.Any())
                 MostraPopupConTesto(Costanti.ERRORE_MACCHINE_FINITE);
         }
 
@@ -155,7 +154,7 @@ namespace IMAR_DialogoOperatore.Commands
         {
             return (_dialogoOperatoreObserver.OperazioneInCorso == Costanti.INIZIO_ATTREZZAGGIO ||
                     _dialogoOperatoreObserver.OperazioneInCorso == Costanti.INIZIO_LAVORO) &&
-                    _dialogoOperatoreObserver.OperatoreSelezionato.MacchinaAssegnata == null;
+                    !_dialogoOperatoreObserver.OperatoreSelezionato.MacchineAssegnate.Any();
         }
 
         private void EseguiOperazioneOMostraMessaggio()

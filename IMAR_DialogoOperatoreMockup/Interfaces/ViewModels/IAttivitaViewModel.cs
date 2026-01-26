@@ -2,14 +2,16 @@
 
 namespace IMAR_DialogoOperatore.Interfaces.ViewModels
 {
-    public interface IAttivitaViewModel
+    public interface IAttivitaViewModel : IViewModelBase
     {
-        string? Articolo { get; }
+        string? CodiceArticolo { get; }
         string? Bolla { get; }
         string Causale { get; set; }
         string? DescrizioneArticolo { get; }
+        string? CodiceDescrizioneArticolo { get; }
         string? DescrizioneFase { get; }
-        string? Fase { get; }
+        string? CodiceFase { get; }
+        string? CodiceDescrizioneFase { get; }
         string? Odp { get; }
         int QuantitaOrdine { get; }
         int QuantitaProdotta { get; }
@@ -21,10 +23,12 @@ namespace IMAR_DialogoOperatore.Interfaces.ViewModels
         int QuantitaScartataContabilizzata { get; set; }
         string SaldoAcconto { get; set; }
         double? CodiceJMes { get; }
-        Macchina? Macchina { get; }
+        Macchina? MacchinaFittizia { get; }
+        Macchina? MacchinaReale { get; }
         string CausaleEstesa { get; }
         DateTime? DataSchedulata { get; }
         DateTime? InizioAttivita { get; }
         DateTime? FineAttivita { get; }
+        IEnumerable<Nota> Note { get; set; }
     }
 }

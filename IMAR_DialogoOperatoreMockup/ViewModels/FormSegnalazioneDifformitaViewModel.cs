@@ -16,7 +16,7 @@ namespace IMAR_DialogoOperatore.ViewModels
 
         public string Bolla => _dialogoOperatoreObserver.AttivitaSelezionata.Bolla;
         public string Odp => _dialogoOperatoreObserver.AttivitaSelezionata.Odp;
-        public string Fase => _dialogoOperatoreObserver.AttivitaSelezionata.Fase;
+        public string Fase => _dialogoOperatoreObserver.AttivitaSelezionata.CodiceFase;
         public string DescrizioneFase => _dialogoOperatoreObserver.AttivitaSelezionata.DescrizioneFase;
         public List<string> ListaCategorie => new List<string> { "Dimensionale", "Finitura", "Materiale", "Strutturale", "Quantitativo", "Errore Disegno/Distinta", "Varie Imballo" };
 

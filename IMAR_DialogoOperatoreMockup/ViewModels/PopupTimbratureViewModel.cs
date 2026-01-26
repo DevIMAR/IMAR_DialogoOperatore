@@ -2,35 +2,12 @@
 
 namespace IMAR_DialogoOperatore.ViewModels
 {
-    public class PopupTimbratureViewModel : ViewModelBase
+    public class PopupTimbratureViewModel : PopupViewModelBase
     {
-        private readonly IDialogoOperatoreObserver _dialogoOperatoreObserver;
-
-        private bool _isVisibile;
-
-        public bool IsVisible
-        {
-            get { return _isVisibile; }
-            set
-            {
-                _isVisibile = value;
-
-                OnNotifyStateChanged();
-            }
-        }
-
         public PopupTimbratureViewModel(
             IDialogoOperatoreObserver dialogoOperatoreObserver)
+            :base(dialogoOperatoreObserver)
         {
-            _dialogoOperatoreObserver = dialogoOperatoreObserver;
-
-            _dialogoOperatoreObserver.OnOperatoreSelezionatoChanged += DialogoOperatoreObserver_OnOperatoreSelezionatoChanged;
-        }
-
-        private void DialogoOperatoreObserver_OnOperatoreSelezionatoChanged()
-        {
-            if (_dialogoOperatoreObserver.OperatoreSelezionato == null)
-                IsVisible = false;
         }
     }
 }

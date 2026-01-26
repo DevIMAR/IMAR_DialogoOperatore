@@ -30,7 +30,7 @@ namespace IMAR_DialogoOperatore.Commands
         public override void Execute(object? parameter)
         {
             _attivitaIndirettaObserver.IsAttivitaIndiretta = true;
-            _fasiIndirettePopupViewModel.MostraPopup = true;
+            _fasiIndirettePopupViewModel.IsVisible = true;
         }
     }
 }

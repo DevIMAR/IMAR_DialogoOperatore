@@ -27,6 +27,7 @@ namespace IMAR_DialogoOperatore.Commands
 		public override void Execute(object? parameter)
 		{
 			_dialogoOperatoreObserver.OperazioneInCorso = Costanti.FINE_ATTREZZAGGIO;
+			_dialogoOperatoreObserver.IsAperturaLavoroAutomaticaAttiva = false;
 		}
 	}
 }

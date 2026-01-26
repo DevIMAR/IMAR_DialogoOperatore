@@ -8,17 +8,20 @@ namespace IMAR_DialogoOperatore.Mappers
 {
     public class AttivitaMapper : IAttivitaMapper
 	{
-        public Attivita AttivitaViewModelToAttivita(IAttivitaViewModel attivitaViewModel)
+        public Attivita? AttivitaViewModelToAttivita(IAttivitaViewModel? attivitaViewModel)
 		{
+            if (attivitaViewModel == null)
+                return null;
+
 			return new Attivita
 			{
                 Causale = attivitaViewModel.Causale,
                 CausaleEstesa = attivitaViewModel.CausaleEstesa,
                 Bolla = attivitaViewModel.Bolla,
                 Odp = attivitaViewModel.Odp,
-                Articolo = attivitaViewModel.Articolo,
+                Articolo = attivitaViewModel.CodiceArticolo,
                 DescrizioneArticolo = attivitaViewModel.DescrizioneArticolo,
-                Fase = attivitaViewModel.Fase,
+                Fase = attivitaViewModel.CodiceFase,
                 DescrizioneFase = attivitaViewModel.DescrizioneFase,
                 QuantitaOrdine = attivitaViewModel.QuantitaOrdine,
                 QuantitaProdotta = attivitaViewModel.QuantitaProdotta,
@@ -30,8 +33,13 @@ namespace IMAR_DialogoOperatore.Mappers
                 QuantitaResidua = attivitaViewModel.QuantitaResidua,
                 SaldoAcconto = attivitaViewModel.SaldoAcconto,
                 CodiceJMes = attivitaViewModel.CodiceJMes,
-                Macchina = attivitaViewModel.Macchina
-            };
+                MacchinaFittizia = attivitaViewModel.MacchinaFittizia,
+                MacchinaReale = attivitaViewModel.MacchinaReale,
+                DataSchedulata = attivitaViewModel.DataSchedulata,
+                InizioAttivita = attivitaViewModel.InizioAttivita,
+                FineAttivita = attivitaViewModel.FineAttivita,
+                Note = attivitaViewModel.Note,
+        };
 		}
 
 		public IEnumerable<IAttivitaViewModel> ListaAttivitaToListaAttivitaViewModel(IEnumerable<Attivita> attivitaList)

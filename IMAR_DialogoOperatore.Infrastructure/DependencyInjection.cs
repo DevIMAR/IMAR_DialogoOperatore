@@ -14,9 +14,12 @@ using IMAR_DialogoOperatore.Infrastructure.JMes;
 using IMAR_DialogoOperatore.Infrastructure.Services;
 using IMAR_DialogoOperatore.Infrastructure.Utilities;
 using IMAR_DialogoOperatore.Services;
+using log4net;
+using log4net.Config;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System.Reflection;
 
 namespace IMAR_DialogoOperatore.Infrastructure
 {
@@ -47,6 +50,7 @@ namespace IMAR_DialogoOperatore.Infrastructure
 			services.AddScoped<IMorpheusApiService, MorpheusApiService>();
 			services.AddScoped<IOperatoreService, OperatoreService>();
 			services.AddScoped<IMacchinaService, MacchinaService>();
+			services.AddScoped<INotaService, NotaService>();
 			services.AddScoped<ISegnalazioniDifformitaService, SegnalazioniDifformitaService>();
 			services.AddScoped<ITimbratureService, TimbratureService>();
 
@@ -59,6 +63,7 @@ namespace IMAR_DialogoOperatore.Infrastructure
 			services.AddScoped<IJSonUtility, JSonUtility>();
 			services.AddScoped<IJMesApiClientErrorUtility, JMesApiClientErrorUtility>();
 			services.AddScoped<IAutoLogoutUtility, AutoLogoutUtility>();
+			services.AddSingleton<ILoggingService, LoggingService>();
 
 			return services;
 		}

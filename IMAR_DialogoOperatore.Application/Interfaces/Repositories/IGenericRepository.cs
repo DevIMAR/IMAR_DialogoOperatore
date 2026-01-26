@@ -6,10 +6,12 @@ namespace IMAR_DialogoOperatore.Application.Interfaces.Repositories
 	{
 		Task<IQueryable<TEntity>> GetAsync(Expression<Func<TEntity, bool>> filter = null,
 		Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
-		string includeProperties = null);
+		string includeProperties = null, 
+		bool asNoTracking = false);
 		IQueryable<TEntity> Get(Expression<Func<TEntity, bool>> filter = null,
 			Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
-			string includeProperties = null);
+			string includeProperties = null,
+			bool asNoTracking = false);
 		TEntity GetByID(object id);
 		void Insert(TEntity entity);
 		Task InsertAsync(TEntity entity);

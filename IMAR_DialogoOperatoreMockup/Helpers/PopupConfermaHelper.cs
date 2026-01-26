@@ -102,7 +102,7 @@ namespace IMAR_DialogoOperatore.Helpers
             if (string.IsNullOrEmpty(faseCercata))
                 return string.Empty;
 
-            string faseSelezionata = _dialogoOperatoreObserver.AttivitaSelezionata.Fase;
+            string faseSelezionata = _dialogoOperatoreObserver.AttivitaSelezionata.CodiceFase;
 
             if (faseCercata == faseSelezionata)
                 return string.Empty;

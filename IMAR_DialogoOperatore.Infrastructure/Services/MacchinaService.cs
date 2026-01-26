@@ -1,4 +1,6 @@
-﻿using IMAR_DialogoOperatore.Application.Interfaces.Clients;
+﻿using System.Reflection.PortableExecutable;
+using IMAR_DialogoOperatore.Application;
+using IMAR_DialogoOperatore.Application.Interfaces.Clients;
 using IMAR_DialogoOperatore.Application.Interfaces.Repositories;
 using IMAR_DialogoOperatore.Application.Interfaces.Services.Activities;
 using IMAR_DialogoOperatore.Application.Interfaces.UoW;
@@ -63,8 +65,8 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
             IEnumerable<AngRes> macchineFittizie = _synergyJmesUoW.AngRes.Get(x => x.ResDsc.Contains("FITTIZIA"));
 
             IEnumerable<mesEvtToEndMac>? macchineFittizieConAttivitaAperte = _jmesApiClient.ChiamaQueryGetJmes<mesEvtToEndMac>()?
-                                                                                           .Where(x => x.ID_Mac371.Contains("FITTIZIA") &&
-                                                                                                       string.IsNullOrWhiteSpace(x.ID_Evt3248));
+                                                                                           .Where(x => x.ID_Mac371.Contains("FITTIZIA"));
+
             if (macchineFittizieConAttivitaAperte == null || !macchineFittizieConAttivitaAperte.Any())
                 return new Macchina
                 {
@@ -95,5 +97,23 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
                                                         .Select(x => x.Uid)
                                                         .Single();
         }
-    }
+
+        public Macchina? GetMacchinaFittiziaDaAttivitaAttrezzata(Attivita attivitaDaAggiungere)
+        {
+			mesEvtToEndMac? macchina = _jmesApiClient.ChiamaQueryGetJmes<mesEvtToEndMac>()?
+                                                     .FirstOrDefault(x => x.ID_Det3350.Equals(attivitaDaAggiungere.Bolla)
+                                                                           && x.ID_Sts3130.Equals(Costanti.JMES_ATTREZZAGGIO_COMPLETATO));
+
+            if (macchina == null)
+                return null;
+
+            return new Macchina
+			{
+				CentroDiLavoro = macchina.ID_Mac368.Substring(0, 3),
+				CodiceMacchina = macchina.ID_Mac368.Substring(3, 3),
+				CodiceJMes = macchina.ID_Mac365
+			};
+		}
+
+	}
 }

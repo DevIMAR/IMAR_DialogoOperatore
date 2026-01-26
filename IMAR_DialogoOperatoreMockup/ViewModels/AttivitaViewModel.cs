@@ -8,12 +8,17 @@ namespace IMAR_DialogoOperatore.ViewModels
 		private readonly Attivita? _attivita;
 
 		private string _causale;
-		public string? Bolla => _attivita?.Bolla;
+		private IEnumerable<Nota> _note;
+
+
+        public string? Bolla => _attivita?.Bolla;
 		public string? Odp => _attivita?.Odp;
-		public string? Articolo => _attivita?.Articolo;
+		public string? CodiceArticolo => _attivita?.Articolo;
 		public string? DescrizioneArticolo => _attivita?.DescrizioneArticolo;
-		public string? Fase => _attivita?.Fase;
+		public string? CodiceDescrizioneArticolo => CodiceArticolo?.Trim() + " - " + DescrizioneArticolo?.Trim();
+		public string? CodiceFase => _attivita?.Fase;
 		public string? DescrizioneFase => _attivita?.DescrizioneFase;
+		public string? CodiceDescrizioneFase => CodiceFase?.Trim() + " - " + DescrizioneFase?.Trim();
 		public int QuantitaOrdine => _attivita != null ? _attivita.QuantitaOrdine : 0;
 		public int QuantitaProdotta => QuantitaProdottaNonContabilizzata + QuantitaProdottaContabilizzata;
         public int QuantitaProdottaNonContabilizzata { get; set; }
@@ -24,12 +29,12 @@ namespace IMAR_DialogoOperatore.ViewModels
 		public int QuantitaResidua => QuantitaOrdine - QuantitaProdotta;
 		public string SaldoAcconto { get; set; }
 		public double? CodiceJMes => _attivita?.CodiceJMes;
-		public Macchina? Macchina => _attivita?.Macchina;
+		public Macchina? MacchinaFittizia => _attivita?.MacchinaFittizia;
+		public Macchina? MacchinaReale => _attivita?.MacchinaReale;
 		public string CausaleEstesa => _attivita?.CausaleEstesa;
         public DateTime? DataSchedulata => _attivita?.DataSchedulata;
         public DateTime? InizioAttivita => _attivita?.InizioAttivita;
 		public DateTime? FineAttivita => _attivita?.FineAttivita;
-
 
         public string Causale
 		{
@@ -39,7 +44,16 @@ namespace IMAR_DialogoOperatore.ViewModels
 				_causale = value;
 				OnNotifyStateChanged();
 			}
-		}
+        }
+        public IEnumerable<Nota> Note
+        {
+            get { return _note; }
+            set
+            {
+                _note = value;
+                OnNotifyStateChanged();
+            }
+        }
 
 
         public AttivitaViewModel(Attivita? attivita)
@@ -54,6 +68,7 @@ namespace IMAR_DialogoOperatore.ViewModels
 			QuantitaScartataNonContabilizzata = _attivita.QuantitaScartataNonContabilizzata;
             QuantitaScartataContabilizzata = _attivita.QuantitaScartataContabilizzata;
 			SaldoAcconto = _attivita.SaldoAcconto;
+			Note = _attivita.Note;
 		}
 	}
 }

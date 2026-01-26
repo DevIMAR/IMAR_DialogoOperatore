@@ -29,15 +29,6 @@ namespace IMAR_DialogoOperatore.Helpers
 			_attivitaMapper = attivitaMapper;
 		}
 
-		public void CercaAttivita(string? bolla = null, string? odp = null)
-		{
-            if (bolla != null)
-				CercaAttivitaDaBolla(bolla);
-
-			if (odp != null)
-				CercaAttivitaDaOdp(odp);
-		}
-
 		public void CercaAttivitaDaBolla(string bolla)
 		{
 			_cercaAttivitaObserver.IsAttivitaCercata = true;
@@ -60,7 +51,7 @@ namespace IMAR_DialogoOperatore.Helpers
 			_dialogoOperatoreObserver.AttivitaSelezionata = _cercaAttivitaObserver.AttivitaTrovate.SingleOrDefault(x => x.Bolla == bolla);
 
 
-			_cercaAttivitaObserver.FaseCercata = _dialogoOperatoreObserver.AttivitaSelezionata.Fase;
+			_cercaAttivitaObserver.FaseCercata = _dialogoOperatoreObserver.AttivitaSelezionata.CodiceFase;
 		}
 
 		public void CercaAttivitaDaOdp(string odp)
@@ -73,14 +64,14 @@ namespace IMAR_DialogoOperatore.Helpers
 			_dialogoOperatoreObserver.AttivitaSelezionata = _cercaAttivitaObserver.AttivitaTrovate.FirstOrDefault();
 
 			if (_dialogoOperatoreObserver.AttivitaSelezionata != null)
-				_cercaAttivitaObserver.FaseCercata = _dialogoOperatoreObserver.AttivitaSelezionata.Fase;
+				_cercaAttivitaObserver.FaseCercata = _dialogoOperatoreObserver.AttivitaSelezionata.CodiceFase;
 		}
 
 		public void CercaAttivitaDaFase(string fase)
 		{
 			_cercaAttivitaObserver.IsAttivitaCercata = true;
 
-			_dialogoOperatoreObserver.AttivitaSelezionata = _cercaAttivitaObserver.AttivitaTrovate.Single(x => x.Fase == fase);
+			_dialogoOperatoreObserver.AttivitaSelezionata = _cercaAttivitaObserver.AttivitaTrovate.Single(x => x.CodiceFase == fase);
 		}
 	}
 }
