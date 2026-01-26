@@ -197,7 +197,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
                     _lockCalFlOdp.ExitWriteLock();
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 _loggingService.LogError("Errore nell'aggiornamento cache CalFlOdp", ex);
             }
