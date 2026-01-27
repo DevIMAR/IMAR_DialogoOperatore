@@ -2,6 +2,7 @@
 using IMAR_DialogoOperatore.Application.Interfaces.Repositories;
 using IMAR_DialogoOperatore.Application.Interfaces.Services.Activities;
 using IMAR_DialogoOperatore.Application.Interfaces.UoW;
+using IMAR_DialogoOperatore.Domain.DTO;
 using IMAR_DialogoOperatore.Domain.Entities.As400;
 using IMAR_DialogoOperatore.Domain.Entities.Imar_Produzione;
 using IMAR_DialogoOperatore.Domain.Entities.Imar_Schedulazione;
@@ -25,7 +26,13 @@ namespace IMAR_DialogoOperatore.Application.Services
         private readonly IAs400Repository _as400Repository;
         private readonly IImarApiClient _imarApiClient;
 
-        public ForzaturaService(
+        private decimal _oreAllocazioneGiornaliera;
+        private List<ODPSchedulazione> _schedulazioneAttuale;
+        private List<ODPSchedulazione> _schedulazionePreview;
+        private ForzaturaDTO _forzaturaDTO;
+
+
+		public ForzaturaService(
             ISynergyJmesUoW synergyJmesUoW,
             IImarSchedulatoreUoW imarSchedulatoreUoW,
             IAs400Repository as400Repository,
@@ -37,25 +44,25 @@ namespace IMAR_DialogoOperatore.Application.Services
             _imarApiClient = imarApiClient;
         }
 
-        public void ForzaRigaOrdineDaIdEvento(int idEvento)
+        public async Task ForzaRigaOrdineDaIdEvento(int idEvento)
         {
             MesEvtDet? evento = _synergyJmesUoW.MesEvtDet.Get(x => x.EvtUid == idEvento).SingleOrDefault();
             if (evento == null)
                 return;
 
-            ForzaRigaOrdineDaOdp(evento.PrdOrdCod);
+            await ForzaRigaOrdineDaOdp(evento.PrdOrdCod);
         }
 
-        public void ForzaRigaOrdineDaOdp(string odp)
+        public async Task ForzaRigaOrdineDaOdp(string odp)
         {
             List<ODC_ODP> odcOdps = _imarSchedulatoreUoW.OdcOdpRepository.Get(x => x.ODP == odp).ToList();
             if (odcOdps.Count == 0)
                 return;
 
-            ForzaRigheOrdine(odcOdps.Select(x => x.ORDINE_RIGA));
+            await ForzaRigheOrdine(odcOdps.Select(x => x.ORDINE_RIGA));
         }
 
-        public void ForzaRigheOrdine(IEnumerable<string> righeOrdine)
+        public async Task ForzaRigheOrdine(IEnumerable<string> righeOrdine)
         {
             List<ORDINE_CLIENTE> ordiniClienti = _imarSchedulatoreUoW.OrdineClienteRepository.Get(x => righeOrdine.Contains(x.ORDINE_RIGA))
                                                                                              .OrderByDescending(x => x.DATA_FINE)
@@ -66,95 +73,75 @@ namespace IMAR_DialogoOperatore.Application.Services
                 if (!ordineCliente.DATA_FINE.HasValue)
                     continue;
 
-                ForzaRigaOrdineDaOrdineCliente(ordineCliente);
+                await ForzaRigaOrdineDaOrdineCliente(ordineCliente);
             }
         }
 
-        public void ForzaRigaOrdineDaOrdineCliente(ORDINE_CLIENTE ordineCliente)
-        {
-            Forzatura forzatura = new Forzatura()
-            {
-                Id = Guid.NewGuid(),
-                CreationTime = DateTime.Now,
-                DataFineLavori = (DateTime)ordineCliente.DATA_FINE,
-                RigaOrdine = ordineCliente.ORDINE_RIGA,
-                Utente = "DialogoOperatore",
-                Attiva = true
-            };
-
-            ICollection<OrdineProduzioneForzato> ordiniProduzioneForzati = new List<OrdineProduzioneForzato>();
-
-            List<ODPSchedulazione> odpSchedulazione = GetSchedulazioneRigaOrdine(ordineCliente.ORDINE_RIGA);
-            foreach (ODPSchedulazione odp in odpSchedulazione)
-            {
-                OrdineProduzioneForzato odpForzatoOut = BuildOdpToLog(odp, TypeAction.VECCHIA.ToString(), forzatura);
-                ordiniProduzioneForzati.Add(odpForzatoOut);
-            }
-
-            forzatura.OrdineProduzioneForzato = ordiniProduzioneForzati;
-
-            AggiungiNuoveFasiDaForzare(ref forzatura);
-
-            _imarApiClient.RegistraForzature(forzatura);
-        }
-
-        private List<ODPSchedulazione> GetSchedulazioneRigaOrdine(string rigaOrdine)
-        {
-            List<FASI> fasi = _imarSchedulatoreUoW.FasiRepository.Get().ToList();
-            List<DESCRIZIONE_FASI> descrizioneFasi = _imarSchedulatoreUoW.DescrizioneFasiRepository.Get().ToList();
-            List<CAL_FL_ODP> schedulazioneOrdiniProduzione = _imarSchedulatoreUoW.CalFlOdpRepository.Get().ToList();
-            List<ODC_ODP> ordiniProduzioneRigheOrdine = _imarSchedulatoreUoW.OdcOdpRepository.Get().ToList();
-            List<ODC_ODP> ordiniProduzioneRigaOrdine = ordiniProduzioneRigheOrdine.Where(x => x.ORDINE_RIGA == rigaOrdine).
-                                                                                   OrderByDescending(x => x.LIVELLO).ToList();
-            ODPSchedulazione ordineProduzione;
-            List<ODPSchedulazione> ordiniProduzioneSchedulati = new List<ODPSchedulazione>();
-            ORDINE_PRODUZIONE currentOdp;
-            foreach (ODC_ODP odp in ordiniProduzioneRigaOrdine)
-            {
-                currentOdp = _imarSchedulatoreUoW.OrdineProduzioneRepository.Get(x => x.ODP == odp.ODP).SingleOrDefault();
-                foreach (CAL_FL_ODP schedulazioneOrdineProduzione in schedulazioneOrdiniProduzione.Where(x => x.ODP == odp.ODP).ToList())
-                {
-                    foreach (var fase in fasi.Where(x => x.ORDINE_PRODUZIONE_ODP == schedulazioneOrdineProduzione.ODP &&
-                                                         x.SEQUENZA == schedulazioneOrdineProduzione.FASE).OrderByDescending(x => x.SEQUENZA).ToList())
-                    {
-                        ordineProduzione = new ODPSchedulazione()
-                        {
-                            Codice = odp.ODP,
-                            SequenzaFase = fase.SEQUENZA,
-                            CodiceFase = fase.CODICE_FASE,
-                            DescrizioneFase = descrizioneFasi.Where(x => x.CODICE_FASE == fase.CODICE_FASE).First().DESCRIZIONE,
-                            DataArrivoMateriale = fase.DATA_ARRIVO_MATE,
-                            InfoDataArrivoMateriale = fase.DATA_MAT_UPDATER,
-                            GiornoSchedulazione = schedulazioneOrdineProduzione.GIORNO,
-                            Durata = schedulazioneOrdineProduzione.T_ODP ?? 0,
-                            Sovraccarico = schedulazioneOrdineProduzione.SOVRACCARICO,
-                            Manuale = schedulazioneOrdineProduzione.MANUALE ?? 0,
-                            Livello = odp.LIVELLO ?? -1,
-                            Flusso = fase.FLUSSO,
-                            InFlusso = fase.I_O ?? false,
-                            CodiceArticolo = currentOdp.ARTICOLO,
-                            QuantitaResidua = currentOdp.QUANTITA_RESIDUA ?? 0
-                        };
-                        ordiniProduzioneSchedulati.Add(ordineProduzione);
-                    }
-                }
-            }
-            ordiniProduzioneSchedulati = ordiniProduzioneSchedulati.OrderByDescending(x => x.GiornoSchedulazione).ThenBy(x => x.Codice).ThenByDescending(x => x.SequenzaFase).ToList();
-            int i = 0;
-            foreach (var odp in ordiniProduzioneSchedulati)
-                odp.IdxForzatura = i++;
-            return ordiniProduzioneSchedulati;
-        }
-
-        private void AggiungiNuoveFasiDaForzare(ref Forzatura forzatura)
+        public async Task ForzaRigaOrdineDaOrdineCliente(ORDINE_CLIENTE ordineCliente)
         {
             ICollection<OrdineProduzioneForzato> ordiniProduzioneForzati = new List<OrdineProduzioneForzato>();
+
+			_schedulazioneAttuale = await GetAttualeSchedulazione(ordineCliente.ORDINE_RIGA);
+
+			await AggiungiNuoveFasiDaForzare(ordineCliente.ORDINE_RIGA);
+
+			_schedulazionePreview = await GetPreviewSchedulazione(ordineCliente.ORDINE_RIGA, _schedulazioneAttuale);
+
+			await _imarApiClient.RimuoviSchedulazioneAttuale("101", _schedulazioneAttuale);
+
+			await _imarApiClient.InserisciNuovaSchedulazione(_forzaturaDTO.Forzatura, ordineCliente.ORDINE_RIGA, _schedulazioneAttuale.Max(x => x.GiornoSchedulazione));
+
+            await RegistraForzatura(ordineCliente);
+		}
+
+		private async Task<List<ODPSchedulazione>> GetAttualeSchedulazione(string rigaOrdine)
+		{
+			var schedulazioneAttualeRiga = await _imarApiClient.GetSchedulazioneAttuale(rigaOrdine);
+			foreach (var allocazione in schedulazioneAttualeRiga)
+			{
+				allocazione.DataArrivoMateriale = allocazione.DataArrivoMateriale?.Year > 1
+													? allocazione.DataArrivoMateriale : null;
+			}
+
+			return schedulazioneAttualeRiga;
+		}
+
+		private async Task<List<ODPSchedulazione>> GetPreviewSchedulazione(string rigaOrdine, List<ODPSchedulazione> odpSchedulazione)
+		{
+			var preview = new List<ODPSchedulazione>();
+            DateTime massimoGiornoSchedulazione = odpSchedulazione.Max(x => x.GiornoSchedulazione);
+            double durataLavorazioni = odpSchedulazione.Sum(x => x.Durata);
+
+            _oreAllocazioneGiornaliera = decimal.Parse(CalcolaAllocazioneTempoGiornaliera(massimoGiornoSchedulazione, durataLavorazioni).ToString());
+
+			_forzaturaDTO = await _imarApiClient.GetPreviewForzatura(rigaOrdine, 
+                                                            massimoGiornoSchedulazione.ToString("ddMMyyyy"),
+															_oreAllocazioneGiornaliera);
+
+
+			List<GiornoSchedulazione> giorniSchedulazione = _forzaturaDTO.Forzatura;
+			foreach (var giorno in giorniSchedulazione)
+			{
+				preview.AddRange(giorno.OrdiniProduzioneInFlusso);
+				preview.AddRange(giorno.OrdiniProduzioneNonFlusso);
+			}
+
+			foreach (var allocazione in preview)
+			{
+				allocazione.DataArrivoMateriale = allocazione.DataArrivoMateriale?.Year > 1
+													? allocazione.DataArrivoMateriale : null;
+			}
+
+			return preview;
+		}
+
+        private async Task AggiungiNuoveFasiDaForzare(string oridneRiga)
+        {
             List<PCIMP00F> pCIMP00Fs;
-            Forzatura forzaturaTemp = forzatura;
-            OrdineProduzioneForzato nuovaFaseDaForzare, fasePrecedente;
-            decimal tempoMacchinaTotale = 0;
+            ODPSchedulazione fasePrecedente;
+            bool faseAggiunta = false;
 
-            List<ODC_ODP> odcOdp = _imarSchedulatoreUoW.OdcOdpRepository.Get(x => x.ORDINE_RIGA == forzaturaTemp.RigaOrdine).ToList();
+			List<ODC_ODP> odcOdp = _imarSchedulatoreUoW.OdcOdpRepository.Get(x => x.ORDINE_RIGA == oridneRiga).ToList();
 
             foreach (string odp in odcOdp.Select(x => x.ODP))
             {
@@ -166,36 +153,49 @@ namespace IMAR_DialogoOperatore.Application.Services
 
                 for (int i = 1; i < pCIMP00Fs.Count(); i++)
                 {
-                    tempoMacchinaTotale += pCIMP00Fs[i].OIAMCI + pCIMP00Fs[i].OILMCI;
-
-                    if (forzatura.OrdineProduzioneForzato.Select(x => x.Fase).Contains(Int32.Parse(pCIMP00Fs[i].CDFACI)))
+                    if (_schedulazioneAttuale.Select(x => x.SequenzaFase).Contains(Int32.Parse(pCIMP00Fs[i].CDFACI)))
                         continue;
 
-                    fasePrecedente = forzatura.OrdineProduzioneForzato.Single(x => x.Fase == Int32.Parse(pCIMP00Fs[i - 1].CDFACI));
+                    fasePrecedente = _schedulazioneAttuale.Single(x => x.SequenzaFase == Int32.Parse(pCIMP00Fs[i - 1].CDFACI));
 
-                    nuovaFaseDaForzare = fasePrecedente with
-                    {
-                        Fase = Int32.Parse(pCIMP00Fs[i].CDFACI),
-                        DescrizioneFase = pCIMP00Fs[i].DSFACI,
-                        Action = TypeAction.NUOVA.ToString(),
-                        Id = Guid.NewGuid()
-                    };
+                    await RegistraNuovaFaseInSchedulatore(fasePrecedente, Int32.Parse(pCIMP00Fs[i].CDFACI));
+                    faseAggiunta = true;
 
-                    RegistraNuovaFaseInSchedulatore(fasePrecedente, nuovaFaseDaForzare);
-
-                    ordiniProduzioneForzati.Add(nuovaFaseDaForzare);
+                    break;
                 }
+
+                if (faseAggiunta)
+                    break;
             }
-            _imarSchedulatoreUoW.Save();
+		}
 
-            forzatura.OreAllocazioneGiornaliera = CalcolaAllocazioneTempoGiornaliera(tempoMacchinaTotale);
+		private async Task RegistraForzatura(ORDINE_CLIENTE ordineCliente)
+		{
+			Forzatura forzatura = new Forzatura()
+			{
+				Id = Guid.NewGuid(),
+				CreationTime = DateTime.Now,
+				DataFineLavori = (DateTime)ordineCliente.DATA_FINE,
+				RigaOrdine = ordineCliente.ORDINE_RIGA,
+				OreAllocazioneGiornaliera = _oreAllocazioneGiornaliera.ToString(),
+				Utente = "DialogoOperatore",
+				Attiva = true
+			};
 
-            List<OrdineProduzioneForzato> forzatureComplete = forzatura.OrdineProduzioneForzato.ToList();
-            forzatureComplete.AddRange(ordiniProduzioneForzati);
-            forzatura.OrdineProduzioneForzato = forzatureComplete;
-        }
+            OrdineProduzioneForzato odpForzatoIn;
 
-        private OrdineProduzioneForzato BuildOdpToLog(ODPSchedulazione odp, string action, Forzatura forzatura)
+			ICollection<OrdineProduzioneForzato> OrdiniProduzioneForzati = new List<OrdineProduzioneForzato>();
+			foreach (var odp in _schedulazioneAttuale)
+				OrdiniProduzioneForzati.Add(BuildOdpToLog(odp, TypeAction.VECCHIA.ToString(), forzatura));
+
+			foreach (var odp in _schedulazionePreview)
+				OrdiniProduzioneForzati.Add(BuildOdpToLog(odp, TypeAction.NUOVA.ToString(), forzatura));
+
+			forzatura.OrdineProduzioneForzato = OrdiniProduzioneForzati;
+			await _imarApiClient.RegistraForzature(forzatura);
+		}
+
+		private OrdineProduzioneForzato BuildOdpToLog(ODPSchedulazione odp, string action, Forzatura forzatura)
         {
             return new OrdineProduzioneForzato()
             {
@@ -215,35 +215,25 @@ namespace IMAR_DialogoOperatore.Application.Services
             };
         }
 
-        private string CalcolaAllocazioneTempoGiornaliera(decimal tempoMacchinaTotale) =>
-            tempoMacchinaTotale switch
-            {
-                < 5 => "1",
-                >= 5 and < 9 => "2",
-                >= 9 and < 16 => "3",
-                >= 16 and < 25 => "4",
-                >= 25 and < 36 => "5",
-                >= 36 and < 45 => "6",
-                >= 45 and < 61 => "7",
-                >= 60 and < 81 => "8",
-                >= 81 => "9"
-            };
+        private double CalcolaAllocazioneTempoGiornaliera(DateTime giornoSchedulazione, double tempoMacchinaTotale) =>
+            Math.Ceiling(tempoMacchinaTotale / giornoSchedulazione.Date.Subtract(DateTime.Today).Days);
 
-        private void RegistraNuovaFaseInSchedulatore(OrdineProduzioneForzato faseDaCopiare, OrdineProduzioneForzato nuovaFaseDaInserire)
+        private async Task RegistraNuovaFaseInSchedulatore(ODPSchedulazione fasePrecedente, int sequenzaNuovaFase)
         {
-            var faseSrc = _imarSchedulatoreUoW.FasiRepository
-                .Get(f => f.ORDINE_PRODUZIONE_ODP == faseDaCopiare.OrdineProduzione
-                          && f.SEQUENZA == faseDaCopiare.Fase)
+            FASI faseSrc = _imarSchedulatoreUoW.FasiRepository
+                .Get(f => f.ORDINE_PRODUZIONE_ODP == fasePrecedente.Codice
+						  && f.SEQUENZA == fasePrecedente.SequenzaFase)
                 .AsNoTracking()
                 .Single();
 
-            var nuovaFase = faseSrc with
+            FASI nuovaFase = faseSrc with
             {
-                SEQUENZA = nuovaFaseDaInserire.Fase,
+                SEQUENZA = sequenzaNuovaFase,
                 CAL_FL_ODP = new List<CAL_FL_ODP>()
             };
 
             _imarSchedulatoreUoW.FasiRepository.Insert(nuovaFase);
+            await _imarSchedulatoreUoW.SaveAsync();
         }
     }
 }

@@ -34,7 +34,7 @@ namespace IMAR_DialogoOperatore.Helpers
             _dialogoOperatoreObserver = dialogoOperatoreObserver;
         }
 
-        public string? ApriFaseNonPianificata(IAttivitaViewModel attivita)
+        public async Task<string?> ApriFaseNonPianificata(IAttivitaViewModel attivita)
         {
             string? result = null;
 
@@ -53,7 +53,7 @@ namespace IMAR_DialogoOperatore.Helpers
             }
 
             if (Int32.TryParse(result, out int evtUid))
-                _forzaturaService.ForzaRigaOrdineDaIdEvento(evtUid);
+                await _forzaturaService.ForzaRigaOrdineDaIdEvento(evtUid);
 
             _dialogoOperatoreObserver.OperazioneInCorso = Costanti.NESSUNA;
             _dialogoOperatoreObserver.AttivitaSelezionata = null;

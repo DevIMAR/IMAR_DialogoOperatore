@@ -45,7 +45,7 @@ namespace IMAR_DialogoOperatore.Commands
             await Task.Delay(1);
 
             AssegnaMacchinaFittiziaAdOperatore();
-            EseguiOperazioneOMostraMessaggio();
+            await EseguiOperazioneOMostraMessaggio();
 
             _dialogoOperatoreObserver.IsOperazioneGestita = true;
             _dialogoOperatoreObserver.IsLoaderVisibile = false;
@@ -61,13 +61,13 @@ namespace IMAR_DialogoOperatore.Commands
                 MostraPopupConTesto(Costanti.ERRORE_MACCHINE_FINITE);
         }
 
-        private void EseguiOperazioneOMostraMessaggio()
+        private async Task EseguiOperazioneOMostraMessaggio()
         {
             string? testo;
 
-            testo = _creaFaseNonPianificataHelper.ApriFaseNonPianificata(_dialogoOperatoreObserver.AttivitaSelezionata);
+            testo = await _creaFaseNonPianificataHelper.ApriFaseNonPianificata(_dialogoOperatoreObserver.AttivitaSelezionata);
             if (testo != null)
-                _messageBoxService.ShowModalAsync(testo, "Creazione fase non pianificata", MessageBoxButtons.Ok);
+                await _messageBoxService.ShowModalAsync(testo, "Creazione fase non pianificata", MessageBoxButtons.Ok);
         }
 
         private void MostraPopupConTesto(string testo)

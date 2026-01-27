@@ -4,9 +4,9 @@ namespace IMAR_DialogoOperatore.Application.Interfaces.Services.Activities
 {
     public interface IForzaturaService
     {
-        void ForzaRigaOrdineDaIdEvento(int idEvento);
-        void ForzaRigaOrdineDaOdp(string odp);
-        void ForzaRigheOrdine(IEnumerable<string> righeOrdine);
-        void ForzaRigaOrdineDaOrdineCliente(ORDINE_CLIENTE ordineCliente);
+        Task ForzaRigaOrdineDaIdEvento(int idEvento);
+        Task ForzaRigaOrdineDaOdp(string odp);
+        Task ForzaRigheOrdine(IEnumerable<string> righeOrdine);
+        Task ForzaRigaOrdineDaOrdineCliente(ORDINE_CLIENTE ordineCliente);
     }
 }

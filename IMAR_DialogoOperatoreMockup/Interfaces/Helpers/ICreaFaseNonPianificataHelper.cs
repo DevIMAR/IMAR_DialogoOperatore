@@ -4,6 +4,6 @@ namespace IMAR_DialogoOperatore.Interfaces.Helpers
 {
     public interface ICreaFaseNonPianificataHelper
     {
-        string? ApriFaseNonPianificata(IAttivitaViewModel attivita);
+		Task<string?> ApriFaseNonPianificata(IAttivitaViewModel attivita);
     }
 }
