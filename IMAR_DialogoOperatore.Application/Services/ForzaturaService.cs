@@ -138,7 +138,7 @@ namespace IMAR_DialogoOperatore.Application.Services
         private async Task AggiungiNuoveFasiDaForzare(string oridneRiga)
         {
             List<PCIMP00F> pCIMP00Fs;
-            ODPSchedulazione fasePrecedente;
+            FASI fasePrecedente;
             bool faseAggiunta = false;
 
 			List<ODC_ODP> odcOdp = _imarSchedulatoreUoW.OdcOdpRepository.Get(x => x.ORDINE_RIGA == oridneRiga).ToList();
@@ -156,9 +156,12 @@ namespace IMAR_DialogoOperatore.Application.Services
                     if (_schedulazioneAttuale.Select(x => x.SequenzaFase).Contains(Int32.Parse(pCIMP00Fs[i].CDFACI)))
                         continue;
 
-                    fasePrecedente = _schedulazioneAttuale.Single(x => x.SequenzaFase == Int32.Parse(pCIMP00Fs[i - 1].CDFACI));
+                    fasePrecedente = _imarSchedulatoreUoW.FasiRepository.Get(f => f.ORDINE_PRODUZIONE_ODP == pCIMP00Fs[i-1].ORPRCI
+																				&& f.SEQUENZA == int.Parse(pCIMP00Fs[i-1].CDFACI))
+				                                                        .AsNoTracking()
+				                                                        .Single();
 
-                    await RegistraNuovaFaseInSchedulatore(fasePrecedente, Int32.Parse(pCIMP00Fs[i].CDFACI));
+					await RegistraNuovaFaseInSchedulatore(fasePrecedente, Int32.Parse(pCIMP00Fs[i].CDFACI));
                     faseAggiunta = true;
 
                     break;
@@ -218,15 +221,9 @@ namespace IMAR_DialogoOperatore.Application.Services
         private double CalcolaAllocazioneTempoGiornaliera(DateTime giornoSchedulazione, double tempoMacchinaTotale) =>
             Math.Ceiling(tempoMacchinaTotale / giornoSchedulazione.Date.Subtract(DateTime.Today).Days);
 
-        private async Task RegistraNuovaFaseInSchedulatore(ODPSchedulazione fasePrecedente, int sequenzaNuovaFase)
+        private async Task RegistraNuovaFaseInSchedulatore(FASI fasePrecedente, int sequenzaNuovaFase)
         {
-            FASI faseSrc = _imarSchedulatoreUoW.FasiRepository
-                .Get(f => f.ORDINE_PRODUZIONE_ODP == fasePrecedente.Codice
-						  && f.SEQUENZA == fasePrecedente.SequenzaFase)
-                .AsNoTracking()
-                .Single();
-
-            FASI nuovaFase = faseSrc with
+            FASI nuovaFase = fasePrecedente with
             {
                 SEQUENZA = sequenzaNuovaFase,
                 CAL_FL_ODP = new List<CAL_FL_ODP>()
