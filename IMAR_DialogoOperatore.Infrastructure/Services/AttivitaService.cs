@@ -453,7 +453,7 @@ namespace IMAR_DialogoOperatore.Services
         {
             string codiceFase = GetCodiceFase(attivita);
 
-            HttpResponseMessage responseMessage = _jmesApiClient.MesWorkStartNotPln(operatore, attivita.Bolla, codiceFase);
+            HttpResponseMessage responseMessage = _jmesApiClient.MesWorkStartNotPln(operatore, attivita, codiceFase);
             var jsonData = responseMessage.Content.ReadFromJsonAsync<JMesResultDto>().GetAwaiter().GetResult();
 
             string? errore = _jMesApiClientErrorUtility.GestioneEventualeErrore(jsonData);

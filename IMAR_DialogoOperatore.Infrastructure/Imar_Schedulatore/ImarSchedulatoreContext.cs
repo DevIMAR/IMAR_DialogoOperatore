@@ -20,6 +20,8 @@ public partial class ImarSchedulatoreContext : DbContext
 
     public virtual DbSet<FASI> FASI { get; set; }
 
+    public virtual DbSet<FASIINFLUSSO> FASIINFLUSSO { get; set; }
+
     public virtual DbSet<ODC_ODP> ODC_ODP { get; set; }
 
     public virtual DbSet<ORDINE_CLIENTE> ORDINE_CLIENTE { get; set; }
@@ -85,6 +87,20 @@ public partial class ImarSchedulatoreContext : DbContext
                 .HasAnnotation("Relational:DefaultConstraintName", "DF__FASI__I_O__43D61337");
             entity.Property(e => e.OPERATORE).HasMaxLength(10);
             entity.Property(e => e.URGENTE).HasMaxLength(255);
+        });
+
+        modelBuilder.Entity<FASIINFLUSSO>(entity =>
+        {
+            entity.HasKey(e => new { e.FLUSSO, e.CODICE_FASE }).HasName("FASIINFLUSSO$PrimaryKey");
+
+            entity.HasIndex(e => e.CODICE_FASE, "FASIINFLUSSO$CODICE_FASE");
+
+            entity.Property(e => e.FLUSSO).HasMaxLength(255);
+            entity.Property(e => e.CODICE_FASE).HasMaxLength(255);
+
+            entity.HasOne(d => d.CODICE_FASENavigation).WithMany(p => p.FASIINFLUSSO)
+                .HasForeignKey(d => d.CODICE_FASE)
+                .HasConstraintName("FASIINFLUSSO$DESCRIZIONE_FASIFASIINFLUSSO");
         });
 
         modelBuilder.Entity<ODC_ODP>(entity =>

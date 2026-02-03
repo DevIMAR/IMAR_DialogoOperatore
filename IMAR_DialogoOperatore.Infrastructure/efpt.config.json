@@ -4,15 +4,18 @@
    "ContextNamespace": null,
    "FilterSchemas": false,
    "IncludeConnectionString": false,
-   "MinimumProductVersion": "2.6.1186",
+   "IrregularWords": null,
+   "MinimumProductVersion": "2.6.1248",
    "ModelNamespace": null,
    "OutputContextPath": null,
    "OutputPath": "",
+   "PluralRules": null,
    "PreserveCasingWithRegex": true,
-   "ProjectRootNamespace": "IMAR_DialogoOperatore.Infrastructure.Imar_Produzione",
+   "ProjectRootNamespace": "IMAR_DialogoOperatore.Infrastructure.Imar_Schedulatore",
    "Schemas": null,
    "SelectedHandlebarsLanguage": 2,
    "SelectedToBeGenerated": 1,
+   "SingularRules": null,
    "T4TemplatePath": null,
    "Tables": [
       {
@@ -25,6 +28,10 @@
       },
       {
          "Name": "[dbo].[FASI]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[FASIINFLUSSO]",
          "ObjectType": 0
       },
       {

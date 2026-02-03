@@ -156,12 +156,7 @@ namespace IMAR_DialogoOperatore.Application.Services
                     if (_schedulazioneAttuale.Select(x => x.SequenzaFase).Contains(Int32.Parse(pCIMP00Fs[i].CDFACI)))
                         continue;
 
-                    fasePrecedente = _imarSchedulatoreUoW.FasiRepository.Get(f => f.ORDINE_PRODUZIONE_ODP == pCIMP00Fs[i-1].ORPRCI
-																				&& f.SEQUENZA == int.Parse(pCIMP00Fs[i-1].CDFACI))
-				                                                        .AsNoTracking()
-				                                                        .Single();
-
-					await RegistraNuovaFaseInSchedulatore(fasePrecedente, Int32.Parse(pCIMP00Fs[i].CDFACI));
+					await RegistraNuovaFaseInSchedulatore(pCIMP00Fs[i]);
                     faseAggiunta = true;
 
                     break;
@@ -221,11 +216,27 @@ namespace IMAR_DialogoOperatore.Application.Services
         private double CalcolaAllocazioneTempoGiornaliera(DateTime giornoSchedulazione, double tempoMacchinaTotale) =>
             Math.Ceiling(tempoMacchinaTotale / giornoSchedulazione.Date.Subtract(DateTime.Today).Days);
 
-        private async Task RegistraNuovaFaseInSchedulatore(FASI fasePrecedente, int sequenzaNuovaFase)
+        private async Task RegistraNuovaFaseInSchedulatore(PCIMP00F faseCopiataDaGalileo)
         {
-            FASI nuovaFase = fasePrecedente with
+            FASI nuovaFase = new FASI
             {
-                SEQUENZA = sequenzaNuovaFase,
+                SEQUENZA = int.Parse(faseCopiataDaGalileo.CDFACI),
+                ORDINE_PRODUZIONE_ODP = faseCopiataDaGalileo.ORPRCI,
+                CODICE_FASE = faseCopiataDaGalileo.CDFLCI,
+                T_ATT_FASE = (double?)faseCopiataDaGalileo.OIAMCI,
+                T_LAV_FASE = (double?)faseCopiataDaGalileo.OILMCI,
+                FLUSSO = faseCopiataDaGalileo.CDRICI.Substring(0, 2),
+                OPERATORE = null,
+                FISSO = false,
+                DATA_MIN = new DateTime(1899, 12, 30),
+                DATA_MAX = new DateTime(1899, 12, 30),
+                I_O = _imarSchedulatoreUoW.FasiInFlussoRepository.Get(fif => fif.CODICE_FASE.Equals(faseCopiataDaGalileo.CDFLCI)) != null,
+                NUOVO_TEMPO = null,
+                PCAVANZ = 0,
+                DATA_ARRIVO_MATE = null,
+                QUANTITA_RES_FASE = (int)(faseCopiataDaGalileo.QORDCI - faseCopiataDaGalileo.QPROCI),
+                URGENTE = "URGENTE",
+                DATA_MAT_UPDATER = null,
                 CAL_FL_ODP = new List<CAL_FL_ODP>()
             };
 

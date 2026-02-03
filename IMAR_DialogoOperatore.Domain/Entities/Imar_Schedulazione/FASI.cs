@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace IMAR_DialogoOperatore.Domain.Entities.Imar_Schedulazione;
 
-public record FASI
+public partial class FASI
 {
     public int SEQUENZA { get; set; }
 

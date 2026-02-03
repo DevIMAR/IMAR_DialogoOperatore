@@ -18,4 +18,6 @@ public partial class DESCRIZIONE_FASI
     public int? P { get; set; }
 
     public short? TEMPI_ATTRAVERSAMENTO1 { get; set; }
+
+    public virtual ICollection<FASIINFLUSSO> FASIINFLUSSO { get; set; } = new List<FASIINFLUSSO>();
 }

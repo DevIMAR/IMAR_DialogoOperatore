@@ -193,7 +193,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.JMes
             return result;
         }
 
-        public HttpResponseMessage MesWorkStartNotPln(Operatore operatore, string bolla, string codiceFase)
+        public HttpResponseMessage MesWorkStartNotPln(Operatore operatore, Attivita attivita, string codiceFase)
         {
             string wizardPath = "?wzdCod=MesWorkStart";
 
@@ -206,9 +206,9 @@ namespace IMAR_DialogoOperatore.Infrastructure.JMes
                         qck = true,
                         clkBdgCod = operatore.Badge,
                         notPlnCod = codiceFase,
-                        notPlnNotCod = bolla,
-                        clkMacUid = operatore.MacchineAssegnate.First().CodiceJMes
-                    }
+                        notPlnNotCod = attivita.Bolla,
+                        clkMacUid = attivita.MacchinaReale != null ? attivita.MacchinaReale.CodiceJMes : operatore.MacchineAssegnate.First().CodiceJMes
+					}
                 }
             };
 
