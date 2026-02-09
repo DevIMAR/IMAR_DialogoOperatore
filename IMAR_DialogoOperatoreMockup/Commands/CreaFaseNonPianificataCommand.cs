@@ -34,6 +34,7 @@ namespace IMAR_DialogoOperatore.Commands
         public override bool CanExecute(object? parameter)
         {
             return _dialogoOperatoreObserver.AttivitaSelezionata != null &&
+                   _dialogoOperatoreObserver.AttivitaSelezionata.SaldoAcconto == Costanti.SALDO &&
                    !string.IsNullOrWhiteSpace(_dialogoOperatoreObserver.OperazioneInCorso) &&
                    (_dialogoOperatoreObserver.OperazioneInCorso.Equals(Costanti.INIZIO_ATTREZZAGGIO) ||
                         _dialogoOperatoreObserver.OperazioneInCorso.Equals(Costanti.INIZIO_LAVORO));
