@@ -12,7 +12,7 @@ namespace IMAR_DialogoOperatore.ViewModels
 		private bool _isAperturaLavoroAutomaticaAttiva;
 
 		public bool IsAvanzamento => (_dialogoOperatoreObserver.OperazioneInCorso == Costanti.AVANZAMENTO || _dialogoOperatoreObserver.OperazioneInCorso == Costanti.FINE_LAVORO) && 
-										(_attivitaSelezionata != null && (_attivitaSelezionata.DescrizioneArticolo != Costanti.FASE_INDIRETTA || _attivitaSelezionata.DescrizioneFase.ToLower().Contains("macchine automatiche")));
+										(_attivitaSelezionata != null && (_attivitaSelezionata.DescrizioneArticolo != Costanti.FASE_INDIRETTA));
 		public bool IsFineAttivitaInUscita => (_dialogoOperatoreObserver.OperazioneInCorso == Costanti.FINE_LAVORO || _dialogoOperatoreObserver.OperazioneInCorso == Costanti.FINE_ATTREZZAGGIO) && _dialogoOperatoreObserver.IsUscita;
 		public bool IsFineAttrezzaggio => _dialogoOperatoreObserver.OperazioneInCorso == Costanti.FINE_ATTREZZAGGIO && !_dialogoOperatoreObserver.IsUscita;
 		public double QuantitaOrdine => _attivitaSelezionata != null ? (double)_attivitaSelezionata.QuantitaOrdine : 0;
