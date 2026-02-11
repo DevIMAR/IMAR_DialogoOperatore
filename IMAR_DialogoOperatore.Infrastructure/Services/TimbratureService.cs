@@ -104,8 +104,9 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
         private IEnumerable<AngRes> GetIdOperatori()
         {
             List<string> badgeEsclusi = new List<string> {
-                "0010", "0046", "0056", "0072", "0078", "0084", "0086", "0091",
-                "0109", "0154", "0157", "0168", "0173", "0222", "0228", "0213"
+                "0010", "0046", "0056", "0072", "0078", "0084", "0086", "0087", 
+                "0091", "0109", "0117", "0137", "0154", "0157", "0168", "0173",  
+                "0222", "0228", "0213", "0249", "0250", "0283"
             };
 
             var res = _synergyJmesUoW.AngRes.Get().ToList();
