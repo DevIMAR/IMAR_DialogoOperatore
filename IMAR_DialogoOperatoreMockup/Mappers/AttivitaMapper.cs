@@ -62,7 +62,8 @@ namespace IMAR_DialogoOperatore.Mappers
                 Fase = attivita.Fase,
                 Bolla = attivita.Bolla,
                 Odp = attivita.Odp,
-                Timestamp = attivita.InizioAttivita
+                Timestamp = attivita.InizioAttivita,
+                SaldoAcconto = attivita.SaldoAcconto
             };
 
             if (temp.CausaleEstesa != Costanti.JMES_IN_LAVORO && !temp.CausaleEstesa.Contains("Attrezzaggio"))
@@ -97,6 +98,7 @@ namespace IMAR_DialogoOperatore.Mappers
             timbraturaAttivitaTemp.Timestamp = (DateTime)attivita.FineAttivita;
             timbraturaAttivitaTemp.QuantitaProdotta = attivita.QuantitaProdotta;
             timbraturaAttivitaTemp.QuantitaScartata = attivita.QuantitaScartata;
+            timbraturaAttivitaTemp.SaldoAcconto = attivita.SaldoAcconto;
 
             timbratureAttivita.Add(timbraturaAttivitaTemp);
             return timbraturaAttivitaTemp;

@@ -422,7 +422,8 @@ namespace IMAR_DialogoOperatore.Services
                                                                                            QuantitaProdotta = (int)memd.QtyPrd,
                                                                                            QuantitaScartata = (int)memd.QtyRej,
                                                                                            InizioAttivita = x.me.TssStr,
-                                                                                           FineAttivita = x.me.TssEnd
+                                                                                           FineAttivita = x.me.TssEnd,
+                                                                                           SaldoAcconto = memd.DecAdv == -1 ? Costanti.ACCONTO : memd.DecAdv == 0 ? Costanti.SALDO : ""
                                                                                        })
                                                                                  .ToList();
 
