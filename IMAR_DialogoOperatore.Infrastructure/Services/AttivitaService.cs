@@ -395,43 +395,82 @@ namespace IMAR_DialogoOperatore.Services
         }
 
         public IList<Attivita>? GetAttivitaOperatoreDellUltimaGiornata(int idJmesOperatore)
-        {
-            DateTime ieriAlle2045 = DateTime.Today.AddHours(-4).AddMinutes(45);
-            DateTime oggiAlle2115 = DateTime.Today.AddHours(21).AddMinutes(15);
+		{
+            List<Attivita> attivitaOperatoreDellUltimaGiornata = new List<Attivita>();
+			DateTime ieriAlle2045 = DateTime.Today.AddHours(-4).AddMinutes(45);
+			DateTime oggiAlle2115 = DateTime.Today.AddHours(21).AddMinutes(15);
 
-            IList<Attivita> attivitaOperatoreDellUltimaGiornata = _synergyJmesUoW.MesEvt
-                                                                                 .Get(x => (int)x.ResEffStrUid == idJmesOperatore)
-                                                                                 .Where(x => x.TssStr >= ieriAlle2045 &&
-                                                                                             x.TssStr <= oggiAlle2115 &&
-                                                                                             x.EvtTypUid != 3) //evito le sospensioni
-                                                                                 .Join(_synergyJmesUoW.MesEvtDet.Get(),
-                                                                                       me => me.Uid,
-                                                                                       med => med.EvtUid,
-                                                                                       (me, med) => new { me, med })
-                                                                                 .Join(_synergyJmesUoW.MesEvtMacDet.Get(),
-                                                                                       x => x.med.Uid,
-                                                                                       memd => memd.EvtDetUid,
-                                                                                       (x, memd) =>
-                                                                                       new Attivita
-                                                                                       {
-                                                                                           CodiceJMes = (double?)x.me.Uid,
-                                                                                           CausaleEstesa = StatoAttivitaMapper.FromJMesCodeExtended(x.me.EvtTypUid),
-                                                                                           Bolla = x.med.DocCod,
-                                                                                           Odp = x.med.PrdOrdCod,
-                                                                                           Fase = x.med.PrdPhsCod,
-                                                                                           QuantitaProdotta = (int)memd.QtyPrd,
-                                                                                           QuantitaScartata = (int)memd.QtyRej,
-                                                                                           InizioAttivita = x.me.TssStr,
-                                                                                           FineAttivita = x.me.TssEnd,
-                                                                                           SaldoAcconto = memd.DecAdv == -1 ? Costanti.ACCONTO : memd.DecAdv == 0 ? Costanti.SALDO : ""
-                                                                                       })
-                                                                                 .ToList();
+			attivitaOperatoreDellUltimaGiornata.AddRange(GetAttivitaOperatoreDellUltimaGiornataNonContabilizzate(idJmesOperatore, ieriAlle2045, oggiAlle2115));
+			attivitaOperatoreDellUltimaGiornata.AddRange(GetAttivitaOperatoreDellUltimaGiornataContabilizzate(idJmesOperatore, ieriAlle2045, oggiAlle2115));
 
-            return attivitaOperatoreDellUltimaGiornata;
-        }
-        
+			return attivitaOperatoreDellUltimaGiornata;
+		}
 
-        public string? ApriAttrezzaggioFaseNonPianificata(Attivita attivita, Operatore operatore)
+		private IList<Attivita> GetAttivitaOperatoreDellUltimaGiornataNonContabilizzate(int idJmesOperatore, DateTime ieriAlle2045, DateTime oggiAlle2115)
+		{
+			IList<Attivita> attivitaOperatoreDellUltimaGiornata = _synergyJmesUoW.MesEvt
+																				 .Get(x => (int)x.ResEffStrUid == idJmesOperatore)
+																				 .Where(x => x.TssStr >= ieriAlle2045 &&
+																							 x.TssStr <= oggiAlle2115 &&
+																							 x.EvtTypUid != 3) //evito le sospensioni
+																				 .Join(_synergyJmesUoW.MesEvtDet.Get(),
+																					   me => me.Uid,
+																					   med => med.EvtUid,
+																					   (me, med) => new { me, med })
+																				 .Join(_synergyJmesUoW.MesEvtMacDet.Get(),
+																					   x => x.med.Uid,
+																					   memd => memd.EvtDetUid,
+																					   (x, memd) =>
+																					   new Attivita
+																					   {
+																						   CodiceJMes = (double?)x.me.Uid,
+																						   CausaleEstesa = StatoAttivitaMapper.FromJMesCodeExtended(x.me.EvtTypUid),
+																						   Bolla = x.med.DocCod,
+																						   Odp = x.med.PrdOrdCod,
+																						   Fase = x.med.PrdPhsCod,
+																						   QuantitaProdotta = (int)memd.QtyPrd,
+																						   QuantitaScartata = (int)memd.QtyRej,
+																						   InizioAttivita = x.me.TssStr,
+																						   FineAttivita = x.me.TssEnd,
+																						   SaldoAcconto = memd.DecAdv == -1 ? Costanti.ACCONTO : memd.DecAdv == 0 ? Costanti.SALDO : ""
+																					   })
+																				 .ToList();
+			return attivitaOperatoreDellUltimaGiornata;
+		}
+
+		private IList<Attivita> GetAttivitaOperatoreDellUltimaGiornataContabilizzate(int idJmesOperatore, DateTime ieriAlle2045, DateTime oggiAlle2115)
+		{
+			IList<Attivita> attivitaOperatoreDellUltimaGiornata = _synergyJmesUoW.MesBckEvt
+																				 .Get(x => (int)x.ResEffStrUid == idJmesOperatore)
+																				 .Where(x => x.TssStr >= ieriAlle2045 &&
+																							 x.TssStr <= oggiAlle2115 &&
+																							 x.EvtTypUid != 3) //evito le sospensioni
+																				 .Join(_synergyJmesUoW.MesBckEvtDet.Get(),
+																					   me => me.Uid,
+																					   med => med.EvtUid,
+																					   (me, med) => new { me, med })
+																				 .Join(_synergyJmesUoW.MesBckEvtMacDet.Get(),
+																					   x => x.med.Uid,
+																					   memd => memd.EvtDetUid,
+																					   (x, memd) =>
+																					   new Attivita
+																					   {
+																						   CodiceJMes = (double?)x.me.Uid,
+																						   CausaleEstesa = StatoAttivitaMapper.FromJMesCodeExtended(x.me.EvtTypUid),
+																						   Bolla = x.med.DocCod,
+																						   Odp = x.med.PrdOrdCod,
+																						   Fase = x.med.PrdPhsCod,
+																						   QuantitaProdotta = (int)memd.QtyPrd,
+																						   QuantitaScartata = (int)memd.QtyRej,
+																						   InizioAttivita = x.me.TssStr,
+																						   FineAttivita = x.me.TssEnd,
+																						   SaldoAcconto = memd.DecAdv == -1 ? Costanti.ACCONTO : memd.DecAdv == 0 ? Costanti.SALDO : ""
+																					   })
+																				 .ToList();
+			return attivitaOperatoreDellUltimaGiornata;
+		}
+
+		public string? ApriAttrezzaggioFaseNonPianificata(Attivita attivita, Operatore operatore)
         {
             string codiceFase = GetCodiceFase(attivita); ;
 
