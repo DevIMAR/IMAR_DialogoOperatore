@@ -13,7 +13,8 @@ namespace IMAR_DialogoOperatore.ViewModels
 
 		public bool IsAvanzamento => (_dialogoOperatoreObserver.OperazioneInCorso == Costanti.AVANZAMENTO || _dialogoOperatoreObserver.OperazioneInCorso == Costanti.FINE_LAVORO) && 
 										(_attivitaSelezionata != null && (_attivitaSelezionata.DescrizioneArticolo != Costanti.FASE_INDIRETTA));
-		public bool IsFineAttivitaInUscita => (_dialogoOperatoreObserver.OperazioneInCorso == Costanti.FINE_LAVORO || _dialogoOperatoreObserver.OperazioneInCorso == Costanti.FINE_ATTREZZAGGIO) && _dialogoOperatoreObserver.IsUscita;
+		public bool IsFineAttivitaInUscita => (_dialogoOperatoreObserver.OperazioneInCorso == Costanti.FINE_LAVORO || _dialogoOperatoreObserver.OperazioneInCorso == Costanti.FINE_ATTREZZAGGIO) && _dialogoOperatoreObserver.IsUscita && !IsAttivitaIndiretta();
+
 		public bool IsFineAttrezzaggio => _dialogoOperatoreObserver.OperazioneInCorso == Costanti.FINE_ATTREZZAGGIO && !_dialogoOperatoreObserver.IsUscita;
 		public double QuantitaOrdine => _attivitaSelezionata != null ? (double)_attivitaSelezionata.QuantitaOrdine : 0;
 		public double QuantitaProdottaPrecedentemente => _attivitaSelezionata != null ? QuantitaOrdine - (double)_attivitaSelezionata.QuantitaResidua : 0;
@@ -77,8 +78,14 @@ namespace IMAR_DialogoOperatore.ViewModels
 
 			OnNotifyStateChanged();
 		}
+		private bool IsAttivitaIndiretta()
+		{
+			return _dialogoOperatoreObserver.AttivitaSelezionata != null &&
+					_dialogoOperatoreObserver.AttivitaSelezionata.DescrizioneArticolo != null &&
+					_dialogoOperatoreObserver.AttivitaSelezionata.DescrizioneArticolo.Contains(Costanti.FASE_INDIRETTA);
+		}
 
-        public override void Dispose()
+		public override void Dispose()
         {
             _dialogoOperatoreObserver.OnAttivitaSelezionataChanged -= DialogoOperatoreStore_OnAttivitaSelezionataChanged;
             _dialogoOperatoreObserver.OnIsRiaperturaAttivaChanged -= DialogoOperatoreObserver_OnIsRiaperturaAttivaChanged;
