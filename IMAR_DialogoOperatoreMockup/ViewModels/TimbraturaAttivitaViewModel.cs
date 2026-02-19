@@ -13,5 +13,6 @@ namespace IMAR_DialogoOperatore.ViewModels
         public int? QuantitaProdotta { get; set; }
         public int? QuantitaScartata { get; set; }
         public DateTime? Timestamp { get; set; }
-    }
+		public string SaldoAcconto { get; set; }
+	}
 }

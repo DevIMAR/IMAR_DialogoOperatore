@@ -79,7 +79,7 @@ namespace IMAR_DialogoOperatore.Helpers
             if (TaskAsana.Html_notes != null)
                     TaskAsana.Html_notes += "Note: " + _taskCompilerObserver.Note + "\n";
 
-            string firmaOperatore = _dialogoOperatoreObserver.OperatoreSelezionato.Nome + " " + _dialogoOperatoreObserver.OperatoreSelezionato.Cognome;
+            string firmaOperatore = _dialogoOperatoreObserver.OperatoreSelezionato.Nome + " " + _dialogoOperatoreObserver.OperatoreSelezionato.Cognome + " - " + _infoTaskOperatoreViewModel.BadgeOperatore;
             TaskAsana.Html_notes += "\n\n" + firmaOperatore;
         }
 

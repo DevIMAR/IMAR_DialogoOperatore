@@ -11,5 +11,6 @@
         int? QuantitaProdotta { get; set; }
         int? QuantitaScartata { get; set; }
         DateTime? Timestamp { get; set; }
+        string SaldoAcconto { get; set; }
     }
 }

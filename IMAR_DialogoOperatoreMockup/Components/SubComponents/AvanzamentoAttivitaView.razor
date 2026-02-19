@@ -79,16 +79,20 @@
 		<DxGridLayoutItem Row="1"
 						  Column="6" ColumnSpan="2">
 			<Template>
-				<DxCheckBox CheckType="CheckType.Switch"
-							@bind-Checked="@AvanzamentoAttivitaViewModel.IsFaseCompletabile"
-							Alignment="CheckBoxContentAlignment.Center"
-							SizeMode="SizeMode.Large"
-							@ref="Saldo"
-							@onkeydown="HandleSaldoKeyPress"
-							@onclick="@(() => Click.InvokeAsync())"
-							CssClass="mt-1">
-					Saldo
-				</DxCheckBox>
+				<div class="d-flex justify-content-center align-items-center mt-1">
+					<label class="me-2" style="color: @(AvanzamentoAttivitaViewModel.IsFaseCompletabile ? "" : "orange"); 
+											   font-weight: @(AvanzamentoAttivitaViewModel.IsFaseCompletabile ? "" : "bold");">Acconto</label>
+					<DxCheckBox CheckType="CheckType.Switch"
+								@bind-Checked="@AvanzamentoAttivitaViewModel.IsFaseCompletabile"
+								Alignment="CheckBoxContentAlignment.Center"
+								SizeMode="SizeMode.Large"
+								@ref="Saldo"
+								@onkeydown="HandleSaldoKeyPress"
+								@onclick="@(() => Click.InvokeAsync())">
+						<span style="color: @(AvanzamentoAttivitaViewModel.IsFaseCompletabile ? "orange" : ""); 
+									font-weight: @(AvanzamentoAttivitaViewModel.IsFaseCompletabile ? "bold" : "");">Saldo</span>
+					</DxCheckBox>
+				</div>
 			</Template>
 		</DxGridLayoutItem>
 	</Items>
