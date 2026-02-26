@@ -1,6 +1,5 @@
 ﻿using IMAR_DialogoOperatore.Application;
 using IMAR_DialogoOperatore.Application.DTOs;
-using IMAR_DialogoOperatore.Application.Interfaces.Clients;
 using IMAR_DialogoOperatore.Application.Interfaces.Services.Activities;
 using IMAR_DialogoOperatore.Application.Interfaces.Services.External;
 using IMAR_DialogoOperatore.Domain.Entities.Imar_Produzione;
@@ -22,8 +21,6 @@ namespace IMAR_DialogoOperatore.Commands
 		private readonly IMacchinaService _macchinaService;
 		private readonly ISegnalazioniDifformitaService _segnalazioniDifformitaService;
 
-        private readonly IImarApiClient _imarApiClient;
-
 		public ConfermaCommand(
 			IPopupConfermaHelper popupConfermaUtility,
 			IConfermaOperazioneHelper confermaOperazioneUtility,
@@ -32,8 +29,7 @@ namespace IMAR_DialogoOperatore.Commands
             IAvanzamentoObserver avanzamentoObserver,
             ISegnalazioneObserver segnalazioneObserver,
 			IMacchinaService macchinaService,
-            ISegnalazioniDifformitaService segnalazioniDifformitaService,
-            IImarApiClient imarApiClient)
+            ISegnalazioniDifformitaService segnalazioniDifformitaService)
 		{
 			_popupConfermaHelper = popupConfermaUtility;
 			_confermaOperazioneHelper = confermaOperazioneUtility;
@@ -45,8 +41,6 @@ namespace IMAR_DialogoOperatore.Commands
 
 			_macchinaService = macchinaService;
             _segnalazioniDifformitaService = segnalazioniDifformitaService;
-
-            _imarApiClient = imarApiClient;
 
 			_popupObserver.OnIsConfermatoChanged += PopupStore_OnIsConfermatoChanged;
 
@@ -78,7 +72,7 @@ namespace IMAR_DialogoOperatore.Commands
 
         private async Task CreaEdInviaSegnalazioneDifformita()
         {
-            CostiArticoloDTO costiArticoloDTO = await _imarApiClient.GetCostiArticolo(_dialogoOperatoreObserver.AttivitaSelezionata.CodiceArticolo);
+            CostiArticoloDTO costiArticoloDTO = await _segnalazioniDifformitaService.GetCostiArticolo(_dialogoOperatoreObserver.AttivitaSelezionata.CodiceArticolo);
 
             _segnalazioniDifformitaService.InsertSegnalazione(new SegnalazioneDifformita
             {

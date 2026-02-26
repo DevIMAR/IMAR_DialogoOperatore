@@ -8,7 +8,6 @@ namespace IMAR_DialogoOperatore.Helpers
 {
     public class AsanaTaskCompilerHelper : ITaskCompilerHelper
     {
-        private readonly InfoBaseAttivitaViewModel _infoBaseAttivitaViewModel;
         private readonly AvanzamentoAttivitaViewModel _avanzamentoAttivitaViewModel;
         private readonly InfoTaskOperatoreViewModel _infoTaskOperatoreViewModel;
         private readonly IDialogoOperatoreObserver _dialogoOperatoreObserver;
@@ -17,13 +16,11 @@ namespace IMAR_DialogoOperatore.Helpers
         public TaskAsana TaskAsana { get; private set; }
 
         public AsanaTaskCompilerHelper(
-            InfoBaseAttivitaViewModel infoBaseAttivitaViewModel,
             AvanzamentoAttivitaViewModel avanzamentoAttivitaViewModel,
             InfoTaskOperatoreViewModel infoTaskOperatoreViewModel,
             IDialogoOperatoreObserver dialogoOperatoreObserver,
             ITaskCompilerObserver taskCompilerObserver)
         {
-            _infoBaseAttivitaViewModel = infoBaseAttivitaViewModel;
             _avanzamentoAttivitaViewModel = avanzamentoAttivitaViewModel;
             _infoTaskOperatoreViewModel = infoTaskOperatoreViewModel;
             _dialogoOperatoreObserver = dialogoOperatoreObserver;

@@ -1,4 +1,6 @@
-﻿using IMAR_DialogoOperatore.Application.Interfaces.Services.External;
+﻿using IMAR_DialogoOperatore.Application.DTOs;
+using IMAR_DialogoOperatore.Application.Interfaces.Clients;
+using IMAR_DialogoOperatore.Application.Interfaces.Services.External;
 using IMAR_DialogoOperatore.Application.Interfaces.UoW;
 using IMAR_DialogoOperatore.Application.Interfaces.Utilities;
 using IMAR_DialogoOperatore.Domain.Entities.Imar_Produzione;
@@ -9,14 +11,18 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
     {
         private readonly IImarProduzioneUoW _imarProduzioneUoW;
         private readonly ILoggingService _loggingService;
+		private readonly IImarApiClient _imarApiClient;
 
-        public SegnalazioniDifformitaService(
+		public SegnalazioniDifformitaService(
             IImarProduzioneUoW imarProduzioneUoW,
-            ILoggingService loggingService)
+            ILoggingService loggingService,
+			IImarApiClient imarApiClient)
         {
             _imarProduzioneUoW = imarProduzioneUoW;
             _loggingService = loggingService;
-        }
+			_imarApiClient = imarApiClient;
+
+		}
 
         public int InsertSegnalazione(SegnalazioneDifformita segnalazione)
         {
@@ -89,5 +95,8 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
 
             return sequenziale;
         }
-    }
+
+        public async Task<CostiArticoloDTO> GetCostiArticolo(string codiceArticolo) => await _imarApiClient.GetCostiArticolo(codiceArticolo);
+
+	}
 }
