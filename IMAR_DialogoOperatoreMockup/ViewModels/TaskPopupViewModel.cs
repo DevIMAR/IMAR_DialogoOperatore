@@ -22,7 +22,8 @@ namespace IMAR_DialogoOperatore.ViewModels
             set
             {
                 _isVisible = value;
-                CategoriaErroreSelezionata = null;
+                if (_isVisible)
+                    CategoriaErroreSelezionata = null;
 
                 _taskCompilerObserver.IsPopupVisible = _isVisible;
 

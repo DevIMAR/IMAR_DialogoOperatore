@@ -1,4 +1,5 @@
 ﻿using IMAR_DialogoOperatore.Interfaces.Observers;
+using IMAR_DialogoOperatore.Interfaces.ViewModels;
 
 namespace IMAR_DialogoOperatore.Observers
 {
@@ -8,6 +9,10 @@ namespace IMAR_DialogoOperatore.Observers
         private string _categoria;
         private bool _isErroreFaseAttuale;
         private string _descrizioneDifetto;
+        private IDatiAttivitaBase? _attivitaPerSegnalazione;
+        private bool _isPopupVisible;
+        private bool _isConfermato;
+
         public uint? QuantitaRecuperata
         {
             get { return _quantitaRecuperata; }
@@ -44,10 +49,40 @@ namespace IMAR_DialogoOperatore.Observers
                 CallAction(OnDescrizioneDifettoChanged);
             }
         }
+        public IDatiAttivitaBase? AttivitaPerSegnalazione
+        {
+            get { return _attivitaPerSegnalazione; }
+            set
+            {
+                _attivitaPerSegnalazione = value;
+                CallAction(OnAttivitaPerSegnalazioneChanged);
+            }
+        }
+        public bool IsPopupVisible
+        {
+            get { return _isPopupVisible; }
+            set
+            {
+                _isPopupVisible = value;
+                CallAction(OnIsPopupVisibleChanged);
+            }
+        }
+        public bool IsConfermato
+        {
+            get { return _isConfermato; }
+            set
+            {
+                _isConfermato = value;
+                CallAction(OnIsConfermatoChanged);
+            }
+        }
 
         public event Action OnQuantitaRecuperataChanged;
         public event Action OnCategoriaChanged;
         public event Action OnIsErroreFaseAttualeChanged;
         public event Action OnDescrizioneDifettoChanged;
+        public event Action OnAttivitaPerSegnalazioneChanged;
+        public event Action OnIsPopupVisibleChanged;
+        public event Action OnIsConfermatoChanged;
     }
 }
