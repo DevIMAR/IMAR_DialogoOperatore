@@ -1,6 +1,7 @@
 ﻿using IMAR_DialogoOperatore.Application;
 using IMAR_DialogoOperatore.Interfaces.Observers;
 using IMAR_DialogoOperatore.Interfaces.ViewModels;
+using IMAR_DialogoOperatore.Observers;
 
 namespace IMAR_DialogoOperatore.ViewModels
 {
@@ -8,6 +9,7 @@ namespace IMAR_DialogoOperatore.ViewModels
 	{
 		private readonly IAvanzamentoObserver _avanzamentoObserver;
 		private readonly IDialogoOperatoreObserver _dialogoOperatoreObserver;
+		private readonly ITaskCompilerObserver _taskCompilerObserver;
 
 		private uint? _quantitaProdotta;
 		private uint? _quantitaScartata;
@@ -25,7 +27,7 @@ namespace IMAR_DialogoOperatore.ViewModels
 				if ((UInt32.TryParse(_quantitaProdotta.ToString(), out uint quantitaProdotta) || value == null) && AttivitaSelezionata != null)
 				{
 					_avanzamentoObserver.QuantitaProdotta = quantitaProdotta;
-					IsFaseCompletabile = Int32.Parse(_quantitaProdotta.ToString()) >= ((IAttivitaViewModel)AttivitaSelezionata).QuantitaResidua;
+					IsFaseCompletabile = Int32.Parse(_quantitaProdotta.ToString()) >= ((IAttivitaViewModel)AttivitaSelezionata)?.QuantitaResidua;
 				}
 
 				OnNotifyStateChanged();
@@ -52,10 +54,12 @@ namespace IMAR_DialogoOperatore.ViewModels
 			get { return _isFaseCompletabile; }
 			set 
 			{ 
-				_isFaseCompletabile = _dialogoOperatoreObserver.AttivitaSelezionata.SaldoAcconto == Costanti.SALDO ? true :
-                                        (_dialogoOperatoreObserver.AttivitaSelezionata.QuantitaProdotta + _dialogoOperatoreObserver.AttivitaSelezionata.QuantitaScartata > 0
-										|| _avanzamentoObserver.QuantitaProdotta + _avanzamentoObserver.QuantitaScartata > 0)
-										&& value;
+				_isFaseCompletabile = _dialogoOperatoreObserver.AttivitaSelezionata?.SaldoAcconto == Costanti.SALDO ? true :
+									  _taskCompilerObserver.EventoSelezionato?.SaldoAcconto == Costanti.SALDO ? true :
+											(_dialogoOperatoreObserver?.AttivitaSelezionata?.QuantitaProdotta + _dialogoOperatoreObserver?.AttivitaSelezionata?.QuantitaScartata > 0
+											|| _avanzamentoObserver.QuantitaProdotta + _avanzamentoObserver.QuantitaScartata > 0
+											|| _taskCompilerObserver.EventoSelezionato?.QuantitaProdotta + _taskCompilerObserver.EventoSelezionato?.QuantitaScartata > 0)
+											&& value;
 
 				_avanzamentoObserver.SaldoAcconto = _isFaseCompletabile ? Costanti.SALDO : Costanti.ACCONTO;
 
@@ -65,10 +69,12 @@ namespace IMAR_DialogoOperatore.ViewModels
 
 		public AvanzamentoAttivitaViewModel(
 			IDialogoOperatoreObserver dialogoOperatoreObserver, 
-			IAvanzamentoObserver avanzamentoObserver)
+			IAvanzamentoObserver avanzamentoObserver,
+			ITaskCompilerObserver taskCompilerObserver)
 		{
 			_dialogoOperatoreObserver = dialogoOperatoreObserver;
 			_avanzamentoObserver = avanzamentoObserver;
+			_taskCompilerObserver = taskCompilerObserver;
 
 			QuantitaProdotta = 0;
 			_avanzamentoObserver.QuantitaProdotta = 0;
