@@ -4,7 +4,6 @@ namespace IMAR_DialogoOperatore.ViewModels
 {
     public class FormSegnalazioneDifformitaViewModel : ViewModelBase
     {
-        private readonly IDialogoOperatoreObserver _dialogoOperatoreObserver;
         private readonly IAvanzamentoObserver _avanzamentoObserver;
         private readonly ISegnalazioneObserver _segnalazioneObserver;
 
@@ -14,10 +13,10 @@ namespace IMAR_DialogoOperatore.ViewModels
         private bool _isErroreFaseAttuale;
         private string _descrizioneDifetto;
 
-        public string Bolla => _dialogoOperatoreObserver.AttivitaSelezionata.Bolla;
-        public string Odp => _dialogoOperatoreObserver.AttivitaSelezionata.Odp;
-        public string Fase => _dialogoOperatoreObserver.AttivitaSelezionata.CodiceFase;
-        public string DescrizioneFase => _dialogoOperatoreObserver.AttivitaSelezionata.DescrizioneFase;
+        public string? Bolla => _segnalazioneObserver.AttivitaPerSegnalazione?.Bolla;
+        public string? Odp => _segnalazioneObserver.AttivitaPerSegnalazione?.Odp;
+        public string? Fase => _segnalazioneObserver.AttivitaPerSegnalazione?.CodiceFase;
+        public string? DescrizioneFase => _segnalazioneObserver.AttivitaPerSegnalazione?.DescrizioneFase;
         public List<string> ListaCategorie => new List<string> { "Dimensionale", "Finitura", "Materiale", "Strutturale", "Quantitativo", "Errore Disegno/Distinta", "Varie Imballo" };
 
         public uint? QuantitaScartata
@@ -81,22 +80,20 @@ namespace IMAR_DialogoOperatore.ViewModels
 
 
         public FormSegnalazioneDifformitaViewModel(
-            IDialogoOperatoreObserver dialogoOperatoreObserver,
             IAvanzamentoObserver avanzamentoObserver,
             ISegnalazioneObserver segnalazioneObserver)
         {
-            _dialogoOperatoreObserver = dialogoOperatoreObserver;
             _avanzamentoObserver = avanzamentoObserver;
             _segnalazioneObserver = segnalazioneObserver;
 
             QuantitaScartata = _avanzamentoObserver.QuantitaScartata;
             Inizializza();
 
-            _dialogoOperatoreObserver.OnAttivitaSelezionataChanged += DialogoOperatoreObserver_OnAttivitaSelezionataChanged;
+            _segnalazioneObserver.OnAttivitaPerSegnalazioneChanged += SegnalazioneObserver_OnAttivitaPerSegnalazioneChanged;
             _avanzamentoObserver.OnQuantitaScartataChanged += AvanzamentoObserver_OnQuantitaScartataChanged;
         }
 
-        private void DialogoOperatoreObserver_OnAttivitaSelezionataChanged()
+        private void SegnalazioneObserver_OnAttivitaPerSegnalazioneChanged()
         {
             Inizializza();
         }

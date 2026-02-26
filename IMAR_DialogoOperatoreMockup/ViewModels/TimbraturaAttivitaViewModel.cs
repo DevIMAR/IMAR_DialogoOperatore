@@ -9,7 +9,10 @@ namespace IMAR_DialogoOperatore.ViewModels
         public string CausaleEstesa { get; set; }
         public string? Bolla { get; set; }
         public string? Odp { get; set; }
-        public string? Fase { get; set; }
+        public string? CodiceFase { get; set; }
+        public string? DescrizioneFase { get; set; }
+        public string? CodiceArticolo { get; set; }
+        public string? DescrizioneArticolo { get; set; }
         public int? QuantitaProdotta { get; set; }
         public int? QuantitaScartata { get; set; }
         public DateTime? Timestamp { get; set; }

@@ -2,7 +2,7 @@
 
 namespace IMAR_DialogoOperatore.Interfaces.ViewModels
 {
-    public interface IAttivitaViewModel : IViewModelBase
+    public interface IAttivitaViewModel : IViewModelBase, IDatiAttivitaBase
     {
         string? CodiceArticolo { get; }
         string? Bolla { get; }

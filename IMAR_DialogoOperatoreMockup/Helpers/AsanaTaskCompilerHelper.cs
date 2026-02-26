@@ -38,7 +38,7 @@ namespace IMAR_DialogoOperatore.Helpers
 
                 TaskAsana.Html_notes += "Bolla: " + _taskCompilerObserver.EventoSelezionato.Bolla + "\n" +
                                        "Odp: " + _taskCompilerObserver.EventoSelezionato.Odp + "\n" +
-                                       "Fase: " + _taskCompilerObserver.EventoSelezionato.Fase + "\n";
+                                       "Fase: " + _taskCompilerObserver.EventoSelezionato.CodiceFase + "\n";
             }
 
             switch (_taskCompilerObserver.CategoriaErroreSelezionata)

@@ -60,6 +60,9 @@ namespace IMAR_DialogoOperatore.Commands
             if (!_popupObserver.IsConfermato)
                 return;
 
+            if (_dialogoOperatoreObserver.OperazioneInCorso == Costanti.NESSUNA)
+                return;
+
             if (_avanzamentoObserver.QuantitaScartata != null && _avanzamentoObserver.QuantitaScartata != 0)
             {
                 _dialogoOperatoreObserver.IsLoaderVisibile = true;
@@ -72,17 +75,21 @@ namespace IMAR_DialogoOperatore.Commands
 
         private async Task CreaEdInviaSegnalazioneDifformita()
         {
-            CostiArticoloDTO costiArticoloDTO = await _segnalazioniDifformitaService.GetCostiArticolo(_dialogoOperatoreObserver.AttivitaSelezionata.CodiceArticolo);
+            var attivita = _segnalazioneObserver.AttivitaPerSegnalazione;
+
+            CostiArticoloDTO costiArticoloDTO = attivita?.CodiceArticolo != null
+                ? await _segnalazioniDifformitaService.GetCostiArticolo(attivita.CodiceArticolo)
+                : new CostiArticoloDTO();
 
             _segnalazioniDifformitaService.InsertSegnalazione(new SegnalazioneDifformita
             {
                 OrigineSegnalazione = "I",
                 Richiedente = _dialogoOperatoreObserver.OperatoreSelezionato.Badge + " - " + _dialogoOperatoreObserver.OperatoreSelezionato.Cognome + " " + _dialogoOperatoreObserver.OperatoreSelezionato.Nome,
-                FaseDifformita = _dialogoOperatoreObserver.AttivitaSelezionata.CodiceFase,
-                DescrizioneFase = _dialogoOperatoreObserver.AttivitaSelezionata.DescrizioneFase,
-                Odp = _dialogoOperatoreObserver.AttivitaSelezionata.Odp,
-                Articolo = _dialogoOperatoreObserver.AttivitaSelezionata.CodiceArticolo,
-                DescrizioneArticolo = _dialogoOperatoreObserver.AttivitaSelezionata.DescrizioneArticolo,
+                FaseDifformita = attivita?.CodiceFase,
+                DescrizioneFase = attivita?.DescrizioneFase,
+                Odp = attivita?.Odp,
+                Articolo = attivita?.CodiceArticolo,
+                DescrizioneArticolo = attivita?.DescrizioneArticolo,
                 QtaProdotta = _avanzamentoObserver.QuantitaProdotta,
                 QtaDifforme = _avanzamentoObserver.QuantitaScartata,
                 CostoGestioneDifformita = 5,
@@ -98,6 +105,8 @@ namespace IMAR_DialogoOperatore.Commands
         public override async void Execute(object? parameter)
         {
 			_dialogoOperatoreObserver.IsOperazioneGestita = false;
+
+            _segnalazioneObserver.AttivitaPerSegnalazione = _dialogoOperatoreObserver.AttivitaSelezionata;
 
             string? testoPopup = _popupConfermaHelper.GetTestoPopup();
 

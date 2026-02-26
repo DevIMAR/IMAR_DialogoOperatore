@@ -17,33 +17,35 @@ namespace IMAR_DialogoOperatore.ViewModels
 
 		public object? AttivitaSelezionata => _dialogoOperatoreObserver.AttivitaSelezionata;
 
-		public uint? QuantitaProdotta 
-		{ 
+		public uint? QuantitaProdotta
+		{
 			get {  return _quantitaProdotta; }
 			set
 			{
 				_quantitaProdotta = value;
 
-				if ((UInt32.TryParse(_quantitaProdotta.ToString(), out uint quantitaProdotta) || value == null) && AttivitaSelezionata != null)
+				if (UInt32.TryParse(_quantitaProdotta.ToString(), out uint quantitaProdotta) || value == null)
 				{
 					_avanzamentoObserver.QuantitaProdotta = quantitaProdotta;
-					IsFaseCompletabile = Int32.Parse(_quantitaProdotta.ToString()) >= ((IAttivitaViewModel)AttivitaSelezionata)?.QuantitaResidua;
+					if (AttivitaSelezionata != null)
+						IsFaseCompletabile = Int32.Parse(_quantitaProdotta.ToString()) >= ((IAttivitaViewModel)AttivitaSelezionata)?.QuantitaResidua;
 				}
 
 				OnNotifyStateChanged();
 			}
 		}
         public uint? QuantitaScartata
-		{ 
+		{
 			get {  return _quantitaScartata; }
 			set
 			{
 				_quantitaScartata = value;
 
-				if ((UInt32.TryParse(_quantitaScartata.ToString(), out uint quantitaScartata) || value == null) && AttivitaSelezionata != null)
+				if (UInt32.TryParse(_quantitaScartata.ToString(), out uint quantitaScartata) || value == null)
 				{
 					_avanzamentoObserver.QuantitaScartata = quantitaScartata;
-					IsFaseCompletabile = Int32.Parse(_quantitaScartata.ToString()) >= ((IAttivitaViewModel)AttivitaSelezionata).QuantitaScartata;
+					if (AttivitaSelezionata != null)
+						IsFaseCompletabile = Int32.Parse(_quantitaScartata.ToString()) >= ((IAttivitaViewModel)AttivitaSelezionata).QuantitaScartata;
 				}
 
 				OnNotifyStateChanged();
