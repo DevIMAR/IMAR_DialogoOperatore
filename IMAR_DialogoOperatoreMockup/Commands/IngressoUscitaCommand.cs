@@ -1,4 +1,4 @@
-﻿using IMAR_DialogoOperatore.Application;
+using IMAR_DialogoOperatore.Application;
 using IMAR_DialogoOperatore.Application.Interfaces.Clients;
 using IMAR_DialogoOperatore.Application.Interfaces.Services.Activities;
 using IMAR_DialogoOperatore.Application.Interfaces.Utilities;
@@ -78,9 +78,9 @@ namespace IMAR_DialogoOperatore.Commands
             _dialogoOperatoreObserver.IsLoaderVisibile = true;
             await Task.Delay(1);
 
-            _jmesApiClient.MesAutoClock(_dialogoOperatoreObserver.OperatoreSelezionato.Badge.ToString(), true);
+            await _jmesApiClient.MesAutoClockAsync(_dialogoOperatoreObserver.OperatoreSelezionato.Badge.ToString(), true);
 
-            AggiornaOperatoreSelezionato();
+            await AggiornaOperatoreSelezionatoAsync();
 
             _dialogoOperatoreObserver.IsLoaderVisibile = false;
 
@@ -111,7 +111,7 @@ namespace IMAR_DialogoOperatore.Commands
             _dialogoOperatoreObserver.IsLoaderVisibile = true;
             await Task.Delay(1);
 
-            _jmesApiClient.MesAutoClock(_dialogoOperatoreObserver.OperatoreSelezionato.Badge.ToString(), false);
+            await _jmesApiClient.MesAutoClockAsync(_dialogoOperatoreObserver.OperatoreSelezionato.Badge.ToString(), false);
 
             _dialogoOperatoreObserver.IsLoaderVisibile = false;
             _dialogoOperatoreObserver.IsExiting = true;
@@ -147,9 +147,9 @@ namespace IMAR_DialogoOperatore.Commands
             }
         }
 
-        private void AggiornaOperatoreSelezionato()
+        private async Task AggiornaOperatoreSelezionatoAsync()
         {
-            Operatore? operatore = _operatoreService.OttieniOperatore(_dialogoOperatoreObserver.OperatoreSelezionato.Badge);
+            Operatore? operatore = await _operatoreService.OttieniOperatoreAsync(_dialogoOperatoreObserver.OperatoreSelezionato.Badge);
 
             _dialogoOperatoreObserver.OperatoreSelezionato = operatore != null ? new OperatoreViewModel(operatore) : null;
         }

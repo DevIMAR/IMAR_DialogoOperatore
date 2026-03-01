@@ -361,3 +361,17 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# Claude Code
+CLAUDE.md
+
+# Screenshots / immagini temporanee
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.bmp
+
+# VS Code (publish settings locali)
+.vscode/*.PublishSettings
+.vscode/*.xml

@@ -1,4 +1,4 @@
-﻿using IMAR_DialogoOperatore.Application;
+using IMAR_DialogoOperatore.Application;
 using IMAR_DialogoOperatore.Application.DTOs;
 using IMAR_DialogoOperatore.Application.Interfaces.Clients;
 using IMAR_DialogoOperatore.Application.Interfaces.Services.Activities;
@@ -105,7 +105,7 @@ namespace IMAR_DialogoOperatore.Commands
         {
 			_dialogoOperatoreObserver.IsOperazioneGestita = false;
 
-            string? testoPopup = _popupConfermaHelper.GetTestoPopup();
+            string? testoPopup = await _popupConfermaHelper.GetTestoPopupAsync();
 
 			if (testoPopup == string.Empty)
                 await MostraLoaderEGestisciOperazione();
@@ -117,19 +117,19 @@ namespace IMAR_DialogoOperatore.Commands
         {
             _dialogoOperatoreObserver.IsLoaderVisibile = true;
             await Task.Delay(1);
-            GestioneEsecuzioneOperazione();
+            await GestioneEsecuzioneOperazioneAsync();
             _dialogoOperatoreObserver.IsLoaderVisibile = false;
 
             _dialogoOperatoreObserver.IsOperazioneGestita = true;
         }
 
-		private void GestioneEsecuzioneOperazione()
+		private async Task GestioneEsecuzioneOperazioneAsync()
         {
             AssegnaSaldoAccontoAdAttivitaSelezionata();
 
-            AssegnaMacchinaFittiziaAdOperatore();
+            await AssegnaMacchinaFittiziaAdOperatoreAsync();
 
-            EseguiOperazioneOMostraMessaggio();
+            await EseguiOperazioneOMostraMessaggioAsync();
 
             _dialogoOperatoreObserver.OperazioneInCorso = Costanti.NESSUNA;
         }
@@ -140,12 +140,12 @@ namespace IMAR_DialogoOperatore.Commands
                 _dialogoOperatoreObserver.AttivitaSelezionata.SaldoAcconto = _avanzamentoObserver.SaldoAcconto;
         }
 
-        private void AssegnaMacchinaFittiziaAdOperatore()
+        private async Task AssegnaMacchinaFittiziaAdOperatoreAsync()
         {
             if (!CanAssegnareMacchinaFittiziaAdOperatore())
                 return;
 
-            _dialogoOperatoreObserver.OperatoreSelezionato.MacchineAssegnate.Add(_macchinaService.GetPrimaMacchinaFittiziaNonUtilizzata());
+            _dialogoOperatoreObserver.OperatoreSelezionato.MacchineAssegnate.Add(await _macchinaService.GetPrimaMacchinaFittiziaNonUtilizzataAsync());
             if (!_dialogoOperatoreObserver.OperatoreSelezionato.MacchineAssegnate.Any())
                 MostraPopupConTesto(Costanti.ERRORE_MACCHINE_FINITE);
         }
@@ -157,9 +157,9 @@ namespace IMAR_DialogoOperatore.Commands
                     !_dialogoOperatoreObserver.OperatoreSelezionato.MacchineAssegnate.Any();
         }
 
-        private void EseguiOperazioneOMostraMessaggio()
+        private async Task EseguiOperazioneOMostraMessaggioAsync()
         {
-            string? result = _confermaOperazioneHelper.EseguiOperazione();
+            string? result = await _confermaOperazioneHelper.EseguiOperazioneAsync();
             if (result != null)
                 MostraPopupConTesto(result);
         }

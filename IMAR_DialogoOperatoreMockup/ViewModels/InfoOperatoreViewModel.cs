@@ -90,7 +90,7 @@ namespace IMAR_DialogoOperatore.ViewModels
         {
             _dialogoOperatoreObserver.IsLoaderVisibile = true;
             await Task.Delay(1);
-            Operatore? operatore = _operatoriService.OttieniOperatore(Badge);
+            Operatore? operatore = await _operatoriService.OttieniOperatoreAsync(Badge);
             _dialogoOperatoreObserver.IsLoaderVisibile = false;
 
             OperatoreSelezionato = operatore != null ? new OperatoreViewModel(operatore) : null;

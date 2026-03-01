@@ -1,4 +1,4 @@
-﻿using IMAR_DialogoOperatore.Application;
+using IMAR_DialogoOperatore.Application;
 using IMAR_DialogoOperatore.Application.DTOs;
 using IMAR_DialogoOperatore.Application.Interfaces.Clients;
 using IMAR_DialogoOperatore.Application.Interfaces.Repositories;
@@ -97,199 +97,199 @@ namespace IMAR_DialogoOperatore.Services
 
             if (attivitaTrovata == null)
                 attivitaTrovata = _as400Repository.ExecuteQuery<Attivita>(@"WITH
-																			    NONCONTABILIZZATE AS (
-																				    SELECT
-																					    NRTSKJM,
-																					    SUM(QTVERJM) AS TOT_QTA_NC,
-																					    SUM(QTSCAJM) AS TOT_SCARTO_NC,
-																					    SUM(QTNCOJM) AS TOT_NONCONF_NC,
-																					    MAX(SAACCJM) AS MAX_SAACCJM
-																				    FROM IMA90DAT.JMRILM00F
-																				    WHERE QCONTJM = ''
-																				    GROUP BY NRTSKJM
-																			    ),
-																			    FASE_PIAN_PREC_NP AS (
-																				    SELECT
-																					    p1.NRBLCI,
-																					    p1.ORPRCI,
-																					    p1.CDFACI,
-																					    MAX(prec.CDFACI) AS CDFACI_PIAN_PREC
-																				    FROM IMA90DAT.PCIMP00F p1
-																				    INNER JOIN IMA90DAT.PCIMP00F prec
-																					    ON prec.ORPRCI = p1.ORPRCI
-																					    AND prec.CDFACI < p1.CDFACI
-																					    AND prec.FLSFCI = ''
-																				    WHERE p1.NRBLCI = '" + bolla + @"'
+																		    NONCONTABILIZZATE AS (
+																			    SELECT
+																				    NRTSKJM,
+																				    SUM(QTVERJM) AS TOT_QTA_NC,
+																				    SUM(QTSCAJM) AS TOT_SCARTO_NC,
+																				    SUM(QTNCOJM) AS TOT_NONCONF_NC,
+																				    MAX(SAACCJM) AS MAX_SAACCJM
+																			    FROM IMA90DAT.JMRILM00F
+																			    WHERE QCONTJM = ''
+																			    GROUP BY NRTSKJM
+																		    ),
+																		    FASE_PIAN_PREC_NP AS (
+																			    SELECT
+																				    p1.NRBLCI,
+																				    p1.ORPRCI,
+																				    p1.CDFACI,
+																				    MAX(prec.CDFACI) AS CDFACI_PIAN_PREC
+																			    FROM IMA90DAT.PCIMP00F p1
+																			    INNER JOIN IMA90DAT.PCIMP00F prec
+																				    ON prec.ORPRCI = p1.ORPRCI
+																				    AND prec.CDFACI < p1.CDFACI
+																				    AND prec.FLSFCI = ''
+																			    WHERE p1.NRBLCI = '" + bolla + @"'
 
-																					    AND p1.FLSFCI = '*'
+																				    AND p1.FLSFCI = '*'
 
-																				    GROUP BY p1.NRBLCI, p1.ORPRCI, p1.CDFACI
-																			    ),
-																			    PRODUZIONE_CUMULATA_NP AS(
-																				    SELECT
-																					    fpp.NRBLCI,
-																					    fpp.ORPRCI,
-																					    fpp.CDFACI,
-																					    SUM(inter.QPROCI +COALESCE(nc.TOT_QTA_NC, 0)) AS PROD_CUMULATA
+																			    GROUP BY p1.NRBLCI, p1.ORPRCI, p1.CDFACI
+																		    ),
+																		    PRODUZIONE_CUMULATA_NP AS(
+																			    SELECT
+																				    fpp.NRBLCI,
+																				    fpp.ORPRCI,
+																				    fpp.CDFACI,
+																				    SUM(inter.QPROCI +COALESCE(nc.TOT_QTA_NC, 0)) AS PROD_CUMULATA
 
-																				    FROM FASE_PIAN_PREC_NP fpp
-																				    INNER JOIN IMA90DAT.PCIMP00F inter
+																			    FROM FASE_PIAN_PREC_NP fpp
+																			    INNER JOIN IMA90DAT.PCIMP00F inter
 
-																					    ON inter.ORPRCI = fpp.ORPRCI
+																				    ON inter.ORPRCI = fpp.ORPRCI
 
-																					    AND inter.CDFACI >= fpp.CDFACI_PIAN_PREC
+																				    AND inter.CDFACI >= fpp.CDFACI_PIAN_PREC
 
-																					    AND inter.CDFACI<fpp.CDFACI
+																				    AND inter.CDFACI<fpp.CDFACI
 
-																				    LEFT JOIN NONCONTABILIZZATE nc
+																			    LEFT JOIN NONCONTABILIZZATE nc
 
-																					    ON nc.NRTSKJM = inter.NRBLCI
+																				    ON nc.NRTSKJM = inter.NRBLCI
 
-																				    GROUP BY fpp.NRBLCI, fpp.ORPRCI, fpp.CDFACI
-																			    ),
-																			    FASE_PIAN_PREC AS(
-																				    SELECT
-
-																					    p1.NRBLCI,
-																					    p1.ORPRCI,
-																					    p1.CDFACI,
-																					    MAX(prec.CDFACI) AS CDFACI_PIAN_PREC
-
-																				    FROM IMA90DAT.PCIMP00F p1
-
-																				    INNER JOIN IMA90DAT.PCIMP00F prec
-
-																					    ON prec.ORPRCI = p1.ORPRCI
-
-																					    AND prec.CDFACI < p1.CDFACI
-
-																					    AND prec.FLSFCI = ''
-
-																				    WHERE p1.NRBLCI = '" + bolla + @"'
-
-																					    AND p1.FLSFCI = ''
-
-																				    GROUP BY p1.NRBLCI, p1.ORPRCI, p1.CDFACI
-																			    ),
-																			    SOMMA_FASI_INTERMEDIE AS(
-																				    SELECT
-																					    fpp.NRBLCI,
-																					    fpp.ORPRCI,
-																					    fpp.CDFACI,
-																					    MAX(CASE WHEN inter.FLSFCI = '*' THEN 1 ELSE 0 END) AS HA_FASI_NP,
-																					    SUM(inter.QPROCI + COALESCE(nc.TOT_QTA_NC, 0)) AS SOMMA_PRODUZIONE
-
-																				    FROM FASE_PIAN_PREC fpp
-																				    INNER JOIN IMA90DAT.PCIMP00F inter
-
-																					    ON inter.ORPRCI = fpp.ORPRCI
-
-																					    AND inter.CDFACI >= fpp.CDFACI_PIAN_PREC
-
-																					    AND inter.CDFACI<fpp.CDFACI
-
-																				    LEFT JOIN NONCONTABILIZZATE nc
-
-																					    ON nc.NRTSKJM = inter.NRBLCI
-
-																				    GROUP BY fpp.NRBLCI, fpp.ORPRCI, fpp.CDFACI
-																			    ),
-																			    FASE_IMM_PREC AS(
-																				    SELECT
-																					    p1.NRBLCI,
-																					    p1.CDFACI,
-																					    prec.TIRECI AS TIRECI_IMM_PREV,
-																					    nc_prec.MAX_SAACCJM AS SAACCJM_IMM_PREV,
-																					    ROW_NUMBER() OVER (PARTITION BY p1.NRBLCI ORDER BY prec.CDFACI DESC) AS RN
-
-																				    FROM IMA90DAT.PCIMP00F p1
-
-																				    INNER JOIN IMA90DAT.PCIMP00F prec
-
-																					    ON prec.ORPRCI = p1.ORPRCI
-
-																					    AND prec.CDFACI<p1.CDFACI
-
-																				    LEFT JOIN NONCONTABILIZZATE nc_prec
-
-																					    ON nc_prec.NRTSKJM = prec.NRBLCI
-
-																				    WHERE p1.NRBLCI = '" + bolla + @"'
-																			    ),
-																			    FASE_PREC AS(
-																				    SELECT
-																					    p1.NRBLCI,
-																					    p1.ORPRCI,
-																					    p1.CDFACI,
-																					    prec.NRBLCI AS NRBLCI_PREV,
-																					    prec.TIRECI AS TIRECI_PREV,
-																					    prec.QPROCI AS QPROCI_PREV,
-																					    nc_prec.TOT_QTA_NC AS QTA_NC_PREV,
-																					    nc_prec.MAX_SAACCJM AS SAACCJM_PREV,
-																					    ROW_NUMBER() OVER (PARTITION BY p1.NRBLCI ORDER BY prec.CDFACI DESC) AS RN
-
-																				    FROM IMA90DAT.PCIMP00F p1
-
-																				    INNER JOIN IMA90DAT.PCIMP00F prec
-
-																					    ON prec.ORPRCI = p1.ORPRCI
-
-																					    AND prec.CDFACI<p1.CDFACI
-
-																				    LEFT JOIN NONCONTABILIZZATE nc_prec
-
-																					    ON nc_prec.NRTSKJM = prec.NRBLCI
-
-																				    WHERE p1.NRBLCI = '" + bolla + @"'
-																			    )
+																			    GROUP BY fpp.NRBLCI, fpp.ORPRCI, fpp.CDFACI
+																		    ),
+																		    FASE_PIAN_PREC AS(
 																			    SELECT
 
-																				    pf2.NRBLCI AS BOLLA,
-																				    pf2.ORPRCI AS ODP,
-																				    pf2.CDARCI AS ARTICOLO,
-																				    TRIM(mf.DSARMA) AS DESCRIZIONEARTICOLO,
-																				    pf2.CDFACI AS FASE,
-																				    pf2.DSFACI AS DESCRIZIONEFASE,
-																				    CASE
-																					    WHEN pf2.FLSFCI = '*' AND pcnp.PROD_CUMULATA IS NOT NULL
+																				    p1.NRBLCI,
+																				    p1.ORPRCI,
+																				    p1.CDFACI,
+																				    MAX(prec.CDFACI) AS CDFACI_PIAN_PREC
 
-																						    THEN pf2.QORDCI - pcnp.PROD_CUMULATA
+																			    FROM IMA90DAT.PCIMP00F p1
 
-																					    WHEN pf2.FLSFCI = ''
+																			    INNER JOIN IMA90DAT.PCIMP00F prec
 
-																							    AND sfi.HA_FASI_NP = 1
+																				    ON prec.ORPRCI = p1.ORPRCI
 
-																							    AND(fip.TIRECI_IMM_PREV = 'S' OR COALESCE(fip.SAACCJM_IMM_PREV, '') = 'S')
+																				    AND prec.CDFACI < p1.CDFACI
 
-																						    THEN sfi.SOMMA_PRODUZIONE
-																					    WHEN fp.NRBLCI_PREV IS NULL OR pf2.FLSFCI<> '' THEN pf2.QORDCI
-																					    WHEN fp.TIRECI_PREV = 'S' OR COALESCE(fp.SAACCJM_PREV, '') = 'S'
+																				    AND prec.FLSFCI = ''
 
-																						    THEN COALESCE(fp.QPROCI_PREV, 0) +COALESCE(fp.QTA_NC_PREV, 0)
+																			    WHERE p1.NRBLCI = '" + bolla + @"'
 
-																					    ELSE pf2.QORDCI
-																				    END AS QUANTITAORDINE,
-																				    COALESCE(ra.TOT_QTA_NC, 0) AS QUANTITAPRODOTTANONCONTABILIZZATA,
-																				    pf2.QPROCI AS QUANTITAPRODOTTACONTABILIZZATA,
-																				    COALESCE(ra.TOT_SCARTO_NC, 0) AS QUANTITASCARTATANONCONTABILIZZATA,
-																				    pf2.QSCACI AS QUANTITASCARTATACONTABILIZZATA,
-																				    COALESCE(ra.TOT_NONCONF_NC, 0) AS QTANONCONFORMENONCONTABILIZZATA,
-																				    pf2.QRESCI AS QTANONCONFORMECONTABILIZZATA,
-																				    CASE
-																					    WHEN ra.MAX_SAACCJM IS NULL THEN pf2.TIRECI
-																					    ELSE ra.MAX_SAACCJM
-																				    END AS SALDOACCONTO,
-																				    pf2.FLSFCI AS ISNONPIANIFICATA
-																			    FROM IMA90DAT.PCIMP00F pf2
-																			    JOIN IMA90DAT.MGART00F mf ON pf2.CDARCI = mf.CDARMA
-																			    LEFT JOIN NONCONTABILIZZATE ra ON ra.NRTSKJM = pf2.NRBLCI
-																			    LEFT JOIN FASE_PREC fp ON fp.NRBLCI = pf2.NRBLCI AND fp.RN = 1
-																			    LEFT JOIN SOMMA_FASI_INTERMEDIE sfi ON sfi.NRBLCI = pf2.NRBLCI
-																			    LEFT JOIN FASE_IMM_PREC fip ON fip.NRBLCI = pf2.NRBLCI AND fip.RN = 1
-																			    LEFT JOIN PRODUZIONE_CUMULATA_NP pcnp ON pcnp.NRBLCI = pf2.NRBLCI
-																			    WHERE pf2.NRBLCI = '" + bolla + "'")
+																				    AND p1.FLSFCI = ''
+
+																			    GROUP BY p1.NRBLCI, p1.ORPRCI, p1.CDFACI
+																		    ),
+																		    SOMMA_FASI_INTERMEDIE AS(
+																			    SELECT
+																				    fpp.NRBLCI,
+																				    fpp.ORPRCI,
+																				    fpp.CDFACI,
+																				    MAX(CASE WHEN inter.FLSFCI = '*' THEN 1 ELSE 0 END) AS HA_FASI_NP,
+																				    SUM(inter.QPROCI + COALESCE(nc.TOT_QTA_NC, 0)) AS SOMMA_PRODUZIONE
+
+																			    FROM FASE_PIAN_PREC fpp
+																			    INNER JOIN IMA90DAT.PCIMP00F inter
+
+																				    ON inter.ORPRCI = fpp.ORPRCI
+
+																				    AND inter.CDFACI >= fpp.CDFACI_PIAN_PREC
+
+																				    AND inter.CDFACI<fpp.CDFACI
+
+																			    LEFT JOIN NONCONTABILIZZATE nc
+
+																				    ON nc.NRTSKJM = inter.NRBLCI
+
+																			    GROUP BY fpp.NRBLCI, fpp.ORPRCI, fpp.CDFACI
+																		    ),
+																		    FASE_IMM_PREC AS(
+																			    SELECT
+																				    p1.NRBLCI,
+																				    p1.CDFACI,
+																				    prec.TIRECI AS TIRECI_IMM_PREV,
+																				    nc_prec.MAX_SAACCJM AS SAACCJM_IMM_PREV,
+																				    ROW_NUMBER() OVER (PARTITION BY p1.NRBLCI ORDER BY prec.CDFACI DESC) AS RN
+
+																			    FROM IMA90DAT.PCIMP00F p1
+
+																			    INNER JOIN IMA90DAT.PCIMP00F prec
+
+																				    ON prec.ORPRCI = p1.ORPRCI
+
+																				    AND prec.CDFACI<p1.CDFACI
+
+																			    LEFT JOIN NONCONTABILIZZATE nc_prec
+
+																				    ON nc_prec.NRTSKJM = prec.NRBLCI
+
+																			    WHERE p1.NRBLCI = '" + bolla + @"'
+																		    ),
+																		    FASE_PREC AS(
+																			    SELECT
+																				    p1.NRBLCI,
+																				    p1.ORPRCI,
+																				    p1.CDFACI,
+																				    prec.NRBLCI AS NRBLCI_PREV,
+																				    prec.TIRECI AS TIRECI_PREV,
+																				    prec.QPROCI AS QPROCI_PREV,
+																				    nc_prec.TOT_QTA_NC AS QTA_NC_PREV,
+																				    nc_prec.MAX_SAACCJM AS SAACCJM_PREV,
+																				    ROW_NUMBER() OVER (PARTITION BY p1.NRBLCI ORDER BY prec.CDFACI DESC) AS RN
+
+																			    FROM IMA90DAT.PCIMP00F p1
+
+																			    INNER JOIN IMA90DAT.PCIMP00F prec
+
+																				    ON prec.ORPRCI = p1.ORPRCI
+
+																				    AND prec.CDFACI<p1.CDFACI
+
+																			    LEFT JOIN NONCONTABILIZZATE nc_prec
+
+																				    ON nc_prec.NRTSKJM = prec.NRBLCI
+
+																			    WHERE p1.NRBLCI = '" + bolla + @"'
+																		    )
+																		    SELECT
+
+																			    pf2.NRBLCI AS BOLLA,
+																			    pf2.ORPRCI AS ODP,
+																			    pf2.CDARCI AS ARTICOLO,
+																			    TRIM(mf.DSARMA) AS DESCRIZIONEARTICOLO,
+																			    pf2.CDFACI AS FASE,
+																			    pf2.DSFACI AS DESCRIZIONEFASE,
+																			    CASE
+																				    WHEN pf2.FLSFCI = '*' AND pcnp.PROD_CUMULATA IS NOT NULL
+
+																					    THEN pf2.QORDCI - pcnp.PROD_CUMULATA
+
+																				    WHEN pf2.FLSFCI = ''
+
+																						    AND sfi.HA_FASI_NP = 1
+
+																						    AND(fip.TIRECI_IMM_PREV = 'S' OR COALESCE(fip.SAACCJM_IMM_PREV, '') = 'S')
+
+																					    THEN sfi.SOMMA_PRODUZIONE
+																				    WHEN fp.NRBLCI_PREV IS NULL OR pf2.FLSFCI<> '' THEN pf2.QORDCI
+																				    WHEN fp.TIRECI_PREV = 'S' OR COALESCE(fp.SAACCJM_PREV, '') = 'S'
+
+																					    THEN COALESCE(fp.QPROCI_PREV, 0) +COALESCE(fp.QTA_NC_PREV, 0)
+
+																				    ELSE pf2.QORDCI
+																			    END AS QUANTITAORDINE,
+																			    COALESCE(ra.TOT_QTA_NC, 0) AS QUANTITAPRODOTTANONCONTABILIZZATA,
+																			    pf2.QPROCI AS QUANTITAPRODOTTACONTABILIZZATA,
+																			    COALESCE(ra.TOT_SCARTO_NC, 0) AS QUANTITASCARTATANONCONTABILIZZATA,
+																			    pf2.QSCACI AS QUANTITASCARTATACONTABILIZZATA,
+																			    COALESCE(ra.TOT_NONCONF_NC, 0) AS QTANONCONFORMENONCONTABILIZZATA,
+																			    pf2.QRESCI AS QTANONCONFORMECONTABILIZZATA,
+																			    CASE
+																				    WHEN ra.MAX_SAACCJM IS NULL THEN pf2.TIRECI
+																				    ELSE ra.MAX_SAACCJM
+																			    END AS SALDOACCONTO,
+																			    pf2.FLSFCI AS ISNONPIANIFICATA
+																		    FROM IMA90DAT.PCIMP00F pf2
+																		    JOIN IMA90DAT.MGART00F mf ON pf2.CDARCI = mf.CDARMA
+																		    LEFT JOIN NONCONTABILIZZATE ra ON ra.NRTSKJM = pf2.NRBLCI
+																		    LEFT JOIN FASE_PREC fp ON fp.NRBLCI = pf2.NRBLCI AND fp.RN = 1
+																		    LEFT JOIN SOMMA_FASI_INTERMEDIE sfi ON sfi.NRBLCI = pf2.NRBLCI
+																		    LEFT JOIN FASE_IMM_PREC fip ON fip.NRBLCI = pf2.NRBLCI AND fip.RN = 1
+																		    LEFT JOIN PRODUZIONE_CUMULATA_NP pcnp ON pcnp.NRBLCI = pf2.NRBLCI
+																		    WHERE pf2.NRBLCI = '" + bolla + "'")
                                                   .SingleOrDefault();
-                                                                            
+
             return attivitaTrovata;
         }
 
@@ -300,208 +300,208 @@ namespace IMAR_DialogoOperatore.Services
 
             if (attivitaFiltrate == null || !attivitaFiltrate.Any())
                 attivitaFiltrate = _as400Repository.ExecuteQuery<Attivita>(@"WITH
-																			    NONCONTABILIZZATE AS (
-																				    SELECT
-																					    NRTSKJM,
-																					    SUM(QTVERJM) AS TOT_QTA_NC,
-																					    SUM(QTSCAJM) AS TOT_SCARTO_NC,
-																					    SUM(QTNCOJM) AS TOT_NONCONF_NC,
-																					    MAX(SAACCJM) AS MAX_SAACCJM
-																				    FROM IMA90DAT.JMRILM00F
-																				    WHERE QCONTJM = ''
-																				    GROUP BY NRTSKJM
-																			    ),
-																			    FASE_PIAN_PREC_NP AS (
-																				    SELECT
-																					    p1.NRBLCI,
-																					    p1.ORPRCI,
-																					    p1.CDFACI,
-																					    MAX(prec.CDFACI) AS CDFACI_PIAN_PREC
-																				    FROM IMA90DAT.PCIMP00F p1
-																				    INNER JOIN IMA90DAT.PCIMP00F prec
-																					    ON prec.ORPRCI = p1.ORPRCI
-																					    AND prec.CDFACI < p1.CDFACI
-																					    AND prec.FLSFCI = ''
-																				    WHERE p1.ORPRCI = '" + odp + @"'
+																		    NONCONTABILIZZATE AS (
+																			    SELECT
+																				    NRTSKJM,
+																				    SUM(QTVERJM) AS TOT_QTA_NC,
+																				    SUM(QTSCAJM) AS TOT_SCARTO_NC,
+																				    SUM(QTNCOJM) AS TOT_NONCONF_NC,
+																				    MAX(SAACCJM) AS MAX_SAACCJM
+																			    FROM IMA90DAT.JMRILM00F
+																			    WHERE QCONTJM = ''
+																			    GROUP BY NRTSKJM
+																		    ),
+																		    FASE_PIAN_PREC_NP AS (
+																			    SELECT
+																				    p1.NRBLCI,
+																				    p1.ORPRCI,
+																				    p1.CDFACI,
+																				    MAX(prec.CDFACI) AS CDFACI_PIAN_PREC
+																			    FROM IMA90DAT.PCIMP00F p1
+																			    INNER JOIN IMA90DAT.PCIMP00F prec
+																				    ON prec.ORPRCI = p1.ORPRCI
+																				    AND prec.CDFACI < p1.CDFACI
+																				    AND prec.FLSFCI = ''
+																			    WHERE p1.ORPRCI = '" + odp + @"'
 
-																					    AND p1.FLSFCI = '*'
+																				    AND p1.FLSFCI = '*'
 
-																				    GROUP BY p1.NRBLCI, p1.ORPRCI, p1.CDFACI
-																			    ),
-																			    PRODUZIONE_CUMULATA_NP AS(
-																				    SELECT
-																					    fpp.NRBLCI,
-																					    fpp.ORPRCI,
-																					    fpp.CDFACI,
-																					    SUM(inter.QPROCI +COALESCE(nc.TOT_QTA_NC, 0)) AS PROD_CUMULATA
+																			    GROUP BY p1.NRBLCI, p1.ORPRCI, p1.CDFACI
+																		    ),
+																		    PRODUZIONE_CUMULATA_NP AS(
+																			    SELECT
+																				    fpp.NRBLCI,
+																				    fpp.ORPRCI,
+																				    fpp.CDFACI,
+																				    SUM(inter.QPROCI +COALESCE(nc.TOT_QTA_NC, 0)) AS PROD_CUMULATA
 
-																				    FROM FASE_PIAN_PREC_NP fpp
-																				    INNER JOIN IMA90DAT.PCIMP00F inter
+																			    FROM FASE_PIAN_PREC_NP fpp
+																			    INNER JOIN IMA90DAT.PCIMP00F inter
 
-																					    ON inter.ORPRCI = fpp.ORPRCI
+																				    ON inter.ORPRCI = fpp.ORPRCI
 
-																					    AND inter.CDFACI >= fpp.CDFACI_PIAN_PREC
+																				    AND inter.CDFACI >= fpp.CDFACI_PIAN_PREC
 
-																					    AND inter.CDFACI<fpp.CDFACI
+																				    AND inter.CDFACI<fpp.CDFACI
 
-																				    LEFT JOIN NONCONTABILIZZATE nc
+																			    LEFT JOIN NONCONTABILIZZATE nc
 
-																					    ON nc.NRTSKJM = inter.NRBLCI
+																				    ON nc.NRTSKJM = inter.NRBLCI
 
-																				    GROUP BY fpp.NRBLCI, fpp.ORPRCI, fpp.CDFACI
-																			    ),
-																			    FASE_PIAN_PREC AS(
-																				    SELECT
-
-																					    p1.NRBLCI,
-																					    p1.ORPRCI,
-																					    p1.CDFACI,
-																					    MAX(prec.CDFACI) AS CDFACI_PIAN_PREC
-
-																				    FROM IMA90DAT.PCIMP00F p1
-
-																				    INNER JOIN IMA90DAT.PCIMP00F prec
-
-																					    ON prec.ORPRCI = p1.ORPRCI
-
-																					    AND prec.CDFACI < p1.CDFACI
-
-																					    AND prec.FLSFCI = ''
-
-																				    WHERE p1.ORPRCI = '" + odp + @"'
-
-																					    AND p1.FLSFCI = ''
-
-																				    GROUP BY p1.NRBLCI, p1.ORPRCI, p1.CDFACI
-																			    ),
-																			    SOMMA_FASI_INTERMEDIE AS(
-																				    SELECT
-																					    fpp.NRBLCI,
-																					    fpp.ORPRCI,
-																					    fpp.CDFACI,
-																					    MAX(CASE WHEN inter.FLSFCI = '*' THEN 1 ELSE 0 END) AS HA_FASI_NP,
-																					    SUM(inter.QPROCI + COALESCE(nc.TOT_QTA_NC, 0)) AS SOMMA_PRODUZIONE
-
-																				    FROM FASE_PIAN_PREC fpp
-																				    INNER JOIN IMA90DAT.PCIMP00F inter
-
-																					    ON inter.ORPRCI = fpp.ORPRCI
-
-																					    AND inter.CDFACI >= fpp.CDFACI_PIAN_PREC
-
-																					    AND inter.CDFACI<fpp.CDFACI
-
-																				    LEFT JOIN NONCONTABILIZZATE nc
-
-																					    ON nc.NRTSKJM = inter.NRBLCI
-
-																				    GROUP BY fpp.NRBLCI, fpp.ORPRCI, fpp.CDFACI
-																			    ),
-																			    FASE_IMM_PREC AS(
-																				    SELECT
-																					    p1.NRBLCI,
-																					    p1.CDFACI,
-																					    prec.TIRECI AS TIRECI_IMM_PREV,
-																					    nc_prec.MAX_SAACCJM AS SAACCJM_IMM_PREV,
-																					    ROW_NUMBER() OVER (PARTITION BY p1.NRBLCI ORDER BY prec.CDFACI DESC) AS RN
-
-																				    FROM IMA90DAT.PCIMP00F p1
-
-																				    INNER JOIN IMA90DAT.PCIMP00F prec
-
-																					    ON prec.ORPRCI = p1.ORPRCI
-
-																					    AND prec.CDFACI<p1.CDFACI
-
-																				    LEFT JOIN NONCONTABILIZZATE nc_prec
-
-																					    ON nc_prec.NRTSKJM = prec.NRBLCI
-
-																				    WHERE p1.ORPRCI = '" + odp + @"'
-																			    ),
-																			    FASE_PREC AS(
-																				    SELECT
-																					    p1.NRBLCI,
-																					    p1.ORPRCI,
-																					    p1.CDFACI,
-																					    prec.NRBLCI AS NRBLCI_PREV,
-																					    prec.TIRECI AS TIRECI_PREV,
-																					    prec.QPROCI AS QPROCI_PREV,
-																					    nc_prec.TOT_QTA_NC AS QTA_NC_PREV,
-																					    nc_prec.MAX_SAACCJM AS SAACCJM_PREV,
-																					    ROW_NUMBER() OVER (PARTITION BY p1.NRBLCI ORDER BY prec.CDFACI DESC) AS RN
-
-																				    FROM IMA90DAT.PCIMP00F p1
-
-																				    INNER JOIN IMA90DAT.PCIMP00F prec
-
-																					    ON prec.ORPRCI = p1.ORPRCI
-
-																					    AND prec.CDFACI<p1.CDFACI
-
-																				    LEFT JOIN NONCONTABILIZZATE nc_prec
-
-																					    ON nc_prec.NRTSKJM = prec.NRBLCI
-
-																				    WHERE p1.ORPRCI = '" + odp + @"'
-																			    )
+																			    GROUP BY fpp.NRBLCI, fpp.ORPRCI, fpp.CDFACI
+																		    ),
+																		    FASE_PIAN_PREC AS(
 																			    SELECT
 
-																				    pf2.NRBLCI AS BOLLA,
-																				    pf2.ORPRCI AS ODP,
-																				    pf2.CDARCI AS ARTICOLO,
-																				    TRIM(mf.DSARMA) AS DESCRIZIONEARTICOLO,
-																				    pf2.CDFACI AS FASE,
-																				    pf2.DSFACI AS DESCRIZIONEFASE,
-																				    CASE
-																					    WHEN pf2.FLSFCI = '*' AND pcnp.PROD_CUMULATA IS NOT NULL
+																				    p1.NRBLCI,
+																				    p1.ORPRCI,
+																				    p1.CDFACI,
+																				    MAX(prec.CDFACI) AS CDFACI_PIAN_PREC
 
-																						    THEN pf2.QORDCI - pcnp.PROD_CUMULATA
+																			    FROM IMA90DAT.PCIMP00F p1
 
-																					    WHEN pf2.FLSFCI = ''
+																			    INNER JOIN IMA90DAT.PCIMP00F prec
 
-																							    AND sfi.HA_FASI_NP = 1
+																				    ON prec.ORPRCI = p1.ORPRCI
 
-																							    AND(fip.TIRECI_IMM_PREV = 'S' OR COALESCE(fip.SAACCJM_IMM_PREV, '') = 'S')
+																				    AND prec.CDFACI < p1.CDFACI
 
-																						    THEN sfi.SOMMA_PRODUZIONE
-																					    WHEN fp.NRBLCI_PREV IS NULL OR pf2.FLSFCI<> '' THEN pf2.QORDCI
-																					    WHEN fp.TIRECI_PREV = 'S' OR COALESCE(fp.SAACCJM_PREV, '') = 'S'
+																				    AND prec.FLSFCI = ''
 
-																						    THEN COALESCE(fp.QPROCI_PREV, 0) +COALESCE(fp.QTA_NC_PREV, 0)
+																			    WHERE p1.ORPRCI = '" + odp + @"'
 
-																					    ELSE pf2.QORDCI
-																				    END AS QUANTITAORDINE,
-																				    COALESCE(ra.TOT_QTA_NC, 0) AS QUANTITAPRODOTTANONCONTABILIZZATA,
-																				    pf2.QPROCI AS QUANTITAPRODOTTACONTABILIZZATA,
-																				    COALESCE(ra.TOT_SCARTO_NC, 0) AS QUANTITASCARTATANONCONTABILIZZATA,
-																				    pf2.QSCACI AS QUANTITASCARTATACONTABILIZZATA,
-																				    COALESCE(ra.TOT_NONCONF_NC, 0) AS QTANONCONFORMENONCONTABILIZZATA,
-																				    pf2.QRESCI AS QTANONCONFORMECONTABILIZZATA,
-																				    CASE
-																					    WHEN ra.MAX_SAACCJM IS NULL THEN pf2.TIRECI
-																					    ELSE ra.MAX_SAACCJM
-																				    END AS SALDOACCONTO,
-																				    pf2.FLSFCI AS ISNONPIANIFICATA
-																			    FROM IMA90DAT.PCIMP00F pf2
-																			    JOIN IMA90DAT.MGART00F mf ON pf2.CDARCI = mf.CDARMA
-																			    LEFT JOIN NONCONTABILIZZATE ra ON ra.NRTSKJM = pf2.NRBLCI
-																			    LEFT JOIN FASE_PREC fp ON fp.NRBLCI = pf2.NRBLCI AND fp.RN = 1
-																			    LEFT JOIN SOMMA_FASI_INTERMEDIE sfi ON sfi.NRBLCI = pf2.NRBLCI
-																			    LEFT JOIN FASE_IMM_PREC fip ON fip.NRBLCI = pf2.NRBLCI AND fip.RN = 1
-																			    LEFT JOIN PRODUZIONE_CUMULATA_NP pcnp ON pcnp.NRBLCI = pf2.NRBLCI
-																			    WHERE pf2.ORPRCI = '" + odp + "'");
+																				    AND p1.FLSFCI = ''
+
+																			    GROUP BY p1.NRBLCI, p1.ORPRCI, p1.CDFACI
+																		    ),
+																		    SOMMA_FASI_INTERMEDIE AS(
+																			    SELECT
+																				    fpp.NRBLCI,
+																				    fpp.ORPRCI,
+																				    fpp.CDFACI,
+																				    MAX(CASE WHEN inter.FLSFCI = '*' THEN 1 ELSE 0 END) AS HA_FASI_NP,
+																				    SUM(inter.QPROCI + COALESCE(nc.TOT_QTA_NC, 0)) AS SOMMA_PRODUZIONE
+
+																			    FROM FASE_PIAN_PREC fpp
+																			    INNER JOIN IMA90DAT.PCIMP00F inter
+
+																				    ON inter.ORPRCI = fpp.ORPRCI
+
+																				    AND inter.CDFACI >= fpp.CDFACI_PIAN_PREC
+
+																				    AND inter.CDFACI<fpp.CDFACI
+
+																			    LEFT JOIN NONCONTABILIZZATE nc
+
+																				    ON nc.NRTSKJM = inter.NRBLCI
+
+																			    GROUP BY fpp.NRBLCI, fpp.ORPRCI, fpp.CDFACI
+																		    ),
+																		    FASE_IMM_PREC AS(
+																			    SELECT
+																				    p1.NRBLCI,
+																				    p1.CDFACI,
+																				    prec.TIRECI AS TIRECI_IMM_PREV,
+																				    nc_prec.MAX_SAACCJM AS SAACCJM_IMM_PREV,
+																				    ROW_NUMBER() OVER (PARTITION BY p1.NRBLCI ORDER BY prec.CDFACI DESC) AS RN
+
+																			    FROM IMA90DAT.PCIMP00F p1
+
+																			    INNER JOIN IMA90DAT.PCIMP00F prec
+
+																				    ON prec.ORPRCI = p1.ORPRCI
+
+																				    AND prec.CDFACI<p1.CDFACI
+
+																			    LEFT JOIN NONCONTABILIZZATE nc_prec
+
+																				    ON nc_prec.NRTSKJM = prec.NRBLCI
+
+																			    WHERE p1.ORPRCI = '" + odp + @"'
+																		    ),
+																		    FASE_PREC AS(
+																			    SELECT
+																				    p1.NRBLCI,
+																				    p1.ORPRCI,
+																				    p1.CDFACI,
+																				    prec.NRBLCI AS NRBLCI_PREV,
+																				    prec.TIRECI AS TIRECI_PREV,
+																				    prec.QPROCI AS QPROCI_PREV,
+																				    nc_prec.TOT_QTA_NC AS QTA_NC_PREV,
+																				    nc_prec.MAX_SAACCJM AS SAACCJM_PREV,
+																				    ROW_NUMBER() OVER (PARTITION BY p1.NRBLCI ORDER BY prec.CDFACI DESC) AS RN
+
+																			    FROM IMA90DAT.PCIMP00F p1
+
+																			    INNER JOIN IMA90DAT.PCIMP00F prec
+
+																				    ON prec.ORPRCI = p1.ORPRCI
+
+																				    AND prec.CDFACI<p1.CDFACI
+
+																			    LEFT JOIN NONCONTABILIZZATE nc_prec
+
+																				    ON nc_prec.NRTSKJM = prec.NRBLCI
+
+																			    WHERE p1.ORPRCI = '" + odp + @"'
+																		    )
+																		    SELECT
+
+																			    pf2.NRBLCI AS BOLLA,
+																			    pf2.ORPRCI AS ODP,
+																			    pf2.CDARCI AS ARTICOLO,
+																			    TRIM(mf.DSARMA) AS DESCRIZIONEARTICOLO,
+																			    pf2.CDFACI AS FASE,
+																			    pf2.DSFACI AS DESCRIZIONEFASE,
+																			    CASE
+																				    WHEN pf2.FLSFCI = '*' AND pcnp.PROD_CUMULATA IS NOT NULL
+
+																					    THEN pf2.QORDCI - pcnp.PROD_CUMULATA
+
+																				    WHEN pf2.FLSFCI = ''
+
+																						    AND sfi.HA_FASI_NP = 1
+
+																						    AND(fip.TIRECI_IMM_PREV = 'S' OR COALESCE(fip.SAACCJM_IMM_PREV, '') = 'S')
+
+																					    THEN sfi.SOMMA_PRODUZIONE
+																				    WHEN fp.NRBLCI_PREV IS NULL OR pf2.FLSFCI<> '' THEN pf2.QORDCI
+																				    WHEN fp.TIRECI_PREV = 'S' OR COALESCE(fp.SAACCJM_PREV, '') = 'S'
+
+																					    THEN COALESCE(fp.QPROCI_PREV, 0) +COALESCE(fp.QTA_NC_PREV, 0)
+
+																				    ELSE pf2.QORDCI
+																			    END AS QUANTITAORDINE,
+																			    COALESCE(ra.TOT_QTA_NC, 0) AS QUANTITAPRODOTTANONCONTABILIZZATA,
+																			    pf2.QPROCI AS QUANTITAPRODOTTACONTABILIZZATA,
+																			    COALESCE(ra.TOT_SCARTO_NC, 0) AS QUANTITASCARTATANONCONTABILIZZATA,
+																			    pf2.QSCACI AS QUANTITASCARTATACONTABILIZZATA,
+																			    COALESCE(ra.TOT_NONCONF_NC, 0) AS QTANONCONFORMENONCONTABILIZZATA,
+																			    pf2.QRESCI AS QTANONCONFORMECONTABILIZZATA,
+																			    CASE
+																				    WHEN ra.MAX_SAACCJM IS NULL THEN pf2.TIRECI
+																				    ELSE ra.MAX_SAACCJM
+																			    END AS SALDOACCONTO,
+																			    pf2.FLSFCI AS ISNONPIANIFICATA
+																		    FROM IMA90DAT.PCIMP00F pf2
+																		    JOIN IMA90DAT.MGART00F mf ON pf2.CDARCI = mf.CDARMA
+																		    LEFT JOIN NONCONTABILIZZATE ra ON ra.NRTSKJM = pf2.NRBLCI
+																		    LEFT JOIN FASE_PREC fp ON fp.NRBLCI = pf2.NRBLCI AND fp.RN = 1
+																		    LEFT JOIN SOMMA_FASI_INTERMEDIE sfi ON sfi.NRBLCI = pf2.NRBLCI
+																		    LEFT JOIN FASE_IMM_PREC fip ON fip.NRBLCI = pf2.NRBLCI AND fip.RN = 1
+																		    LEFT JOIN PRODUZIONE_CUMULATA_NP pcnp ON pcnp.NRBLCI = pf2.NRBLCI
+																		    WHERE pf2.ORPRCI = '" + odp + "'");
 
             return attivitaFiltrate.OrderBy(x => x.Fase);
         }
 
-        public string? AvanzaAttivita(Operatore operatore, Attivita attivitaDaAvanzare, int quantitaProdotta, int quantitaScartata)
+        public async Task<string?> AvanzaAttivitaAsync(Operatore operatore, Attivita attivitaDaAvanzare, int quantitaProdotta, int quantitaScartata)
         {
             if (attivitaDaAvanzare.SaldoAcconto != "S")
                 attivitaDaAvanzare.QuantitaResidua = attivitaDaAvanzare.QuantitaOrdine - attivitaDaAvanzare.QuantitaProdottaNonContabilizzata;
 
 
-            HttpResponseMessage result = _jmesApiClient.MesAdvanceDeclaration(operatore, attivitaDaAvanzare, quantitaProdotta, quantitaScartata);
+            HttpResponseMessage result = await _jmesApiClient.MesAdvanceDeclarationAsync(operatore, attivitaDaAvanzare, quantitaProdotta, quantitaScartata);
 
             string? errore = _jMesApiClientErrorUtility.GestioneEventualeErrore(result);
             if (errore != null)
@@ -510,13 +510,13 @@ namespace IMAR_DialogoOperatore.Services
             return null;
         }
 
-        public IList<Attivita> OttieniAttivitaOperatore(Operatore operatore)
+        public async Task<IList<Attivita>> OttieniAttivitaOperatoreAsync(Operatore operatore)
         {
-            IList<mesTskForOpe>? attivitaIndiretteOperatore = OttieniAttivitaIndiretteOperatore(operatore.Badge);
+            IList<mesTskForOpe>? attivitaIndiretteOperatore = await OttieniAttivitaIndiretteOperatoreAsync(operatore.Badge);
             if (attivitaIndiretteOperatore == null)
                 return new List<Attivita>();
 
-            IList<mesDiaOpe>? attivitaAperte = GetAttivitaAperte();
+            IList<mesDiaOpe>? attivitaAperte = await GetAttivitaAperteAsync();
             if (attivitaAperte == null)
                 return new List<Attivita>();
 
@@ -525,14 +525,14 @@ namespace IMAR_DialogoOperatore.Services
             return attivitaOperatoreAperte.OrderBy(x => x.Bolla).ToList();
         }
 
-        public IList<mesDiaOpe>? GetAttivitaAperte()
+        public async Task<IList<mesDiaOpe>?> GetAttivitaAperteAsync()
         {
-            return _jmesApiClient.ChiamaQueryGetJmes<mesDiaOpe>();
+            return await _jmesApiClient.ChiamaQueryGetJmesAsync<mesDiaOpe>();
         }
 
-        private IList<mesTskForOpe>? OttieniAttivitaIndiretteOperatore(string badgeOperatore)
+        private async Task<IList<mesTskForOpe>?> OttieniAttivitaIndiretteOperatoreAsync(string badgeOperatore)
         {
-            IList<mesTskForOpe>? attivitaOperatore = _jmesApiClient.ChiamaQueryGetJmes<mesTskForOpe>();
+            IList<mesTskForOpe>? attivitaOperatore = await _jmesApiClient.ChiamaQueryGetJmesAsync<mesTskForOpe>();
             if (attivitaOperatore == null)
                 return null;
 
@@ -646,10 +646,10 @@ namespace IMAR_DialogoOperatore.Services
             return attivitaIndirette;
         }
 
-        public List<string>? GetIdOperatoriConBollaAperta(string bolla)
+        public async Task<List<string>> GetIdOperatoriConBollaApertaAsync(string bolla)
         {
-            IList<mesDiaOpe> attivitaAperte = GetAttivitaAperte();
-            IList<mesRcpActOpe>? riepilogoAttivitaOperatore = _jmesApiClient.ChiamaQueryGetJmes<mesRcpActOpe>();
+            IList<mesDiaOpe>? attivitaAperte = await GetAttivitaAperteAsync();
+            IList<mesRcpActOpe>? riepilogoAttivitaOperatore = await _jmesApiClient.ChiamaQueryGetJmesAsync<mesRcpActOpe>();
 
             return attivitaAperte
                    .Join(riepilogoAttivitaOperatore,
@@ -738,29 +738,29 @@ namespace IMAR_DialogoOperatore.Services
 			return attivitaOperatoreDellUltimaGiornata;
 		}
 
-		public string? ApriAttrezzaggioFaseNonPianificata(Attivita attivita, Operatore operatore)
+		public async Task<string?> ApriAttrezzaggioFaseNonPianificataAsync(Attivita attivita, Operatore operatore)
         {
             string codiceFase = GetCodiceFase(attivita); ;
 
-            HttpResponseMessage responseMessage = _jmesApiClient.MesEquipStartNotPln(operatore, attivita.Bolla, codiceFase);
+            HttpResponseMessage responseMessage = await _jmesApiClient.MesEquipStartNotPlnAsync(operatore, attivita.Bolla, codiceFase);
 
             string? errore = _jMesApiClientErrorUtility.GestioneEventualeErrore(responseMessage);
             if (errore != null)
                 return errore;
 
-            var jsonData = responseMessage.Content.ReadFromJsonAsync<JMesResultDto>().GetAwaiter().GetResult();
+            var jsonData = await responseMessage.Content.ReadFromJsonAsync<JMesResultDto>();
             if (jsonData != null)
                 return jsonData.result.instanceRef.model.diaOpe.evtUid.ToString();
 
             return null;
         }
 
-        public string? ApriLavoroFaseNonPianificata(Attivita attivita, Operatore operatore)
+        public async Task<string?> ApriLavoroFaseNonPianificataAsync(Attivita attivita, Operatore operatore)
         {
             string codiceFase = GetCodiceFase(attivita);
 
-            HttpResponseMessage responseMessage = _jmesApiClient.MesWorkStartNotPln(operatore, attivita, codiceFase);
-            var jsonData = responseMessage.Content.ReadFromJsonAsync<JMesResultDto>().GetAwaiter().GetResult();
+            HttpResponseMessage responseMessage = await _jmesApiClient.MesWorkStartNotPlnAsync(operatore, attivita, codiceFase);
+            var jsonData = await responseMessage.Content.ReadFromJsonAsync<JMesResultDto>();
 
             string? errore = _jMesApiClientErrorUtility.GestioneEventualeErrore(jsonData);
             if (errore != null)

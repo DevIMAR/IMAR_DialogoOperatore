@@ -1,7 +1,7 @@
-﻿namespace IMAR_DialogoOperatore.Interfaces.Helpers
+namespace IMAR_DialogoOperatore.Interfaces.Helpers
 {
 	public interface IPopupConfermaHelper
 	{
-		string GetTestoPopup();
+		Task<string> GetTestoPopupAsync();
 	}
 }

@@ -1,4 +1,4 @@
-﻿using IMAR_DialogoOperatore.Application;
+using IMAR_DialogoOperatore.Application;
 using IMAR_DialogoOperatore.Application.Interfaces.Services.Activities;
 using IMAR_DialogoOperatore.Domain.Models;
 using IMAR_DialogoOperatore.Interfaces.Helpers;
@@ -29,7 +29,7 @@ namespace IMAR_DialogoOperatore.Helpers
             _avanzamentoObserver = avanzamentoObserver;
         }
 
-        public string GetTestoPopup()
+        public async Task<string> GetTestoPopupAsync()
         {
             string? operazioneInCorso = _dialogoOperatoreObserver.OperazioneInCorso;
             if (operazioneInCorso == null)
@@ -38,7 +38,7 @@ namespace IMAR_DialogoOperatore.Helpers
             switch (operazioneInCorso)
             {
                 case Costanti.INIZIO_LAVORO:
-                    return GestisciInizioLavoro();
+                    return await GestisciInizioLavoroAsync();
 
                 case Costanti.INIZIO_ATTREZZAGGIO:
                     return GestisciInizioAttrezzaggio();
@@ -52,12 +52,12 @@ namespace IMAR_DialogoOperatore.Helpers
             }
         }
 
-        private string GestisciInizioLavoro()
+        private async Task<string> GestisciInizioLavoroAsync()
         {
             string messaggioPopup = string.Empty;
 
             messaggioPopup += GestisciCambioDiFaseSelezionata(_cercaAttivitaObserver.FaseCercata);
-            messaggioPopup += GestisciLavoroApertoDaAltri();
+            messaggioPopup += await GestisciLavoroApertoDaAltriAsync();
             messaggioPopup += GestisciAperturaConQtProdottaFasePrecedenteAZero();
             messaggioPopup += GestisciCambioCausale();
 
@@ -151,11 +151,11 @@ namespace IMAR_DialogoOperatore.Helpers
             return -1;
         }
 
-        private string GestisciLavoroApertoDaAltri()
+        private async Task<string> GestisciLavoroApertoDaAltriAsync()
         {
             string messaggioAttivitaAperta = "Questa fase è già in lavorazione da:\n";
 
-            IList<string>? idJmesOperatoriConStessaBollaAperta = _attivitaService.GetIdOperatoriConBollaAperta(_dialogoOperatoreObserver.AttivitaSelezionata.Bolla);
+            IList<string>? idJmesOperatoriConStessaBollaAperta = await _attivitaService.GetIdOperatoriConBollaApertaAsync(_dialogoOperatoreObserver.AttivitaSelezionata.Bolla);
             if (idJmesOperatoriConStessaBollaAperta.Count == 0)
                 return string.Empty;
 

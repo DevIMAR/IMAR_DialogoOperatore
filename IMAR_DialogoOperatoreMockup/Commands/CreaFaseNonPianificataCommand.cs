@@ -45,19 +45,19 @@ namespace IMAR_DialogoOperatore.Commands
             _dialogoOperatoreObserver.IsLoaderVisibile = true;
             await Task.Delay(1);
 
-            AssegnaMacchinaFittiziaAdOperatore();
+            await AssegnaMacchinaFittiziaAdOperatoreAsync();
             await EseguiOperazioneOMostraMessaggio();
 
             _dialogoOperatoreObserver.IsOperazioneGestita = true;
             _dialogoOperatoreObserver.IsLoaderVisibile = false;
         }
 
-        private void AssegnaMacchinaFittiziaAdOperatore()
+        private async Task AssegnaMacchinaFittiziaAdOperatoreAsync()
         {
             if (_dialogoOperatoreObserver.OperatoreSelezionato.MacchineAssegnate.Any())
                 return;
 
-            _dialogoOperatoreObserver.OperatoreSelezionato.MacchineAssegnate.Add(_macchinaService.GetPrimaMacchinaFittiziaNonUtilizzata());
+            _dialogoOperatoreObserver.OperatoreSelezionato.MacchineAssegnate.Add(await _macchinaService.GetPrimaMacchinaFittiziaNonUtilizzataAsync());
             if (!_dialogoOperatoreObserver.OperatoreSelezionato.MacchineAssegnate.Any())
                 MostraPopupConTesto(Costanti.ERRORE_MACCHINE_FINITE);
         }

@@ -1,4 +1,4 @@
-﻿using IMAR_DialogoOperatore.Application;
+using IMAR_DialogoOperatore.Application;
 using IMAR_DialogoOperatore.Application.Interfaces.Clients;
 using IMAR_DialogoOperatore.Application.Interfaces.Services.Activities;
 using IMAR_DialogoOperatore.Application.Interfaces.Utilities;
@@ -75,8 +75,8 @@ namespace IMAR_DialogoOperatore.Commands
         {
             _dialogoOperatoreObserver.IsLoaderVisibile = true;
             await Task.Delay(1);
-            _jmesApiClient.MesBreakEnd(_dialogoOperatoreObserver.OperatoreSelezionato.Badge.ToString());
-            _dialogoOperatoreObserver.OperatoreSelezionato = new OperatoreViewModel(_operatoriService.OttieniOperatore(_dialogoOperatoreObserver.OperatoreSelezionato.Badge));
+            await _jmesApiClient.MesBreakEndAsync(_dialogoOperatoreObserver.OperatoreSelezionato.Badge.ToString());
+            _dialogoOperatoreObserver.OperatoreSelezionato = new OperatoreViewModel(await _operatoriService.OttieniOperatoreAsync(_dialogoOperatoreObserver.OperatoreSelezionato.Badge));
             _dialogoOperatoreObserver.IsLoaderVisibile = false;
 
             _dialogoOperatoreObserver.OperatoreSelezionato.Stato = Costanti.PRESENTE;
@@ -97,9 +97,9 @@ namespace IMAR_DialogoOperatore.Commands
 
             _dialogoOperatoreObserver.IsLoaderVisibile = true;
             await Task.Delay(1);
-            _jmesApiClient.MesBreakStart(_dialogoOperatoreObserver.OperatoreSelezionato.Badge.ToString());
-            _dialogoOperatoreObserver.OperatoreSelezionato = new OperatoreViewModel(_operatoriService.OttieniOperatore(_dialogoOperatoreObserver.OperatoreSelezionato.Badge));
-           
+            await _jmesApiClient.MesBreakStartAsync(_dialogoOperatoreObserver.OperatoreSelezionato.Badge.ToString());
+            _dialogoOperatoreObserver.OperatoreSelezionato = new OperatoreViewModel(await _operatoriService.OttieniOperatoreAsync(_dialogoOperatoreObserver.OperatoreSelezionato.Badge));
+
             _dialogoOperatoreObserver.IsLoaderVisibile = false;
             _dialogoOperatoreObserver.IsExiting = true;
             await Task.Delay(1);

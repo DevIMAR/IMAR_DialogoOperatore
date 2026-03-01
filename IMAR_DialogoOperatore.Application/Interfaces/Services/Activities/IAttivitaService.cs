@@ -1,4 +1,4 @@
-﻿using IMAR_DialogoOperatore.Domain.Models;
+using IMAR_DialogoOperatore.Domain.Models;
 
 namespace IMAR_DialogoOperatore.Application.Interfaces.Services.Activities
 {
@@ -6,14 +6,14 @@ namespace IMAR_DialogoOperatore.Application.Interfaces.Services.Activities
     {
         bool ConfrontaCausaliAttivita(IList<Attivita> listaAttivitaDaControllare, string bollaAttivitaDaConfrontare, string operazioneAttivitaDaConfrontare);
         Attivita? CercaAttivitaDaBolla(string bolla);
-        string? AvanzaAttivita(Operatore operatore, Attivita attivitaDaAvanzare, int quantitaProdotta, int quantitaScartata);
+        Task<string?> AvanzaAttivitaAsync(Operatore operatore, Attivita attivitaDaAvanzare, int quantitaProdotta, int quantitaScartata);
         public IEnumerable<Attivita> GetAttivitaPerOdp(string odp);
-        public IList<Attivita> OttieniAttivitaOperatore(Operatore operatore);
-        IList<mesDiaOpe>? GetAttivitaAperte();
+        public Task<IList<Attivita>> OttieniAttivitaOperatoreAsync(Operatore operatore);
+        Task<IList<mesDiaOpe>?> GetAttivitaAperteAsync();
         public IList<Attivita> GetAttivitaIndirette();
-        List<string> GetIdOperatoriConBollaAperta(string bolla);
+        Task<List<string>> GetIdOperatoriConBollaApertaAsync(string bolla);
         IList<Attivita>? GetAttivitaOperatoreDellUltimaGiornata(int idJmesOperatore);
-        string? ApriAttrezzaggioFaseNonPianificata(Attivita attivita, Operatore operatore);
-        string? ApriLavoroFaseNonPianificata(Attivita attivita, Operatore operatore);
+        Task<string?> ApriAttrezzaggioFaseNonPianificataAsync(Attivita attivita, Operatore operatore);
+        Task<string?> ApriLavoroFaseNonPianificataAsync(Attivita attivita, Operatore operatore);
     }
 }
