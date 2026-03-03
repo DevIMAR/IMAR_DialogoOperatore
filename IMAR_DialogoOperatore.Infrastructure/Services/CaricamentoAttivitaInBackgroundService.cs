@@ -371,7 +371,9 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
 				var calFlOdpData = imarSchedulatoreUoW.CalFlOdpRepository
 					.Get()
 					.GroupBy(c => new { c.ODP, c.FASE })
-					.ToDictionary(g => (g.Key.ODP, g.Key.FASE.ToString().PadLeft(3, '0')), g => g.Min(x => x.GIORNO));
+					.Select(g => new { g.Key.ODP, g.Key.FASE, MinGiorno = g.Min(x => x.GIORNO) })
+					.AsEnumerable()
+					.ToDictionary(x => (x.ODP, x.FASE.ToString().PadLeft(3, '0')), x => x.MinGiorno);
 
 				_lockCalFlOdp.EnterWriteLock();
 				try

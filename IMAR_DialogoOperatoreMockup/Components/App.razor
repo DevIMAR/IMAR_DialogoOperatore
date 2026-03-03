@@ -6,11 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <base href="/" />
 
-    <link rel="stylesheet" href="_content/DevExpress.Blazor.Themes/bootstrap-external.bs5.min.css" />
-	<link href="_content/DevExpress.Blazor.Themes/blazing-dark.bs5.min.css" asp-append-version="true" rel="stylesheet" />
-	<link rel="stylesheet" href="app.css" />
-	<link rel="stylesheet" href="diaope.css" />
-	<link rel="stylesheet" href="CustomDevExpress.css" />
+    <link rel="stylesheet" href="_content/DevExpress.Blazor.Themes/bootstrap-external.bs5.min.css" asp-append-version="true" />
+	<link rel="stylesheet" href="_content/DevExpress.Blazor.Themes/blazing-dark.bs5.min.css" asp-append-version="true" />
+	<link rel="stylesheet" href="app.css" asp-append-version="true" />
+	<link rel="stylesheet" href="diaope.css" asp-append-version="true" />
+	<link rel="stylesheet" href="CustomDevExpress.css" asp-append-version="true" />
     @DxResourceManager.RegisterScripts()
     <HeadOutlet @rendermode="InteractiveServer" />
 </head>
@@ -18,7 +18,7 @@
 <body>
     <Routes @rendermode="InteractiveServer" />
     <script src="_framework/blazor.web.js"></script>
-    <script src="DialogoOperatore.js"></script>
+    <script src="DialogoOperatore.js" asp-append-version="true"></script>
 </body>
 
 </html>

@@ -28,7 +28,11 @@ namespace IMAR_DialogoOperatore.ViewModels
 				{
 					_avanzamentoObserver.QuantitaProdotta = quantitaProdotta;
 					if (AttivitaSelezionata != null)
-						IsFaseCompletabile = Int32.Parse(_quantitaProdotta.ToString()) >= ((IAttivitaViewModel)AttivitaSelezionata)?.QuantitaResidua;
+					{
+						var attivita = (IAttivitaViewModel)AttivitaSelezionata;
+						int quantitaTotaleFase = attivita.QuantitaProdotta + (int)quantitaProdotta + attivita.QuantitaScartata + (int)(_avanzamentoObserver.QuantitaScartata ?? 0);
+						IsFaseCompletabile = quantitaTotaleFase >= attivita.QuantitaOrdine;
+					}
 				}
 
 				OnNotifyStateChanged();
@@ -45,7 +49,11 @@ namespace IMAR_DialogoOperatore.ViewModels
 				{
 					_avanzamentoObserver.QuantitaScartata = quantitaScartata;
 					if (AttivitaSelezionata != null)
-						IsFaseCompletabile = Int32.Parse(_quantitaScartata.ToString()) >= ((IAttivitaViewModel)AttivitaSelezionata).QuantitaScartata;
+					{
+						var attivita = (IAttivitaViewModel)AttivitaSelezionata;
+						int quantitaTotaleFase = attivita.QuantitaProdotta + (int)(_avanzamentoObserver.QuantitaProdotta ?? 0) + attivita.QuantitaScartata + (int)quantitaScartata;
+						IsFaseCompletabile = quantitaTotaleFase >= attivita.QuantitaOrdine;
+					}
 				}
 
 				OnNotifyStateChanged();
