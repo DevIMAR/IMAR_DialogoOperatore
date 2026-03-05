@@ -180,9 +180,9 @@
 	[Parameter] public bool ShowDataSchedulata { get; set; } = false;
 	[Parameter] public bool ShowBottoneIndirette { get; set; } = false;
 
-	private DxMaskedInput<string?> BollaRef;
-	private DxMaskedInput<string?> OdpRef;
-	private DxComboBox<string, string> FasiRef;
+	private DxMaskedInput<string?> BollaRef = null!;
+	private DxMaskedInput<string?> OdpRef = null!;
+	private DxComboBox<string, string> FasiRef = null!;
 	private DotNetObjectReference<InfoBaseAttivita>? _dotNetRef;
 
 	protected override Task OnInitializedAsync()
@@ -276,7 +276,7 @@
 
 	private async void HandleFaseKeyPress(KeyboardEventArgs e)
 	{
-		List<string> listaFasi = InfoBaseAttivitaViewModel.FasiPerAttivita.ToList();
+		List<string> listaFasi = InfoBaseAttivitaViewModel.FasiPerAttivita?.ToList() ?? new();
 
 		int index = listaFasi.IndexOf(InfoBaseAttivitaViewModel.FaseSelezionata);
 
