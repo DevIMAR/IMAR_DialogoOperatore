@@ -29,20 +29,21 @@
 
     <script src="_framework/blazor.web.js" autostart="false"></script>
     <script>
-        Blazor.start({
-            circuit: {
-                reconnectionOptions: {
-                    maxRetries: 30,
-                    retryIntervalMilliseconds: 2000
-                }
-            }
-        });
+        const reconnectModal = document.getElementById('components-reconnect-modal');
 
-        // Ricarica la pagina quando il server torna disponibile dopo un deploy
+        function showReconnectModal() {
+            if (reconnectModal) reconnectModal.style.display = '';
+        }
+
+        function hideReconnectModal() {
+            if (reconnectModal) reconnectModal.style.display = 'none';
+        }
+
         function waitForServerAndReload() {
+            showReconnectModal();
             const checkServer = setInterval(async () => {
                 try {
-                    const resp = await fetch('/');
+                    const resp = await fetch('/', { cache: 'no-store' });
                     if (resp.ok) {
                         clearInterval(checkServer);
                         location.reload();
@@ -51,17 +52,17 @@
             }, 3000);
         }
 
-        // Caso 1: tutti i retry esauriti
-        document.addEventListener('blazor:reconnectionFailed', waitForServerAndReload);
-
-        // Caso 2: il server ha rifiutato il circuito (deploy/restart)
-        new MutationObserver(() => {
-            const modal = document.getElementById('components-reconnect-modal');
-            if (modal && modal.classList.contains('components-reconnect-rejected')) {
-                waitForServerAndReload();
+        Blazor.start({
+            circuit: {
+                reconnectionHandler: {
+                    onConnectionDown() {
+                        waitForServerAndReload();
+                    },
+                    onConnectionUp() {
+                        hideReconnectModal();
+                    }
+                }
             }
-        }).observe(document.getElementById('components-reconnect-modal'), {
-            attributes: true, attributeFilter: ['class']
         });
     </script>
     <script src="DialogoOperatore.js" asp-append-version="true"></script>
