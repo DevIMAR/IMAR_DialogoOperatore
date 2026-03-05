@@ -4,6 +4,7 @@ using IMAR_DialogoOperatore.Application.Interfaces.UoW;
 using IMAR_DialogoOperatore.Application.Interfaces.Utilities;
 using IMAR_DialogoOperatore.Domain.Entities.As400;
 using IMAR_DialogoOperatore.Domain.Models;
+using IMAR_DialogoOperatore.Infrastructure.Utilities;
 using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics;
 
@@ -23,8 +24,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
 		private IList<Attivita>? _attivitaAperte;
 		private IList<stdMesIndTsk>? _attivitaIndirette;
 		private Dictionary<(string, string), DateTime> _calFlOdpCache;
-
-		public CaricamentoAttivitaInBackgroundService(
+	public CaricamentoAttivitaInBackgroundService(
 			IServiceProvider serviceProvider)
 		{
 			_serviceProvider = serviceProvider;
@@ -74,252 +74,15 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
 				var as400Repository = scope.ServiceProvider.GetRequiredService<IAs400Repository>();
 				var loggingService = scope.ServiceProvider.GetRequiredService<ILoggingService>();
 
-				List<Attivita> nuoveAttivita = new List<Attivita>();
-
 				UpdateDatiDaMonitor(as400Repository);
+				loggingService.LogInfo($"  [TIMING] UpdateDatiDaMonitor: {sw.ElapsedMilliseconds}ms ({_odpDatiMonitor?.Count ?? 0} ODP)");
 				if (_odpDatiMonitor == null)
 					return;
 
-				decimal dimensioneBatch = 1000;
-				decimal batchCount = Math.Ceiling(_odpDatiMonitor.Count / dimensioneBatch);
+				var nuoveAttivita = CaricaAttivitaDaAs400InBatch(as400Repository, loggingService);
+				var attivitaIndirette = await CaricaAttivitaIndiretteAsync(jmesApiClient, loggingService);
 
-				for (int i = 0; i < batchCount; i++)
-				{
-					var batchConsiderato = Math.Min((int)dimensioneBatch, _odpDatiMonitor.Count - (int)dimensioneBatch * i);
-					var batchOdp = string.Join(',', _odpDatiMonitor.Slice((int)dimensioneBatch * i, batchConsiderato));
-
-					var batchAttivita = as400Repository.ExecuteQuery<Attivita>(@"WITH
-																				NONCONTABILIZZATE AS (
-																					SELECT
-																						NRTSKJM,
-																						SUM(QTVERJM) AS TOT_QTA_NC,
-																						SUM(QTSCAJM) AS TOT_SCARTO_NC,
-																						SUM(QTNCOJM) AS TOT_NONCONF_NC,
-																						MAX(SAACCJM) AS MAX_SAACCJM
-																					FROM IMA90DAT.JMRILM00F
-																					WHERE QCONTJM = ''
-																					GROUP BY NRTSKJM
-																				),
-																				-- Per ogni fase non pianificata: trova la fase pianificata precedente più grande
-																				FASE_PIAN_PREC_NP AS (
-																					SELECT
-																						p1.NRBLCI,
-																						p1.ORPRCI,
-																						p1.CDFACI,
-																						MAX(prec.CDFACI) AS CDFACI_PIAN_PREC
-																					FROM IMA90DAT.PCIMP00F p1
-																					INNER JOIN IMA90DAT.PCIMP00F prec
-																						ON prec.ORPRCI = p1.ORPRCI
-																						AND prec.CDFACI < p1.CDFACI
-																						AND prec.FLSFCI = ''
-																					WHERE p1.ORPRCI IN (" + batchOdp + @")
-
-																					  AND p1.FLSFCI = '*'
-
-																					GROUP BY p1.NRBLCI, p1.ORPRCI, p1.CDFACI
-																				),
-																				--Per ogni fase non pianificata: somma produzione dalla pianificata prec(inclusa)
-																				-- fino alla fase immediatamente prima della corrente(esclusa la corrente)
-																				PRODUZIONE_CUMULATA_NP AS(
-																					SELECT
-																						fpp.NRBLCI,
-																						fpp.ORPRCI,
-																						fpp.CDFACI,
-																						SUM(inter.QPROCI +COALESCE(nc.TOT_QTA_NC, 0)) AS PROD_CUMULATA
-
-																					FROM FASE_PIAN_PREC_NP fpp
-																					INNER JOIN IMA90DAT.PCIMP00F inter
-
-																						ON inter.ORPRCI = fpp.ORPRCI
-
-																						AND inter.CDFACI >= fpp.CDFACI_PIAN_PREC
-
-																						AND inter.CDFACI<fpp.CDFACI
-
-																					LEFT JOIN NONCONTABILIZZATE nc
-
-																						ON nc.NRTSKJM = inter.NRBLCI
-
-																					GROUP BY fpp.NRBLCI, fpp.ORPRCI, fpp.CDFACI
-																				),
-																				--Per ogni fase pianificata: trova la fase pianificata precedente più grande
-																				FASE_PIAN_PREC AS(
-																					SELECT
-
-																						p1.NRBLCI,
-																						p1.ORPRCI,
-																						p1.CDFACI,
-																						MAX(prec.CDFACI) AS CDFACI_PIAN_PREC
-
-																					FROM IMA90DAT.PCIMP00F p1
-
-																					INNER JOIN IMA90DAT.PCIMP00F prec
-
-																						ON prec.ORPRCI = p1.ORPRCI
-
-																						AND prec.CDFACI < p1.CDFACI
-
-																						AND prec.FLSFCI = ''
-
-																					WHERE p1.ORPRCI IN(" + batchOdp + @")
-
-																					  AND p1.FLSFCI = ''
-
-																					GROUP BY p1.NRBLCI, p1.ORPRCI, p1.CDFACI
-																				),
-																				SOMMA_FASI_INTERMEDIE AS(
-																					SELECT
-																						fpp.NRBLCI,
-																						fpp.ORPRCI,
-																						fpp.CDFACI,
-																						MAX(CASE WHEN inter.FLSFCI = '*' THEN 1 ELSE 0 END) AS HA_FASI_NP,
-																						SUM(inter.QPROCI + COALESCE(nc.TOT_QTA_NC, 0)) AS SOMMA_PRODUZIONE
-
-																					FROM FASE_PIAN_PREC fpp
-																					INNER JOIN IMA90DAT.PCIMP00F inter
-
-																						ON inter.ORPRCI = fpp.ORPRCI
-
-																						AND inter.CDFACI >= fpp.CDFACI_PIAN_PREC
-
-																						AND inter.CDFACI<fpp.CDFACI
-
-																					LEFT JOIN NONCONTABILIZZATE nc
-
-																						ON nc.NRTSKJM = inter.NRBLCI
-
-																					GROUP BY fpp.NRBLCI, fpp.ORPRCI, fpp.CDFACI
-																				),
-																				FASE_IMM_PREC AS(
-																					SELECT
-																						p1.NRBLCI,
-																						p1.CDFACI,
-																						prec.TIRECI AS TIRECI_IMM_PREV,
-																						nc_prec.MAX_SAACCJM AS SAACCJM_IMM_PREV,
-																						ROW_NUMBER() OVER (PARTITION BY p1.NRBLCI ORDER BY prec.CDFACI DESC) AS RN
-
-																					FROM IMA90DAT.PCIMP00F p1
-
-																					INNER JOIN IMA90DAT.PCIMP00F prec
-
-																						ON prec.ORPRCI = p1.ORPRCI
-
-																						AND prec.CDFACI<p1.CDFACI
-
-																					LEFT JOIN NONCONTABILIZZATE nc_prec
-
-																						ON nc_prec.NRTSKJM = prec.NRBLCI
-
-																					WHERE p1.ORPRCI IN(" + batchOdp + @")
-																				),
-																				FASE_PREC AS(
-																					SELECT
-																						p1.NRBLCI,
-																						p1.ORPRCI,
-																						p1.CDFACI,
-																						prec.NRBLCI AS NRBLCI_PREV,
-																						prec.TIRECI AS TIRECI_PREV,
-																						prec.QPROCI AS QPROCI_PREV,
-																						nc_prec.TOT_QTA_NC AS QTA_NC_PREV,
-																						nc_prec.MAX_SAACCJM AS SAACCJM_PREV,
-																						ROW_NUMBER() OVER (PARTITION BY p1.NRBLCI ORDER BY prec.CDFACI DESC) AS RN
-
-																					FROM IMA90DAT.PCIMP00F p1
-
-																					INNER JOIN IMA90DAT.PCIMP00F prec
-
-																						ON prec.ORPRCI = p1.ORPRCI
-
-																						AND prec.CDFACI<p1.CDFACI
-
-																					LEFT JOIN NONCONTABILIZZATE nc_prec
-
-																						ON nc_prec.NRTSKJM = prec.NRBLCI
-
-																					WHERE p1.ORPRCI IN(" + batchOdp + @")
-																				)
-																				SELECT
-
-																					pf2.NRBLCI AS BOLLA,
-																					pf2.ORPRCI AS ODP,
-																					pf2.CDARCI AS ARTICOLO,
-																					TRIM(mf.DSARMA) AS DESCRIZIONEARTICOLO,
-																					pf2.CDFACI AS FASE,
-																					pf2.DSFACI AS DESCRIZIONEFASE,
-																					CASE
-																						-- Fase NON PIANIFICATA: QORDCI - produzione cumulata precedente
-
-																						WHEN pf2.FLSFCI = '*' AND pcnp.PROD_CUMULATA IS NOT NULL
-
-																							THEN pf2.QORDCI - pcnp.PROD_CUMULATA
-																						-- Fase pianificata con fasi NP intermedie e fase imm.prec.a saldo
-
-																						WHEN pf2.FLSFCI = ''
-
-																							 AND sfi.HA_FASI_NP = 1
-
-																							 AND(fip.TIRECI_IMM_PREV = 'S' OR COALESCE(fip.SAACCJM_IMM_PREV, '') = 'S')
-
-																							THEN sfi.SOMMA_PRODUZIONE
-																						WHEN fp.NRBLCI_PREV IS NULL OR pf2.FLSFCI<> '' THEN pf2.QORDCI
-																						WHEN fp.TIRECI_PREV = 'S' OR COALESCE(fp.SAACCJM_PREV, '') = 'S'
-
-																							THEN COALESCE(fp.QPROCI_PREV, 0) +COALESCE(fp.QTA_NC_PREV, 0)
-
-																						ELSE pf2.QORDCI
-																					END AS QUANTITAORDINE,
-																					COALESCE(ra.TOT_QTA_NC, 0) AS QUANTITAPRODOTTANONCONTABILIZZATA,
-																					pf2.QPROCI AS QUANTITAPRODOTTACONTABILIZZATA,
-																					COALESCE(ra.TOT_SCARTO_NC, 0) AS QUANTITASCARTATANONCONTABILIZZATA,
-																					pf2.QSCACI AS QUANTITASCARTATACONTABILIZZATA,
-																					COALESCE(ra.TOT_NONCONF_NC, 0) AS QTANONCONFORMENONCONTABILIZZATA,
-																					pf2.QRESCI AS QTANONCONFORMECONTABILIZZATA,
-																					CASE
-																						WHEN ra.MAX_SAACCJM IS NULL THEN pf2.TIRECI
-																						ELSE ra.MAX_SAACCJM
-																					END AS SALDOACCONTO,
-																					pf2.FLSFCI AS ISNONPIANIFICATA
-																				FROM IMA90DAT.PCIMP00F pf2
-																				JOIN IMA90DAT.MGART00F mf ON pf2.CDARCI = mf.CDARMA
-																				LEFT JOIN NONCONTABILIZZATE ra ON ra.NRTSKJM = pf2.NRBLCI
-																				LEFT JOIN FASE_PREC fp ON fp.NRBLCI = pf2.NRBLCI AND fp.RN = 1
-																				LEFT JOIN SOMMA_FASI_INTERMEDIE sfi ON sfi.NRBLCI = pf2.NRBLCI
-																				LEFT JOIN FASE_IMM_PREC fip ON fip.NRBLCI = pf2.NRBLCI AND fip.RN = 1
-																				LEFT JOIN PRODUZIONE_CUMULATA_NP pcnp ON pcnp.NRBLCI = pf2.NRBLCI
-																				WHERE pf2.ORPRCI IN(" + batchOdp + ")");
-
-
-					_lockCalFlOdp.EnterReadLock();
-					try
-					{
-						foreach (var attivita in batchAttivita)
-						{
-							if (_calFlOdpCache.TryGetValue((attivita.Odp, attivita.Fase), out var dataSchedulata))
-							{
-								attivita.DataSchedulata = dataSchedulata;
-							}
-						}
-					}
-					finally
-					{
-						_lockCalFlOdp.ExitReadLock();
-					}
-
-					nuoveAttivita.AddRange(batchAttivita);
-				}
-
-				var attivitaIndirette = await jmesApiClient.ChiamaQueryGetJmesAsync<stdMesIndTsk>();
-
-				_lock.EnterWriteLock();
-				try
-				{
-					_attivitaAperte = nuoveAttivita;
-					_attivitaIndirette = attivitaIndirette;
-				}
-				finally
-				{
-					_lock.ExitWriteLock();
-				}
+				AggiornaCacheAttivita(nuoveAttivita, attivitaIndirette);
 
 				loggingService.LogInfo($"CaricamentoAttivitaInBackgroundService.UpdateAttivitaAsync completato in {sw.ElapsedMilliseconds}ms ({nuoveAttivita.Count} attività)");
 			}
@@ -339,7 +102,112 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
 			}
 		}
 
-		private void UpdateDatiDaMonitor(IAs400Repository as400Repository)
+		private List<Attivita> CaricaAttivitaDaAs400InBatch(IAs400Repository as400Repository, ILoggingService loggingService)
+		{
+			List<Attivita> nuoveAttivita = new List<Attivita>();
+
+			decimal dimensioneBatch = 1000;
+			decimal batchCount = Math.Ceiling(_odpDatiMonitor.Count / dimensioneBatch);
+
+			for (int i = 0; i < batchCount; i++)
+			{
+				var batchConsiderato = Math.Min((int)dimensioneBatch, _odpDatiMonitor.Count - (int)dimensioneBatch * i);
+				var batchOdp = string.Join(',', _odpDatiMonitor.Slice((int)dimensioneBatch * i, batchConsiderato));
+
+				var swBatch = Stopwatch.StartNew();
+				var batchAttivita = EseguiQueryAttivitaAs400(as400Repository, batchOdp);
+				loggingService.LogInfo($"  [TIMING] Batch {i + 1}/{(int)batchCount} query AS400: {swBatch.ElapsedMilliseconds}ms ({batchAttivita.Count} attività, {batchConsiderato} ODP)");
+
+				swBatch.Restart();
+				QuantitaOrdineCalculator.Calcola(batchAttivita);
+				loggingService.LogInfo($"  [TIMING] Batch {i + 1}/{(int)batchCount} calcolo QuantitaOrdine C#: {swBatch.ElapsedMilliseconds}ms");
+
+				ArricchisciConDateSchedulate(batchAttivita);
+				nuoveAttivita.AddRange(batchAttivita);
+			}
+
+			return nuoveAttivita;
+		}
+
+		private List<Attivita> EseguiQueryAttivitaAs400(IAs400Repository as400Repository, string batchOdp)
+		{
+			return as400Repository.ExecuteQuery<Attivita>(@"WITH
+																			NONCONTABILIZZATE AS (
+																				SELECT
+																					NRTSKJM,
+																					SUM(QTVERJM) AS TOT_QTA_NC,
+																					SUM(QTSCAJM) AS TOT_SCARTO_NC,
+																					SUM(QTNCOJM) AS TOT_NONCONF_NC,
+																					MAX(SAACCJM) AS MAX_SAACCJM
+																				FROM IMA90DAT.JMRILM00F
+																				WHERE QCONTJM = ''
+																				GROUP BY NRTSKJM
+																			)
+																			SELECT
+																				pf2.NRBLCI AS BOLLA,
+																				pf2.ORPRCI AS ODP,
+																				pf2.CDARCI AS ARTICOLO,
+																				TRIM(mf.DSARMA) AS DESCRIZIONEARTICOLO,
+																				pf2.CDFACI AS FASE,
+																				pf2.DSFACI AS DESCRIZIONEFASE,
+																				pf2.QORDCI AS QUANTITAORDINEORIGINALE,
+																				0 AS QUANTITAORDINE,
+																				COALESCE(ra.TOT_QTA_NC, 0) AS QUANTITAPRODOTTANONCONTABILIZZATA,
+																				pf2.QPROCI AS QUANTITAPRODOTTACONTABILIZZATA,
+																				COALESCE(ra.TOT_SCARTO_NC, 0) AS QUANTITASCARTATANONCONTABILIZZATA,
+																				pf2.QSCACI AS QUANTITASCARTATACONTABILIZZATA,
+																				COALESCE(ra.TOT_NONCONF_NC, 0) AS QTANONCONFORMENONCONTABILIZZATA,
+																				pf2.QRESCI AS QTANONCONFORMECONTABILIZZATA,
+																				pf2.TIRECI AS TIPORICEVIMENTO,
+																				CASE WHEN ra.MAX_SAACCJM IS NULL THEN pf2.TIRECI ELSE ra.MAX_SAACCJM END AS SALDOACCONTO,
+																				ra.MAX_SAACCJM AS SALDOACCONTOJMES,
+																				pf2.FLSFCI AS ISNONPIANIFICATA
+																			FROM IMA90DAT.PCIMP00F pf2
+																			JOIN IMA90DAT.MGART00F mf ON pf2.CDARCI = mf.CDARMA
+																			LEFT JOIN NONCONTABILIZZATE ra ON ra.NRTSKJM = pf2.NRBLCI
+																			WHERE pf2.ORPRCI IN(" + batchOdp + ")").ToList();
+		}
+
+		private void ArricchisciConDateSchedulate(List<Attivita> attivita)
+		{
+			_lockCalFlOdp.EnterReadLock();
+			try
+			{
+				foreach (var a in attivita)
+				{
+					if (_calFlOdpCache.TryGetValue((a.Odp, a.Fase), out var dataSchedulata))
+						a.DataSchedulata = dataSchedulata;
+				}
+			}
+			finally
+			{
+				_lockCalFlOdp.ExitReadLock();
+			}
+		}
+
+		private async Task<IList<stdMesIndTsk>?> CaricaAttivitaIndiretteAsync(IJmesApiClient jmesApiClient, ILoggingService loggingService)
+		{
+			var sw = Stopwatch.StartNew();
+			var attivitaIndirette = await jmesApiClient.ChiamaQueryGetJmesAsync<stdMesIndTsk>();
+			loggingService.LogInfo($"  [TIMING] Attività indirette JMes: {sw.ElapsedMilliseconds}ms");
+			return attivitaIndirette;
+		}
+
+		private void AggiornaCacheAttivita(List<Attivita> nuoveAttivita, IList<stdMesIndTsk>? attivitaIndirette)
+		{
+			_lock.EnterWriteLock();
+			try
+			{
+				_attivitaAperte = nuoveAttivita;
+				_attivitaIndirette = attivitaIndirette;
+			}
+			finally
+			{
+				_lock.ExitWriteLock();
+			}
+		}
+
+private void UpdateDatiDaMonitor(IAs400Repository as400Repository)
 		{
 			_lock.EnterWriteLock();
 			try

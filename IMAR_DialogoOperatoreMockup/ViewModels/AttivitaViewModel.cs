@@ -19,7 +19,9 @@ namespace IMAR_DialogoOperatore.ViewModels
 		public string? CodiceFase => _attivita?.Fase;
 		public string? DescrizioneFase => _attivita?.DescrizioneFase;
 		public string? CodiceDescrizioneFase => CodiceFase?.Trim() + " - " + DescrizioneFase?.Trim();
+		public int QuantitaOrdineOriginale => _attivita?.QuantitaOrdineOriginale ?? 0;
 		public int QuantitaOrdine => _attivita != null ? _attivita.QuantitaOrdine : 0;
+		public string? BollaFasePrecedente => _attivita?.BollaFasePrecedente;
 		public int QuantitaProdotta => QuantitaProdottaNonContabilizzata + QuantitaProdottaContabilizzata;
         public int QuantitaProdottaNonContabilizzata { get; set; }
         public int QuantitaProdottaContabilizzata { get; set; }

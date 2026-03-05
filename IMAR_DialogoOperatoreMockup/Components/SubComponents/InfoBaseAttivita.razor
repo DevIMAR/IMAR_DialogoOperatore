@@ -4,6 +4,8 @@
 
 @inject InfoBaseAttivitaViewModel InfoBaseAttivitaViewModel
 @inject IDialogoOperatoreObserver DialogoOperatoreObserver
+@inject IJSRuntime JS
+@inject ILogger<InfoBaseAttivita> Logger
 
 <DxGridLayout>
 	<Rows>
@@ -45,9 +47,8 @@
 							   BindValueMode="BindValueMode.OnInput"
 							   Mask="000000"
 							   MaskMode="MaskMode.Numeric"
-							   CssClass="dxbl-text-edit mt-2"
+							   CssClass="dxbl-text-edit mt-2 bolla-input"
 							   @ref="@BollaRef"
-							   @onkeydown="HandleBollaKeyPress"
 							   inputmode="text"
 							   enterkeyhint="enter">
 						<Buttons>
@@ -67,9 +68,8 @@
 							   BindValueMode="BindValueMode.OnInput"
 							   Mask="00000000"
 							   MaskMode="MaskMode.Numeric"
-							   CssClass="dxbl-text-edit mt-2"
+							   CssClass="dxbl-text-edit mt-2 odp-input"
 							   @ref="@OdpRef"
-							   @onkeydown="HandleOdpKeyPress"
 							   inputmode="text"
 							   enterkeyhint="enter">
 				</DxMaskedInput>
@@ -171,6 +171,8 @@
 	</Items>
 </DxGridLayout>
 
+@implements IAsyncDisposable
+
 @code {
 	[Parameter] public EventCallback InfoBaseInserite { get; set; }
 	[Parameter] public bool ShowArticolo { get; set; } = false;
@@ -181,6 +183,7 @@
 	private DxMaskedInput<string?> BollaRef;
 	private DxMaskedInput<string?> OdpRef;
 	private DxComboBox<string, string> FasiRef;
+	private DotNetObjectReference<InfoBaseAttivita>? _dotNetRef;
 
 	protected override Task OnInitializedAsync()
 	{
@@ -193,9 +196,47 @@
 	protected override async Task OnAfterRenderAsync(bool firstRender)
 	{
 		if (firstRender)
+		{
 			await SetFocus(BollaRef);
 
+			// Registra listener JS direttamente sugli <input> DOM
+			// per intercettare Enter, Tab, e cambio focus (mouse/tablet)
+			_dotNetRef = DotNetObjectReference.Create(this);
+			await JS.InvokeVoidAsync("setupSearchInputs", _dotNetRef);
+		}
+
 		await base.OnAfterRenderAsync(firstRender);
+	}
+
+	[JSInvokable]
+	public async Task OnBollaSearch(string value)
+	{
+		Logger.LogInformation("[BOLLA] Ricerca da JS | Valore: '{Value}'", value);
+
+		var sw = System.Diagnostics.Stopwatch.StartNew();
+		InfoBaseAttivitaViewModel.CercaAttivitaDaBolla(value);
+		Logger.LogInformation("[BOLLA] Ricerca completata in {Ms}ms | Fasi trovate: {Count}",
+			sw.ElapsedMilliseconds, InfoBaseAttivitaViewModel.FasiPerAttivita?.Count() ?? 0);
+
+		await InvokeAsync(StateHasChanged);
+		await SetFocusToFasi();
+	}
+
+	[JSInvokable]
+	public async Task OnOdpSearch(string value)
+	{
+		var odp = value.PadLeft(8, '0');
+		Logger.LogInformation("[ODP] Ricerca da JS | Valore: '{Value}' -> '{Odp}'", value, odp);
+
+		InfoBaseAttivitaViewModel.Odp = odp;
+
+		var sw = System.Diagnostics.Stopwatch.StartNew();
+		InfoBaseAttivitaViewModel.CercaAttivitaDaOdp(odp);
+		Logger.LogInformation("[ODP] Ricerca completata in {Ms}ms | Fasi trovate: {Count}",
+			sw.ElapsedMilliseconds, InfoBaseAttivitaViewModel.FasiPerAttivita?.Count() ?? 0);
+
+		await InvokeAsync(StateHasChanged);
+		await SetFocusToFasi();
 	}
 
 	private async void InfoBaseAttivitaViewModel_NotifyStateChanged()
@@ -223,57 +264,6 @@
 		{
 
 		}
-	}
-
-	private async void HandleBollaKeyPress(KeyboardEventArgs e)
-	{
-		switch (e.Key)
-		{
-			case "Enter":
-
-				TriggerRicercaAttivitaDaBolla();
-
-				await SetFocusToFasi();
-				break;
-
-			case "Tab":
-				await SetFocus(OdpRef);
-				break;
-		}
-	}
-
-	private void TriggerRicercaAttivitaDaBolla()
-	{
-		if (string.IsNullOrWhiteSpace(BollaRef.Value) || InfoBaseAttivitaViewModel.IsAttivitaSelezionata)
-			return;
-
-		InfoBaseAttivitaViewModel.CercaAttivitaDaBolla(BollaRef.Value);
-	}
-
-	private async void HandleOdpKeyPress(KeyboardEventArgs e)
-	{
-		switch (e.Key)
-		{
-			case "Enter":
-				TriggerRicercaAttivitaDaOdp();
-
-				await SetFocusToFasi();
-				break;
-
-			case "Tab":
-				await SetFocus(BollaRef);
-				break;
-		}
-	}
-
-	private void TriggerRicercaAttivitaDaOdp()
-	{
-		if (string.IsNullOrWhiteSpace(OdpRef.Value) || InfoBaseAttivitaViewModel.IsAttivitaSelezionata)
-			return;
-
-		OdpRef.Value = OdpRef.Value.PadLeft(8, '0');
-
-		InfoBaseAttivitaViewModel.CercaAttivitaDaOdp(OdpRef.Value);
 	}
 
 	private async Task SetFocusToFasi()
@@ -310,5 +300,12 @@
 				await InfoBaseInserite.InvokeAsync();
 				break;
 		}
+	}
+
+	public async ValueTask DisposeAsync()
+	{
+		InfoBaseAttivitaViewModel.NotifyStateChanged -= InfoBaseAttivitaViewModel_NotifyStateChanged;
+		DialogoOperatoreObserver.OnIsDettaglioAttivitaOpenChanged -= DialogoOperatoreObserver_OnIsDettaglioAttivitaOpenChanged;
+		_dotNetRef?.Dispose();
 	}
 }

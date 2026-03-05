@@ -12,6 +12,7 @@ namespace IMAR_DialogoOperatore.Application.Interfaces.Services.Activities
         Task<IList<mesDiaOpe>?> GetAttivitaAperteAsync();
         public IList<Attivita> GetAttivitaIndirette();
         Task<List<string>> GetIdOperatoriConBollaApertaAsync(string bolla);
+        string? GetNomeOperatoreFasePrecedente(string bollaFasePrecedente);
         IList<Attivita>? GetAttivitaOperatoreDellUltimaGiornata(int idJmesOperatore);
         Task<string?> ApriAttrezzaggioFaseNonPianificataAsync(Attivita attivita, Operatore operatore);
         Task<string?> ApriLavoroFaseNonPianificataAsync(Attivita attivita, Operatore operatore);

@@ -31,7 +31,9 @@ namespace IMAR_DialogoOperatore.ViewModels
                                              _dialogoOperatoreObserver.AttivitaSelezionata?.Odp == Odp;
         public bool IsDataSchedulataLontana => _attivitaSelezionata?.DataSchedulata > DateTime.Today.AddDays(Costanti.LIMITE_GIORNO_VICINO);
         public bool IsAttivitaSaldata => _attivitaSelezionata != null && _attivitaSelezionata.SaldoAcconto == Costanti.SALDO;
-        public bool IsAttivitaNonSchedulata => _attivitaSelezionata != null && !IsAttivitaSaldata && (DataSchedulata == new DateTime(1, 1, 1).ToString("dd/MM/yyyy") || DataSchedulata == null);
+        public bool IsAttivitaNonSchedulata => _attivitaSelezionata != null && !IsAttivitaSaldata &&
+                                             _attivitaSelezionata.DescrizioneArticolo != Costanti.FASE_INDIRETTA &&
+                                             (DataSchedulata == new DateTime(1, 1, 1).ToString("dd/MM/yyyy") || DataSchedulata == null);
 
         public string TestoDataLontana => Costanti.TESTO_DATA_LONTANA;
         public string TestoAttivitaSaldata => Costanti.TESTO_ATTIVITA_SALDATA;

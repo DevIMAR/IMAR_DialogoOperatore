@@ -5,6 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <base href="/" />
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
 
     <link rel="stylesheet" href="_content/DevExpress.Blazor.Themes/bootstrap-external.bs5.min.css" asp-append-version="true" />
 	<link rel="stylesheet" href="_content/DevExpress.Blazor.Themes/blazing-dark.bs5.min.css" asp-append-version="true" />
@@ -17,7 +18,40 @@
 
 <body>
     <Routes @rendermode="InteractiveServer" />
-    <script src="_framework/blazor.web.js"></script>
+
+    <div id="components-reconnect-modal" class="diaope-reconnect-modal">
+        <div class="diaope-reconnect-content">
+            <div class="diaope-reconnect-spinner"></div>
+            <p class="diaope-reconnect-text">Aggiornamento in corso...</p>
+            <p class="diaope-reconnect-subtext">La pagina si ricaricherà automaticamente</p>
+        </div>
+    </div>
+
+    <script src="_framework/blazor.web.js" autostart="false"></script>
+    <script>
+        Blazor.start({
+            circuit: {
+                reconnectionOptions: {
+                    maxRetries: 30,
+                    retryIntervalMilliseconds: 2000
+                }
+            }
+        });
+
+        // Ricarica la pagina quando il server torna disponibile dopo un deploy
+        Blazor.addEventListener('enhancedload', () => { });
+        document.addEventListener('blazor:reconnectionFailed', () => {
+            const checkServer = setInterval(async () => {
+                try {
+                    const resp = await fetch('/');
+                    if (resp.ok) {
+                        clearInterval(checkServer);
+                        location.reload();
+                    }
+                } catch { }
+            }, 3000);
+        });
+    </script>
     <script src="DialogoOperatore.js" asp-append-version="true"></script>
 </body>
 

@@ -181,6 +181,7 @@ namespace IMAR_DialogoOperatore.Helpers
             messaggioPopup += GestisciCambioDiFaseSelezionata();
             messaggioPopup += GestisciFaseConQtaProdottaMaggioreDiFasePrecedente(quantitaProdottaAggiornata);
             messaggioPopup += GestisciAvanzamentoFaseChiusaASaldo();
+            messaggioPopup += GestisciSaldoConQuantitaInferiore(quantitaProdottaAggiornata);
 
             messaggioPopup += "Stai dichiarando " + _avanzamentoObserver.QuantitaProdotta + " pezzi.\n" +
                                 "La quantità totale prodotta per questa fase è " + quantitaProdottaAggiornata + "/" + _dialogoOperatoreObserver.AttivitaSelezionata.QuantitaOrdine + ".\n" +
@@ -205,6 +206,33 @@ namespace IMAR_DialogoOperatore.Helpers
                 return string.Empty;
 
             return "La fase è già stata chiusa a saldo.\n";
+        }
+
+        private string GestisciSaldoConQuantitaInferiore(int quantitaProdottaAggiornata)
+        {
+            if (_avanzamentoObserver.SaldoAcconto != Costanti.SALDO)
+                return string.Empty;
+
+            var attivita = _dialogoOperatoreObserver.AttivitaSelezionata;
+            if (attivita.BollaFasePrecedente == null)
+                return string.Empty;
+
+            int quantitaTotale = quantitaProdottaAggiornata
+                               + attivita.QuantitaScartata
+                               + (int)(_avanzamentoObserver.QuantitaScartata ?? 0);
+
+            if (quantitaTotale >= attivita.QuantitaOrdine)
+                return string.Empty;
+
+            int differenza = attivita.QuantitaOrdine - quantitaTotale;
+            string? nomeOperatore = _attivitaService.GetNomeOperatoreFasePrecedente(attivita.BollaFasePrecedente);
+
+            if (nomeOperatore != null)
+                return $"Il tuo collega {nomeOperatore} ne aveva dichiarati {attivita.QuantitaOrdine}. " +
+                       $"I {differenza} pezzi mancanti sono stati scartati? O vuoi contare meglio?\n";
+
+            return $"La fase precedente aveva dichiarato {attivita.QuantitaOrdine} pezzi. " +
+                   $"I {differenza} pezzi mancanti sono stati scartati? O vuoi contare meglio?\n";
         }
     }
 }

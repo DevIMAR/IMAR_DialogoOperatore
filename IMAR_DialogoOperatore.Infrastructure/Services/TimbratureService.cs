@@ -22,7 +22,11 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
             List<Timbratura> timbraturePause = new List<Timbratura>();
             List<Timbratura> timbratureIngressiUscite = new List<Timbratura>();
 
-            AngRes operatore = GetIdOperatori().SingleOrDefault(o => o.ResCod == badgeOperatore.PadLeft(4, '0'));
+            AngRes operatore = _synergyJmesUoW.AngRes.Get().ToList().SingleOrDefault(o => o.ResCod == badgeOperatore.PadLeft(4, '0'));
+
+            if (operatore == null)
+                return timbrature;
+
             List<TblResBrk> pause = GetPauseOperatoreDiOggi(operatore).ToList();
             List<TblResClk> ingressiUscite = GetIngressiUsciteOperatoreDiOggi(operatore).ToList();
 

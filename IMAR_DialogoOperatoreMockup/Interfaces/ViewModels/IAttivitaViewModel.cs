@@ -13,7 +13,9 @@ namespace IMAR_DialogoOperatore.Interfaces.ViewModels
         string? CodiceFase { get; }
         string? CodiceDescrizioneFase { get; }
         string? Odp { get; }
+        int QuantitaOrdineOriginale { get; }
         int QuantitaOrdine { get; }
+        string? BollaFasePrecedente { get; }
         int QuantitaProdotta { get; }
         int QuantitaProdottaNonContabilizzata { get; set; }
         int QuantitaProdottaContabilizzata { get; set; }

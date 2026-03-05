@@ -10,7 +10,12 @@
         public string DescrizioneArticolo { get; set; }
         public string Fase { get; set; }
         public string DescrizioneFase { get; set; }
+        public int QuantitaOrdineOriginale { get; set; }
         public int QuantitaOrdine { get; set; }
+        public string? BollaFasePrecedente { get; set; }
+        public string IsNonPianificata { get; set; }
+        public string TipoRicevimento { get; set; }
+        public string? SaldoAccontoJmes { get; set; }
         public int QuantitaProdotta { get; set; }
         public int QuantitaProdottaNonContabilizzata { get; set; }
         public int QuantitaProdottaContabilizzata { get; set; }
