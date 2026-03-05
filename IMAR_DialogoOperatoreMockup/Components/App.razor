@@ -59,7 +59,9 @@
                         waitForServerAndReload();
                     },
                     onConnectionUp() {
-                        hideReconnectModal();
+                        // Il server è tornato ma il circuito è morto dopo un deploy.
+                        // Reload pulito per avere un circuito nuovo.
+                        location.reload();
                     }
                 }
             }
