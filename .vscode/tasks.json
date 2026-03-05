@@ -1,0 +1,52 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceFolder}/IMAR_DialogoOperatoreMockup/IMAR_DialogoOperatore.csproj",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary;ForceNoAlign"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "build-esportatore",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceFolder}/GeneratoreTimbratureTeamSystem/EsportatoreTimbratureTeamSystem.csproj",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary;ForceNoAlign"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "publish-produzione",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "publish",
+                "${workspaceFolder}/IMAR_DialogoOperatoreMockup/IMAR_DialogoOperatore.csproj",
+                "-c",
+                "Release",
+                "/p:PublishProfile=DialogoOperatore Produzione"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "test",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "test",
+                "${workspaceFolder}/IMAR_DialogoOperatore.Test/IMAR_DialogoOperatore.Test.csproj"
+            ],
+            "problemMatcher": "$msCompile"
+        }
+    ]
+}
