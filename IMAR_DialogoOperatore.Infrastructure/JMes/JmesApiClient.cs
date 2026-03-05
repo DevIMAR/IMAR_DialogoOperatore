@@ -179,10 +179,9 @@ namespace IMAR_DialogoOperatore.Infrastructure.JMes
 
             HttpResponseMessage result = await operazione();
 
-            string? errore = _jMesApiClientErrorUtility.GestioneEventualeErrore(result);
+            var (errore, _) = await _jMesApiClientErrorUtility.GestioneEventualeErroreAsync(result);
             if (errore != null)
             {
-                _loggingService.LogError($"Errore operazione JMES: {errore}");
                 _loggingService.LogInfo($"JmesApiClient.RegistrazioneOperazioneSuDbAsync completato in {sw.ElapsedMilliseconds}ms (con errore)");
                 return errore;
             }

@@ -10,7 +10,7 @@ using IMAR_DialogoOperatore.Domain.Models;
 using IMAR_DialogoOperatore.Infrastructure.Mappers;
 using IMAR_DialogoOperatore.Infrastructure.Services;
 using IMAR_DialogoOperatore.Infrastructure.Utilities;
-using System.Net.Http.Json;
+
 
 namespace IMAR_DialogoOperatore.Services
 {
@@ -203,7 +203,7 @@ namespace IMAR_DialogoOperatore.Services
 
             HttpResponseMessage result = await _jmesApiClient.MesAdvanceDeclarationAsync(operatore, attivitaDaAvanzare, quantitaProdotta, quantitaScartata);
 
-            string? errore = _jMesApiClientErrorUtility.GestioneEventualeErrore(result);
+            var (errore, _) = await _jMesApiClientErrorUtility.GestioneEventualeErroreAsync(result);
             if (errore != null)
                 return errore;
 
@@ -478,11 +478,10 @@ namespace IMAR_DialogoOperatore.Services
 
             HttpResponseMessage responseMessage = await _jmesApiClient.MesEquipStartNotPlnAsync(operatore, attivita.Bolla, codiceFase);
 
-            string? errore = _jMesApiClientErrorUtility.GestioneEventualeErrore(responseMessage);
+            var (errore, jsonData) = await _jMesApiClientErrorUtility.GestioneEventualeErroreAsync(responseMessage);
             if (errore != null)
                 return errore;
 
-            var jsonData = await responseMessage.Content.ReadFromJsonAsync<JMesResultDto>();
             if (jsonData != null)
                 return jsonData.result.instanceRef.model.diaOpe.evtUid.ToString();
 
@@ -494,9 +493,8 @@ namespace IMAR_DialogoOperatore.Services
             string codiceFase = GetCodiceFase(attivita);
 
             HttpResponseMessage responseMessage = await _jmesApiClient.MesWorkStartNotPlnAsync(operatore, attivita, codiceFase);
-            var jsonData = await responseMessage.Content.ReadFromJsonAsync<JMesResultDto>();
 
-            string? errore = _jMesApiClientErrorUtility.GestioneEventualeErrore(jsonData);
+            var (errore, jsonData) = await _jMesApiClientErrorUtility.GestioneEventualeErroreAsync(responseMessage);
             if (errore != null)
                 return errore;
 

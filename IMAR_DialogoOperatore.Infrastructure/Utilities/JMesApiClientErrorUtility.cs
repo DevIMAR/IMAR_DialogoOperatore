@@ -1,21 +1,43 @@
 ﻿using IMAR_DialogoOperatore.Application.DTOs;
 using IMAR_DialogoOperatore.Application.Interfaces.Utilities;
-using System.Net.Http.Json;
+using System.Text.Json;
 
 namespace IMAR_DialogoOperatore.Infrastructure.Utilities
 {
     public class JMesApiClientErrorUtility : IJMesApiClientErrorUtility
     {
-        public string? GestioneEventualeErrore(HttpResponseMessage result)
-        {
-            var jsonData = result.Content.ReadFromJsonAsync<JMesResultDto>().GetAwaiter().GetResult();
+        private readonly ILoggingService _loggingService;
 
-            return GestioneEventualeErrore(jsonData);
+        public JMesApiClientErrorUtility(ILoggingService loggingService)
+        {
+            _loggingService = loggingService;
+        }
+
+        public async Task<(string? errore, JMesResultDto? dati)> GestioneEventualeErroreAsync(HttpResponseMessage result)
+        {
+            var rawJson = await result.Content.ReadAsStringAsync();
+            _loggingService.LogDebug($"Risposta JMES (HTTP {(int)result.StatusCode}): {rawJson}");
+
+            JMesResultDto? jsonData = null;
+            try
+            {
+                jsonData = JsonSerializer.Deserialize<JMesResultDto>(rawJson);
+            }
+            catch (JsonException ex)
+            {
+                _loggingService.LogError($"Errore deserializzazione risposta JMES: {rawJson}", ex);
+                return ("Errore nella lettura della risposta JMES", null);
+            }
+
+            string? errore = GestioneEventualeErrore(jsonData);
+            if (errore != null)
+                _loggingService.LogError($"Errore JMES: {errore} | Risposta completa: {rawJson}");
+
+            return (errore, jsonData);
         }
 
         public string? GestioneEventualeErrore(JMesResultDto? jsonData)
         {
-
             if (jsonData != null && jsonData.result.instanceRef.model.error)
                 return ScritturaTestoErrore(jsonData);
 

@@ -78,7 +78,15 @@ namespace IMAR_DialogoOperatore.Commands
             _dialogoOperatoreObserver.IsLoaderVisibile = true;
             await Task.Delay(1);
 
-            await _jmesApiClient.MesAutoClockAsync(_dialogoOperatoreObserver.OperatoreSelezionato.Badge.ToString(), true);
+            string? errore = await _jmesApiClient.RegistrazioneOperazioneSuDbAsync(
+                () => _jmesApiClient.MesAutoClockAsync(_dialogoOperatoreObserver.OperatoreSelezionato.Badge.ToString(), true));
+
+            if (errore != null)
+            {
+                _dialogoOperatoreObserver.IsLoaderVisibile = false;
+                _toastDisplayerUtility.ShowRedToast("Errore Entrata", errore);
+                return;
+            }
 
             await AggiornaOperatoreSelezionatoAsync();
 
@@ -111,7 +119,11 @@ namespace IMAR_DialogoOperatore.Commands
             _dialogoOperatoreObserver.IsLoaderVisibile = true;
             await Task.Delay(1);
 
-            await _jmesApiClient.MesAutoClockAsync(_dialogoOperatoreObserver.OperatoreSelezionato.Badge.ToString(), false);
+            string? erroreUscita = await _jmesApiClient.RegistrazioneOperazioneSuDbAsync(
+                () => _jmesApiClient.MesAutoClockAsync(_dialogoOperatoreObserver.OperatoreSelezionato.Badge.ToString(), false));
+
+            if (erroreUscita != null)
+                _loggingService.LogError($"Errore MesAutoClock uscita badge {_dialogoOperatoreObserver.OperatoreSelezionato.Badge}: {erroreUscita}");
 
             _dialogoOperatoreObserver.IsLoaderVisibile = false;
             _dialogoOperatoreObserver.IsExiting = true;

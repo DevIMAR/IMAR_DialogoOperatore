@@ -4,7 +4,7 @@ namespace IMAR_DialogoOperatore.Application.Interfaces.Utilities
 {
     public interface IJMesApiClientErrorUtility
     {
-        string? GestioneEventualeErrore(HttpResponseMessage result);
+        Task<(string? errore, JMesResultDto? dati)> GestioneEventualeErroreAsync(HttpResponseMessage result);
         string? GestioneEventualeErrore(JMesResultDto? jsonData);
     }
 }

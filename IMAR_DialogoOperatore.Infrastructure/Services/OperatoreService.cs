@@ -55,8 +55,8 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
 
 			Operatore = GetOperatoreFromAngRes(risorsa);
 
-			Operatore.Ingresso = ingressiUscite != null && ingressiUscite.Any(x => x.ResUid == risorsa.Uid) ? ingressiUscite.Where(x => x.ResUid == risorsa.Uid).Max(x => x.ClkInnTss) ?? fallback : fallback;
-			Operatore.Uscita = ingressiUscite != null && ingressiUscite.Any(x => x.ResUid == risorsa.Uid) ? ingressiUscite.Where(x => x.ResUid == risorsa.Uid).Max(x => x.ClkOutTss) ?? fallback : fallback;
+			Operatore.Ingresso = ingressiUscite != null && ingressiUscite.Any(x => x.ResUid == risorsa.Uid) ? ingressiUscite.Where(x => x.ResUid == risorsa.Uid).Max(x => x.EdtInnTss ?? x.ClkInnTss) ?? fallback : fallback;
+			Operatore.Uscita = ingressiUscite != null && ingressiUscite.Any(x => x.ResUid == risorsa.Uid) ? ingressiUscite.Where(x => x.ResUid == risorsa.Uid).Max(x => x.EdtOutTss ?? x.ClkOutTss) ?? fallback : fallback;
 			Operatore.InizioPausa = iniziFiniPause != null && iniziFiniPause.Any(x => x.ResUid == risorsa.Uid) ? iniziFiniPause.Where(x => x.ResUid == risorsa.Uid).Max(x => x.TssStr) ?? fallback : fallback;
 			Operatore.FinePausa = iniziFiniPause != null && iniziFiniPause.Any(x => x.ResUid == risorsa.Uid) ? iniziFiniPause.Where(x => x.ResUid == risorsa.Uid).Max(x => x.TssEnd) ?? fallback : fallback;
 			Operatore.AttivitaAperte = await _attivitaService.OttieniAttivitaOperatoreAsync(Operatore);
