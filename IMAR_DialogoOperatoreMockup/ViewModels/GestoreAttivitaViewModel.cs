@@ -42,9 +42,7 @@ namespace IMAR_DialogoOperatore.ViewModels
 		{
 			if (!(_dialogoOperatoreObserver.OperazioneInCorso == Costanti.AVANZAMENTO ||
 					_dialogoOperatoreObserver.OperazioneInCorso == Costanti.INIZIO_LAVORO ||
-					_dialogoOperatoreObserver.OperazioneInCorso == Costanti.INIZIO_ATTREZZAGGIO ||
-					_dialogoOperatoreObserver.OperazioneInCorso == Costanti.FINE_LAVORO ||
-					_dialogoOperatoreObserver.OperazioneInCorso == Costanti.FINE_ATTREZZAGGIO))
+					_dialogoOperatoreObserver.OperazioneInCorso == Costanti.INIZIO_ATTREZZAGGIO))
 				_cercaAttivitaObserver.IsAttivitaCercata = false;
 
             _dialogoOperatoreObserver.IsDettaglioAttivitaOpen = IsOpen;

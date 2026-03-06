@@ -211,6 +211,9 @@
 	[JSInvokable]
 	public async Task OnBollaSearch(string value)
 	{
+		if (InfoBaseAttivitaViewModel.IsAttivitaSelezionata)
+			return;
+
 		Logger.LogInformation("[BOLLA] Ricerca da JS | Valore: '{Value}'", value);
 
 		var sw = System.Diagnostics.Stopwatch.StartNew();
@@ -225,6 +228,9 @@
 	[JSInvokable]
 	public async Task OnOdpSearch(string value)
 	{
+		if (InfoBaseAttivitaViewModel.IsAttivitaSelezionata)
+			return;
+
 		var odp = value.PadLeft(8, '0');
 		Logger.LogInformation("[ODP] Ricerca da JS | Valore: '{Value}' -> '{Odp}'", value, odp);
 
