@@ -40,9 +40,11 @@ namespace IMAR_DialogoOperatore.ViewModels
 
         private void DialogoOperatoreStore_OnOperazioneInCorsoChanged()
 		{
-			if (!(_dialogoOperatoreObserver.OperazioneInCorso == Costanti.AVANZAMENTO || 
-					_dialogoOperatoreObserver.OperazioneInCorso == Costanti.INIZIO_LAVORO || 
-					_dialogoOperatoreObserver.OperazioneInCorso == Costanti.INIZIO_ATTREZZAGGIO))
+			if (!(_dialogoOperatoreObserver.OperazioneInCorso == Costanti.AVANZAMENTO ||
+					_dialogoOperatoreObserver.OperazioneInCorso == Costanti.INIZIO_LAVORO ||
+					_dialogoOperatoreObserver.OperazioneInCorso == Costanti.INIZIO_ATTREZZAGGIO ||
+					_dialogoOperatoreObserver.OperazioneInCorso == Costanti.FINE_LAVORO ||
+					_dialogoOperatoreObserver.OperazioneInCorso == Costanti.FINE_ATTREZZAGGIO))
 				_cercaAttivitaObserver.IsAttivitaCercata = false;
 
             _dialogoOperatoreObserver.IsDettaglioAttivitaOpen = IsOpen;
@@ -77,7 +79,9 @@ namespace IMAR_DialogoOperatore.ViewModels
 			if ((operazioneInCorso == null || operazioneInCorso == Costanti.NESSUNA) && attivitaSelezionata == null)
 				return false;
 
-			if ((operazioneInCorso != Costanti.INIZIO_LAVORO && operazioneInCorso != Costanti.INIZIO_ATTREZZAGGIO) && operazioneInCorso != Costanti.AVANZAMENTO && attivitaSelezionata == null)
+			if (operazioneInCorso != Costanti.INIZIO_LAVORO && operazioneInCorso != Costanti.INIZIO_ATTREZZAGGIO
+				&& operazioneInCorso != Costanti.AVANZAMENTO && operazioneInCorso != Costanti.FINE_LAVORO
+				&& operazioneInCorso != Costanti.FINE_ATTREZZAGGIO && attivitaSelezionata == null)
 				return false;
 
 			return true;
