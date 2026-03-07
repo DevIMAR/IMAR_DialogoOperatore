@@ -23,6 +23,13 @@
 	</BodyTemplate>
 
 	<FooterTemplate>
+		<DxButton Text="Fine Lavoro (Z)"
+				  style="margin-right: 3%;"
+				  RenderStyle="ButtonRenderStyle.Primary"
+				  Enabled="@GestoreAttivitaViewModel.FineLavoroCommand.CanExecute(null)"
+				  Click="@GestoreAttivitaViewModel.FineLavoroCommand.Execute"
+				  CssClass="d-flex justify-content-center align-items-center conferma-dettagli" />
+
 		<DxButton Text="Rilavorazione"
 				  style="margin-right: 3%;"
 				  RenderStyle="ButtonRenderStyle.Warning"
