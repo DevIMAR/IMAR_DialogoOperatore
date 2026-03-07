@@ -2,6 +2,7 @@ using IMAR_DialogoOperatore.Application;
 using IMAR_DialogoOperatore.Application.DTOs;
 using IMAR_DialogoOperatore.Application.Interfaces.Clients;
 using IMAR_DialogoOperatore.Application.Interfaces.Services.External;
+using IMAR_DialogoOperatore.Application.Interfaces.Utilities;
 using IMAR_DialogoOperatore.Domain.Entities.Imar_Produzione;
 using IMAR_DialogoOperatore.Interfaces.Helpers;
 using IMAR_DialogoOperatore.Interfaces.Observers;
@@ -18,6 +19,7 @@ namespace IMAR_DialogoOperatore.Commands
         private readonly ISegnalazioniDifformitaService _segnalazioniDifformitaService;
         private readonly IDialogoOperatoreObserver _dialogoOperatoreObserver;
         private readonly IPopupObserver _popupObserver;
+        private readonly ILoggingService _loggingService;
 
         private bool _attendeSegnalazione;
 
@@ -29,7 +31,8 @@ namespace IMAR_DialogoOperatore.Commands
             ISegnalazioneObserver segnalazioneObserver,
             ISegnalazioniDifformitaService segnalazioniDifformitaService,
             IDialogoOperatoreObserver dialogoOperatoreObserver,
-            IPopupObserver popupObserver)
+            IPopupObserver popupObserver,
+            ILoggingService loggingService)
         {
             _imarApiClient = imarApiClient;
             _taskCompilerHelper = taskCompilerHelper;
@@ -39,6 +42,7 @@ namespace IMAR_DialogoOperatore.Commands
             _segnalazioniDifformitaService = segnalazioniDifformitaService;
             _dialogoOperatoreObserver = dialogoOperatoreObserver;
             _popupObserver = popupObserver;
+            _loggingService = loggingService;
 
             _taskCompilerObserver.OnCategoriaErroreSelezionataChanged += CanExecuteEvaluator;
             _taskCompilerObserver.OnNoteChanged += CanExecuteEvaluator;
@@ -59,31 +63,37 @@ namespace IMAR_DialogoOperatore.Commands
 
         public override async void Execute(object? parameter)
         {
-            if (_avanzamentoObserver.QuantitaScartata != null && _avanzamentoObserver.QuantitaScartata > 0)
+            await SafeExecuteAsync(async () =>
             {
-                _segnalazioneObserver.AttivitaPerSegnalazione = _taskCompilerObserver.EventoSelezionato;
-                _attendeSegnalazione = true;
-                _popupObserver.TestoPopup = null;
-                _popupObserver.IsPopupVisible = true;
-            }
-            else
-            {
-                await CompilaEdInviaTask();
-            }
+                if (_avanzamentoObserver.QuantitaScartata != null && _avanzamentoObserver.QuantitaScartata > 0)
+                {
+                    _segnalazioneObserver.AttivitaPerSegnalazione = _taskCompilerObserver.EventoSelezionato;
+                    _attendeSegnalazione = true;
+                    _popupObserver.TestoPopup = null;
+                    _popupObserver.IsPopupVisible = true;
+                }
+                else
+                {
+                    await CompilaEdInviaTask();
+                }
+            }, _loggingService, "InviaTaskCommand.Execute");
         }
 
         private async void PopupObserver_OnIsConfermatoChanged()
         {
-            if (!_attendeSegnalazione)
-                return;
+            await SafeExecuteAsync(async () =>
+            {
+                if (!_attendeSegnalazione)
+                    return;
 
-            _attendeSegnalazione = false;
+                _attendeSegnalazione = false;
 
-            if (!_popupObserver.IsConfermato)
-                return;
+                if (!_popupObserver.IsConfermato)
+                    return;
 
-            await CreaEdInviaSegnalazioneDifformita();
-            await CompilaEdInviaTask();
+                await CreaEdInviaSegnalazioneDifformita();
+                await CompilaEdInviaTask();
+            }, _loggingService, "InviaTaskCommand.PopupObserver_OnIsConfermatoChanged");
         }
 
         private async Task CompilaEdInviaTask()

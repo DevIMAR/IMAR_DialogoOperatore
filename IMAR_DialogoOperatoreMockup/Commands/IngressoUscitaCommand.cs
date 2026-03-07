@@ -67,10 +67,13 @@ namespace IMAR_DialogoOperatore.Commands
 
 		public override async void Execute(object? parameter)
         {
-            if (_dialogoOperatoreObserver.OperatoreSelezionato.Stato == Costanti.ASSENTE)
-                await EffettuaIngressoOperatore();
-            else
-                await EffettuaUscitaOperatore();
+            await SafeExecuteAsync(async () =>
+            {
+                if (_dialogoOperatoreObserver.OperatoreSelezionato.Stato == Costanti.ASSENTE)
+                    await EffettuaIngressoOperatore();
+                else
+                    await EffettuaUscitaOperatore();
+            }, _loggingService, "IngressoUscitaCommand.Execute");
         }
 
         private async Task EffettuaIngressoOperatore()

@@ -89,11 +89,15 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
 		{
 			Operatore.MacchineAssegnate = new List<Macchina?>();
 
+			Macchina? macchina;
 			Attivita? attivitaDirettaApertaDaOperatore = Operatore.AttivitaAperte.FirstOrDefault(x => !x.Bolla.Contains("AI"));
 			if (attivitaDirettaApertaDaOperatore != null)
-				Operatore.MacchineAssegnate.Add(await _macchinaService.GetMacchinaFittiziaByFirstAttivitaApertaAsync(attivitaDirettaApertaDaOperatore, Operatore.IdJMes));
+				macchina = await _macchinaService.GetMacchinaFittiziaByFirstAttivitaApertaAsync(attivitaDirettaApertaDaOperatore, Operatore.IdJMes);
 			else
-				Operatore.MacchineAssegnate.Add(await _macchinaService.GetPrimaMacchinaFittiziaNonUtilizzataAsync());
+				macchina = await _macchinaService.GetPrimaMacchinaFittiziaNonUtilizzataAsync();
+
+			if (macchina != null)
+				Operatore.MacchineAssegnate.Add(macchina);
 		}
 
 		private string GetStatus()
@@ -201,7 +205,12 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
 				attivitaDaAggiungere.MacchinaFittizia = macchinaDaAttivitaAttrezzata;
 			}
 			else
-				attivitaDaAggiungere.MacchinaFittizia = operatore.MacchineAssegnate.First();
+			{
+				Macchina? macchina = operatore.MacchineAssegnate.FirstOrDefault();
+				if (macchina == null)
+					return "Nessuna macchina fittizia disponibile per avviare il lavoro";
+				attivitaDaAggiungere.MacchinaFittizia = macchina;
+			}
 
 			errore = await _jmesApiClient.RegistrazioneOperazioneSuDbAsync(() => _jmesApiClient.MesWorkStartAsync(operatore, attivitaDaAggiungere));
 
