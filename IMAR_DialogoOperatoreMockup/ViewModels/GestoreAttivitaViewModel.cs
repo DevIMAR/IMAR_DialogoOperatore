@@ -19,6 +19,7 @@ namespace IMAR_DialogoOperatore.ViewModels
 		public ICommand MostraNotePopupCommand { get; set; }
 		public ICommand CreaFaseNonPianificataCommand { get; set; }
 		public ICommand FineLavoroCommand { get; set; }
+		public ICommand FineAttrezzaggioCommand { get; set; }
 
 		public GestoreAttivitaViewModel(
 			IDialogoOperatoreObserver dialogoOperatoreObserver,
@@ -26,7 +27,8 @@ namespace IMAR_DialogoOperatore.ViewModels
 			ConfermaCommand confermaCommand,
             MostraNotePopupCommand mostraNotePopupCommand,
 			CreaFaseNonPianificataCommand creaFaseNonPianificataCommand,
-			FineLavoroCommand fineLavoroCommand)
+			FineLavoroCommand fineLavoroCommand,
+			FineAttrezzaggioCommand fineAttrezzaggioCommand)
         {
 			_dialogoOperatoreObserver = dialogoOperatoreObserver;
 			_cercaAttivitaObserver = cercaAttivitaObserver;
@@ -35,6 +37,7 @@ namespace IMAR_DialogoOperatore.ViewModels
             MostraNotePopupCommand = mostraNotePopupCommand;
 			CreaFaseNonPianificataCommand = creaFaseNonPianificataCommand;
 			FineLavoroCommand = fineLavoroCommand;
+			FineAttrezzaggioCommand = fineAttrezzaggioCommand;
 
             _dialogoOperatoreObserver.OnAttivitaSelezionataChanged += AttivitaStore_OnAttivitaSelezionataChanged;
 			_dialogoOperatoreObserver.OnOperazioneInCorsoChanged += DialogoOperatoreStore_OnOperazioneInCorsoChanged;

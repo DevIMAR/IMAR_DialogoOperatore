@@ -30,6 +30,13 @@
 					  Click="@GestoreAttivitaViewModel.FineLavoroCommand.Execute"
 					  CssClass="d-flex justify-content-center align-items-center conferma-dettagli" />
 		}
+		@if (GestoreAttivitaViewModel.FineAttrezzaggioCommand.CanExecute(null))
+		{
+			<DxButton Text="Fine Attrezzaggio (M)"
+					  style="margin-right: 3%; background-color: dodgerblue; border-color: dodgerblue; color: white;"
+					  Click="@GestoreAttivitaViewModel.FineAttrezzaggioCommand.Execute"
+					  CssClass="d-flex justify-content-center align-items-center conferma-dettagli" />
+		}
 
 		<DxButton Text="Rilavorazione"
 				  style="margin-right: 3%;"
