@@ -23,13 +23,28 @@
 	</BodyTemplate>
 
 	<FooterTemplate>
-		@* <DxButton Text="Rilavorazione"
+		@if (GestoreAttivitaViewModel.FineLavoroCommand.CanExecute(null))
+		{
+			<DxButton Text="Fine Lavoro (Z)"
+					  style="margin-right: 3%; background-color: dodgerblue; border-color: dodgerblue; color: white;"
+					  Click="@GestoreAttivitaViewModel.FineLavoroCommand.Execute"
+					  CssClass="d-flex justify-content-center align-items-center conferma-dettagli" />
+		}
+		@if (GestoreAttivitaViewModel.FineAttrezzaggioCommand.CanExecute(null))
+		{
+			<DxButton Text="Fine Attrezzaggio (M)"
+					  style="margin-right: 3%; background-color: dodgerblue; border-color: dodgerblue; color: white;"
+					  Click="@GestoreAttivitaViewModel.FineAttrezzaggioCommand.Execute"
+					  CssClass="d-flex justify-content-center align-items-center conferma-dettagli" />
+		}
+
+		<DxButton Text="Rilavorazione"
 				  style="margin-right: 3%;"
 				  RenderStyle="ButtonRenderStyle.Warning"
 				  RenderStyleMode="ButtonRenderStyleMode.Outline"
 				  Enabled="@GestoreAttivitaViewModel.CreaFaseNonPianificataCommand.CanExecute(null)"
 				  Click="@GestoreAttivitaViewModel.CreaFaseNonPianificataCommand.Execute"
-				  CssClass="d-flex justify-content-center align-items-center conferma-dettagli" /> *@
+				  CssClass="d-flex justify-content-center align-items-center conferma-dettagli" />
 
 		<DxButton style="margin-right: 3%;"
 				  RenderStyle="ButtonRenderStyle.Warning"

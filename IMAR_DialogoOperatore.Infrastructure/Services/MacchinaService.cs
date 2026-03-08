@@ -1,4 +1,3 @@
-﻿using System.Reflection.PortableExecutable;
 using IMAR_DialogoOperatore.Application;
 using IMAR_DialogoOperatore.Application.Interfaces.Clients;
 using IMAR_DialogoOperatore.Application.Interfaces.Repositories;
@@ -44,10 +43,10 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
             };
         }
 
-        public Macchina? GetMacchinaFittiziaByFirstAttivitaAperta(Attivita attivitaAperta, int idJMesOperatore)
+        public async Task<Macchina?> GetMacchinaFittiziaByFirstAttivitaApertaAsync(Attivita attivitaAperta, int idJMesOperatore)
         {
-            mesEvtToEndMac? macchinaFittiziaConAttivitaOperatoreAperta = _jmesApiClient.ChiamaQueryGetJmes<mesEvtToEndMac>()?
-                                                                                       .LastOrDefault(x => x.ID_Det3350.Trim() == attivitaAperta.Bolla.ToString() && 
+            mesEvtToEndMac? macchinaFittiziaConAttivitaOperatoreAperta = (await _jmesApiClient.ChiamaQueryGetJmesAsync<mesEvtToEndMac>())?
+                                                                                       .LastOrDefault(x => x.ID_Det3350.Trim() == attivitaAperta.Bolla.ToString() &&
                                                                                                              x.ID_Evt3245 == idJMesOperatore);
             if (macchinaFittiziaConAttivitaOperatoreAperta == null)
                 return null;
@@ -60,11 +59,11 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
             };
         }
 
-        public Macchina? GetPrimaMacchinaFittiziaNonUtilizzata()
+        public async Task<Macchina?> GetPrimaMacchinaFittiziaNonUtilizzataAsync()
         {
             IEnumerable<AngRes> macchineFittizie = _synergyJmesUoW.AngRes.Get(x => x.ResDsc.Contains("FITTIZIA"));
 
-            IEnumerable<mesEvtToEndMac>? macchineFittizieConAttivitaAperte = _jmesApiClient.ChiamaQueryGetJmes<mesEvtToEndMac>()?
+            IEnumerable<mesEvtToEndMac>? macchineFittizieConAttivitaAperte = (await _jmesApiClient.ChiamaQueryGetJmesAsync<mesEvtToEndMac>())?
                                                                                            .Where(x => x.ID_Mac371.Contains("FITTIZIA"));
 
             if (macchineFittizieConAttivitaAperte == null || !macchineFittizieConAttivitaAperte.Any())
@@ -98,9 +97,9 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
                                                         .Single();
         }
 
-        public Macchina? GetMacchinaFittiziaDaAttivitaAttrezzata(Attivita attivitaDaAggiungere)
+        public async Task<Macchina?> GetMacchinaFittiziaDaAttivitaAttrezzataAsync(Attivita attivitaDaAggiungere)
         {
-			mesEvtToEndMac? macchina = _jmesApiClient.ChiamaQueryGetJmes<mesEvtToEndMac>()?
+			mesEvtToEndMac? macchina = (await _jmesApiClient.ChiamaQueryGetJmesAsync<mesEvtToEndMac>())?
                                                      .FirstOrDefault(x => x.ID_Det3350.Equals(attivitaDaAggiungere.Bolla)
                                                                            && x.ID_Sts3130.Equals(Costanti.JMES_ATTREZZAGGIO_COMPLETATO));
 

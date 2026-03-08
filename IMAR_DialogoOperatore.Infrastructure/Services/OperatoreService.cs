@@ -1,4 +1,4 @@
-﻿using IMAR_DialogoOperatore.Application;
+using IMAR_DialogoOperatore.Application;
 using IMAR_DialogoOperatore.Application.Interfaces.Clients;
 using IMAR_DialogoOperatore.Application.Interfaces.Services.Activities;
 using IMAR_DialogoOperatore.Application.Interfaces.UoW;
@@ -31,7 +31,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
 			_macchinaService = macchinaService;
 		}
 
-		public Operatore? OttieniOperatore(int? badge)
+		public async Task<Operatore?> OttieniOperatoreAsync(int? badge)
 		{
 			if (badge == null)
 				return null;
@@ -55,13 +55,13 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
 
 			Operatore = GetOperatoreFromAngRes(risorsa);
 
-			Operatore.Ingresso = ingressiUscite != null && ingressiUscite.Any(x => x.ResUid == risorsa.Uid) ? ingressiUscite.Where(x => x.ResUid == risorsa.Uid).Max(x => x.ClkInnTss) ?? fallback : fallback;
-			Operatore.Uscita = ingressiUscite != null && ingressiUscite.Any(x => x.ResUid == risorsa.Uid) ? ingressiUscite.Where(x => x.ResUid == risorsa.Uid).Max(x => x.ClkOutTss) ?? fallback : fallback;
+			Operatore.Ingresso = ingressiUscite != null && ingressiUscite.Any(x => x.ResUid == risorsa.Uid) ? ingressiUscite.Where(x => x.ResUid == risorsa.Uid).Max(x => x.EdtInnTss ?? x.ClkInnTss) ?? fallback : fallback;
+			Operatore.Uscita = ingressiUscite != null && ingressiUscite.Any(x => x.ResUid == risorsa.Uid) ? ingressiUscite.Where(x => x.ResUid == risorsa.Uid).Max(x => x.EdtOutTss ?? x.ClkOutTss) ?? fallback : fallback;
 			Operatore.InizioPausa = iniziFiniPause != null && iniziFiniPause.Any(x => x.ResUid == risorsa.Uid) ? iniziFiniPause.Where(x => x.ResUid == risorsa.Uid).Max(x => x.TssStr) ?? fallback : fallback;
 			Operatore.FinePausa = iniziFiniPause != null && iniziFiniPause.Any(x => x.ResUid == risorsa.Uid) ? iniziFiniPause.Where(x => x.ResUid == risorsa.Uid).Max(x => x.TssEnd) ?? fallback : fallback;
-			Operatore.AttivitaAperte = _attivitaService.OttieniAttivitaOperatore(Operatore);
+			Operatore.AttivitaAperte = await _attivitaService.OttieniAttivitaOperatoreAsync(Operatore);
 
-			AssegnaMacchinaAdOperatore();
+			await AssegnaMacchinaAdOperatoreAsync();
 
 			Operatore.Stato = GetStatus();
 
@@ -85,15 +85,19 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
 			iniziFiniPause = _synergyJmesUoW.TblResBrk.Get();
 		}
 
-		private void AssegnaMacchinaAdOperatore()
+		private async Task AssegnaMacchinaAdOperatoreAsync()
 		{
 			Operatore.MacchineAssegnate = new List<Macchina?>();
 
+			Macchina? macchina;
 			Attivita? attivitaDirettaApertaDaOperatore = Operatore.AttivitaAperte.FirstOrDefault(x => !x.Bolla.Contains("AI"));
 			if (attivitaDirettaApertaDaOperatore != null)
-				Operatore.MacchineAssegnate.Add(_macchinaService.GetMacchinaFittiziaByFirstAttivitaAperta(attivitaDirettaApertaDaOperatore, Operatore.IdJMes));
+				macchina = await _macchinaService.GetMacchinaFittiziaByFirstAttivitaApertaAsync(attivitaDirettaApertaDaOperatore, Operatore.IdJMes);
 			else
-				Operatore.MacchineAssegnate.Add(_macchinaService.GetPrimaMacchinaFittiziaNonUtilizzata());
+				macchina = await _macchinaService.GetPrimaMacchinaFittiziaNonUtilizzataAsync();
+
+			if (macchina != null)
+				Operatore.MacchineAssegnate.Add(macchina);
 		}
 
 		private string GetStatus()
@@ -107,7 +111,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
 			return Costanti.PRESENTE;
 		}
 
-		public string? RimuoviAttivitaDaOperatore(Operatore operatore, Attivita attivitaDaRimuovere, int? quantitaProdotta, int? quantitaScartata, bool isSospeso = false, bool? isAttrezzaggio = null)
+		public async Task<string?> RimuoviAttivitaDaOperatoreAsync(Operatore operatore, Attivita attivitaDaRimuovere, int? quantitaProdotta, int? quantitaScartata, bool isSospeso = false, bool? isAttrezzaggio = null)
 		{
 			if (isAttrezzaggio == null)
 				isAttrezzaggio = attivitaDaRimuovere.Causale == Costanti.IN_ATTREZZAGGIO;
@@ -117,27 +121,27 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
 			if (isAttrezzaggio == true)
 			{
 				if (isSospeso)
-					errore = _jmesApiClient.RegistrazioneOperazioneSuDb(() => _jmesApiClient.MesEquipSuspension(operatore.Badge, (double)attivitaDaRimuovere.CodiceJMes));
+					errore = await _jmesApiClient.RegistrazioneOperazioneSuDbAsync(() => _jmesApiClient.MesEquipSuspensionAsync(operatore.Badge, (double)attivitaDaRimuovere.CodiceJMes));
 				else
 				{
-					errore = _jmesApiClient.RegistrazioneOperazioneSuDb(() => _jmesApiClient.MesEquipEnd(operatore.Badge, (double)attivitaDaRimuovere.CodiceJMes));
+					errore = await _jmesApiClient.RegistrazioneOperazioneSuDbAsync(() => _jmesApiClient.MesEquipEndAsync(operatore.Badge, (double)attivitaDaRimuovere.CodiceJMes));
 
                     if (errore == null)
-						errore = _jmesApiClient.RegistrazioneOperazioneSuDb(() => _jmesApiClient.MesEquipRemove(operatore.Badge, (double)attivitaDaRimuovere.CodiceJMes));
+						errore = await _jmesApiClient.RegistrazioneOperazioneSuDbAsync(() => _jmesApiClient.MesEquipRemoveAsync(operatore.Badge, (double)attivitaDaRimuovere.CodiceJMes));
 				}
 			}
 			else
 			{
 				if (isSospeso)
-					errore = _jmesApiClient.RegistrazioneOperazioneSuDb(() => _jmesApiClient.MesWorkSuspension(operatore.Badge, attivitaDaRimuovere, (int)quantitaProdotta, (int)quantitaScartata));
+					errore = await _jmesApiClient.RegistrazioneOperazioneSuDbAsync(() => _jmesApiClient.MesWorkSuspensionAsync(operatore.Badge, attivitaDaRimuovere, (int)quantitaProdotta, (int)quantitaScartata));
 				else
-					errore = _jmesApiClient.RegistrazioneOperazioneSuDb(() => _jmesApiClient.MesWorkEnd(operatore.Badge, attivitaDaRimuovere, (int)quantitaProdotta, (int)quantitaScartata));
+					errore = await _jmesApiClient.RegistrazioneOperazioneSuDbAsync(() => _jmesApiClient.MesWorkEndAsync(operatore.Badge, attivitaDaRimuovere, (int)quantitaProdotta, (int)quantitaScartata));
 			}
 
 			return errore;
 		}
 
-		public string? AggiungiAttivitaAdOperatore(bool isAttrezzaggio, Operatore operatore, Attivita attivitaDaAggiungere, bool isAttivitaIndiretta)
+		public async Task<string?> AggiungiAttivitaAdOperatoreAsync(bool isAttrezzaggio, Operatore operatore, Attivita attivitaDaAggiungere, bool isAttivitaIndiretta)
 		{
 			if (attivitaDaAggiungere == null)
 				return "Nessuna attività da aprire selezionata";
@@ -150,10 +154,10 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
 				if (isCambioCausaleApertura)
 					return "Non è possibile aprire l'attrezzaggio di una fase se se ne è già aperto il lavoro!";
 
-				errore = GestisciAperturaAttrezzaggio(operatore, attivitaDaAggiungere);
+				errore = await GestisciAperturaAttrezzaggioAsync(operatore, attivitaDaAggiungere);
 			}
 			else
-				errore = GestisciAperturaLavoro(operatore, attivitaDaAggiungere, isCambioCausaleApertura, isAttivitaIndiretta);
+				errore = await GestisciAperturaLavoroAsync(operatore, attivitaDaAggiungere, isCambioCausaleApertura, isAttivitaIndiretta);
 
 			if (errore != null)
 				return errore;
@@ -161,57 +165,62 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
 			return null;
 		}
 
-		private string? GestisciAperturaAttrezzaggio(Operatore operatore, Attivita attivita)
+		private async Task<string?> GestisciAperturaAttrezzaggioAsync(Operatore operatore, Attivita attivita)
 		{
 			string? errore = null;
 
-			Macchina? macchinaDaAttivitaAttrezzata = _macchinaService.GetMacchinaFittiziaDaAttivitaAttrezzata(attivita);
-			errore = _jmesApiClient.RegistrazioneOperazioneSuDb(() => _jmesApiClient.MesEquipStart(operatore, attivita.Bolla, macchinaDaAttivitaAttrezzata));
+			Macchina? macchinaDaAttivitaAttrezzata = await _macchinaService.GetMacchinaFittiziaDaAttivitaAttrezzataAsync(attivita);
+			errore = await _jmesApiClient.RegistrazioneOperazioneSuDbAsync(() => _jmesApiClient.MesEquipStartAsync(operatore, attivita.Bolla, macchinaDaAttivitaAttrezzata));
 
 			return errore;
 		}
 
-		private string? GestisciAperturaLavoro(Operatore operatore, Attivita attivitaDaAggiungere, bool isCambioCausaleApertura, bool isAttivitaIndiretta)
+		private async Task<string?> GestisciAperturaLavoroAsync(Operatore operatore, Attivita attivitaDaAggiungere, bool isCambioCausaleApertura, bool isAttivitaIndiretta)
 		{
 			string? errore = null;
 
 			if (isAttivitaIndiretta)
-				errore = _jmesApiClient.RegistrazioneOperazioneSuDb(() => _jmesApiClient.MesWorkStartIndiretta(operatore.Badge, attivitaDaAggiungere.Bolla));
+				errore = await _jmesApiClient.RegistrazioneOperazioneSuDbAsync(() => _jmesApiClient.MesWorkStartIndirettaAsync(operatore.Badge, attivitaDaAggiungere.Bolla));
 			else
-				errore = GestisciAperturaAttivitaDiretta(operatore, attivitaDaAggiungere, isCambioCausaleApertura);
+				errore = await GestisciAperturaAttivitaDirettaAsync(operatore, attivitaDaAggiungere, isCambioCausaleApertura);
 
 			return errore;
 		}
 
-		private string? GestisciAperturaAttivitaDiretta(Operatore operatore, Attivita attivitaDaAggiungere, bool isCambioCausaleApertura)
+		private async Task<string?> GestisciAperturaAttivitaDirettaAsync(Operatore operatore, Attivita attivitaDaAggiungere, bool isCambioCausaleApertura)
 		{
 			string? errore = null;
 
 			if (isCambioCausaleApertura)
 			{
-				errore = GestisciCambioCausale(operatore, attivitaDaAggiungere);
+				errore = await GestisciCambioCausaleAsync(operatore, attivitaDaAggiungere);
 				if (errore != null)
 					return errore;
 			}
 
-			Macchina? macchinaDaAttivitaAttrezzata = _macchinaService.GetMacchinaFittiziaDaAttivitaAttrezzata(attivitaDaAggiungere);
+			Macchina? macchinaDaAttivitaAttrezzata = await _macchinaService.GetMacchinaFittiziaDaAttivitaAttrezzataAsync(attivitaDaAggiungere);
 			if (macchinaDaAttivitaAttrezzata != null)
 			{
 				operatore.MacchineAssegnate.Add(macchinaDaAttivitaAttrezzata);
 				attivitaDaAggiungere.MacchinaFittizia = macchinaDaAttivitaAttrezzata;
 			}
 			else
-				attivitaDaAggiungere.MacchinaFittizia = operatore.MacchineAssegnate.First();
+			{
+				Macchina? macchina = operatore.MacchineAssegnate.FirstOrDefault();
+				if (macchina == null)
+					return "Nessuna macchina fittizia disponibile per avviare il lavoro";
+				attivitaDaAggiungere.MacchinaFittizia = macchina;
+			}
 
-			errore = _jmesApiClient.RegistrazioneOperazioneSuDb(() => _jmesApiClient.MesWorkStart(operatore, attivitaDaAggiungere));
+			errore = await _jmesApiClient.RegistrazioneOperazioneSuDbAsync(() => _jmesApiClient.MesWorkStartAsync(operatore, attivitaDaAggiungere));
 
 			return errore;
 		}
 
-		private string? GestisciCambioCausale(Operatore operatore, Attivita attivitaDaAggiungere)
+		private async Task<string?> GestisciCambioCausaleAsync(Operatore operatore, Attivita attivitaDaAggiungere)
 		{
 			Attivita AttivitaOperatoreDaRimuovere = operatore.AttivitaAperte.Single(x => x.Bolla == attivitaDaAggiungere.Bolla);
-			return RimuoviAttivitaDaOperatore(operatore, AttivitaOperatoreDaRimuovere, null, null, isAttrezzaggio: true);
+			return await RimuoviAttivitaDaOperatoreAsync(operatore, AttivitaOperatoreDaRimuovere, null, null, isAttrezzaggio: true);
 		}
 
 		public Operatore GetOperatoreDaIdJMes(string idJMesOperatore)

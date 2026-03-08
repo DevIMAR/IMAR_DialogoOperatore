@@ -5,20 +5,69 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <base href="/" />
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
 
-    <link rel="stylesheet" href="_content/DevExpress.Blazor.Themes/bootstrap-external.bs5.min.css" />
-	<link href="_content/DevExpress.Blazor.Themes/blazing-dark.bs5.min.css" asp-append-version="true" rel="stylesheet" />
-	<link rel="stylesheet" href="app.css" />
-	<link rel="stylesheet" href="diaope.css" />
-	<link rel="stylesheet" href="CustomDevExpress.css" />
+    <link rel="stylesheet" href="_content/DevExpress.Blazor.Themes/bootstrap-external.bs5.min.css" asp-append-version="true" />
+	<link rel="stylesheet" href="_content/DevExpress.Blazor.Themes/blazing-dark.bs5.min.css" asp-append-version="true" />
+	<link rel="stylesheet" href="app.css" asp-append-version="true" />
+	<link rel="stylesheet" href="diaope.css" asp-append-version="true" />
+	<link rel="stylesheet" href="CustomDevExpress.css" asp-append-version="true" />
     @DxResourceManager.RegisterScripts()
     <HeadOutlet @rendermode="InteractiveServer" />
 </head>
 
 <body>
     <Routes @rendermode="InteractiveServer" />
-    <script src="_framework/blazor.web.js"></script>
-    <script src="DialogoOperatore.js"></script>
+
+    <div id="components-reconnect-modal" class="diaope-reconnect-modal">
+        <div class="diaope-reconnect-content">
+            <div class="diaope-reconnect-spinner"></div>
+            <p class="diaope-reconnect-text">Aggiornamento in corso...</p>
+            <p class="diaope-reconnect-subtext">La pagina si ricaricherà automaticamente</p>
+        </div>
+    </div>
+
+    <script src="_framework/blazor.web.js" autostart="false"></script>
+    <script>
+        const reconnectModal = document.getElementById('components-reconnect-modal');
+
+        function showReconnectModal() {
+            if (reconnectModal) reconnectModal.style.display = '';
+        }
+
+        function hideReconnectModal() {
+            if (reconnectModal) reconnectModal.style.display = 'none';
+        }
+
+        function waitForServerAndReload() {
+            showReconnectModal();
+            const checkServer = setInterval(async () => {
+                try {
+                    const resp = await fetch('/', { cache: 'no-store' });
+                    if (resp.ok) {
+                        clearInterval(checkServer);
+                        location.reload();
+                    }
+                } catch { }
+            }, 3000);
+        }
+
+        Blazor.start({
+            circuit: {
+                reconnectionHandler: {
+                    onConnectionDown() {
+                        waitForServerAndReload();
+                    },
+                    onConnectionUp() {
+                        // Il server è tornato ma il circuito è morto dopo un deploy.
+                        // Reload pulito per avere un circuito nuovo.
+                        location.reload();
+                    }
+                }
+            }
+        });
+    </script>
+    <script src="DialogoOperatore.js" asp-append-version="true"></script>
 </body>
 
 </html>

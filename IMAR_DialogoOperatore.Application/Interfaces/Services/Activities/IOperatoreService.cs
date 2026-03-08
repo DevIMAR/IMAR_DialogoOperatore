@@ -1,4 +1,4 @@
-﻿using IMAR_DialogoOperatore.Domain.Models;
+using IMAR_DialogoOperatore.Domain.Models;
 
 namespace IMAR_DialogoOperatore.Application.Interfaces.Services.Activities
 {
@@ -6,9 +6,9 @@ namespace IMAR_DialogoOperatore.Application.Interfaces.Services.Activities
     {
         Operatore Operatore { get; set; }
 
-        Operatore? OttieniOperatore(int? badge);
-        string? RimuoviAttivitaDaOperatore(Operatore operatore, Attivita attivitaDaRimuovere, int? quantitaProdotta, int? quantitaScartata, bool isSospeso = false, bool? isAttrezzaggio = null);
-        string? AggiungiAttivitaAdOperatore(bool isAttrezzaggio, Operatore operatore, Attivita attivita, bool isAttivitaIndiretta);
+        Task<Operatore?> OttieniOperatoreAsync(int? badge);
+        Task<string?> RimuoviAttivitaDaOperatoreAsync(Operatore operatore, Attivita attivitaDaRimuovere, int? quantitaProdotta, int? quantitaScartata, bool isSospeso = false, bool? isAttrezzaggio = null);
+        Task<string?> AggiungiAttivitaAdOperatoreAsync(bool isAttrezzaggio, Operatore operatore, Attivita attivita, bool isAttivitaIndiretta);
         Operatore GetOperatoreDaIdJMes(string idJMesOperatore);
     }
 }

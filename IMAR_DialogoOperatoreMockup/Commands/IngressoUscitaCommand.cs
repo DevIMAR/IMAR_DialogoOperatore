@@ -1,4 +1,4 @@
-﻿using IMAR_DialogoOperatore.Application;
+using IMAR_DialogoOperatore.Application;
 using IMAR_DialogoOperatore.Application.Interfaces.Clients;
 using IMAR_DialogoOperatore.Application.Interfaces.Services.Activities;
 using IMAR_DialogoOperatore.Application.Interfaces.Utilities;
@@ -67,10 +67,13 @@ namespace IMAR_DialogoOperatore.Commands
 
 		public override async void Execute(object? parameter)
         {
-            if (_dialogoOperatoreObserver.OperatoreSelezionato.Stato == Costanti.ASSENTE)
-                await EffettuaIngressoOperatore();
-            else
-                await EffettuaUscitaOperatore();
+            await SafeExecuteAsync(async () =>
+            {
+                if (_dialogoOperatoreObserver.OperatoreSelezionato.Stato == Costanti.ASSENTE)
+                    await EffettuaIngressoOperatore();
+                else
+                    await EffettuaUscitaOperatore();
+            }, _loggingService, "IngressoUscitaCommand.Execute");
         }
 
         private async Task EffettuaIngressoOperatore()
@@ -78,9 +81,17 @@ namespace IMAR_DialogoOperatore.Commands
             _dialogoOperatoreObserver.IsLoaderVisibile = true;
             await Task.Delay(1);
 
-            _jmesApiClient.MesAutoClock(_dialogoOperatoreObserver.OperatoreSelezionato.Badge.ToString(), true);
+            string? errore = await _jmesApiClient.RegistrazioneOperazioneSuDbAsync(
+                () => _jmesApiClient.MesAutoClockAsync(_dialogoOperatoreObserver.OperatoreSelezionato.Badge.ToString(), true));
 
-            AggiornaOperatoreSelezionato();
+            if (errore != null)
+            {
+                _dialogoOperatoreObserver.IsLoaderVisibile = false;
+                _toastDisplayerUtility.ShowRedToast("Errore Entrata", errore);
+                return;
+            }
+
+            await AggiornaOperatoreSelezionatoAsync();
 
             _dialogoOperatoreObserver.IsLoaderVisibile = false;
 
@@ -111,7 +122,11 @@ namespace IMAR_DialogoOperatore.Commands
             _dialogoOperatoreObserver.IsLoaderVisibile = true;
             await Task.Delay(1);
 
-            _jmesApiClient.MesAutoClock(_dialogoOperatoreObserver.OperatoreSelezionato.Badge.ToString(), false);
+            string? erroreUscita = await _jmesApiClient.RegistrazioneOperazioneSuDbAsync(
+                () => _jmesApiClient.MesAutoClockAsync(_dialogoOperatoreObserver.OperatoreSelezionato.Badge.ToString(), false));
+
+            if (erroreUscita != null)
+                _loggingService.LogError($"Errore MesAutoClock uscita badge {_dialogoOperatoreObserver.OperatoreSelezionato.Badge}: {erroreUscita}");
 
             _dialogoOperatoreObserver.IsLoaderVisibile = false;
             _dialogoOperatoreObserver.IsExiting = true;
@@ -147,9 +162,9 @@ namespace IMAR_DialogoOperatore.Commands
             }
         }
 
-        private void AggiornaOperatoreSelezionato()
+        private async Task AggiornaOperatoreSelezionatoAsync()
         {
-            Operatore? operatore = _operatoreService.OttieniOperatore(_dialogoOperatoreObserver.OperatoreSelezionato.Badge);
+            Operatore? operatore = await _operatoreService.OttieniOperatoreAsync(_dialogoOperatoreObserver.OperatoreSelezionato.Badge);
 
             _dialogoOperatoreObserver.OperatoreSelezionato = operatore != null ? new OperatoreViewModel(operatore) : null;
         }

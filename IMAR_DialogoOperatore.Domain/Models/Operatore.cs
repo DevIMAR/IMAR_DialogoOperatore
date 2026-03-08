@@ -10,8 +10,8 @@
 		public DateTime Uscita { get; set; }
 		public DateTime InizioPausa { get; set; }
 		public DateTime FinePausa { get; set; }
-		public IList<Attivita> AttivitaAperte { get; set; }
-		public IList<Macchina?> MacchineAssegnate { get; set; }
+		public IList<Attivita> AttivitaAperte { get; set; } = new List<Attivita>();
+		public IList<Macchina?> MacchineAssegnate { get; set; } = new List<Macchina?>();
 		public int IdJMes { get; set; }
     }
 }

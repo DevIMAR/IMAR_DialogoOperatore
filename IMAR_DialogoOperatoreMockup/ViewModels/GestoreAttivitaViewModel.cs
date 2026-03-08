@@ -18,13 +18,17 @@ namespace IMAR_DialogoOperatore.ViewModels
 		public ICommand ConfermaCommand { get; set; }
 		public ICommand MostraNotePopupCommand { get; set; }
 		public ICommand CreaFaseNonPianificataCommand { get; set; }
+		public ICommand FineLavoroCommand { get; set; }
+		public ICommand FineAttrezzaggioCommand { get; set; }
 
 		public GestoreAttivitaViewModel(
 			IDialogoOperatoreObserver dialogoOperatoreObserver,
 			ICercaAttivitaObserver cercaAttivitaObserver,
 			ConfermaCommand confermaCommand,
             MostraNotePopupCommand mostraNotePopupCommand,
-			CreaFaseNonPianificataCommand creaFaseNonPianificataCommand)
+			CreaFaseNonPianificataCommand creaFaseNonPianificataCommand,
+			FineLavoroCommand fineLavoroCommand,
+			FineAttrezzaggioCommand fineAttrezzaggioCommand)
         {
 			_dialogoOperatoreObserver = dialogoOperatoreObserver;
 			_cercaAttivitaObserver = cercaAttivitaObserver;
@@ -32,6 +36,8 @@ namespace IMAR_DialogoOperatore.ViewModels
 			ConfermaCommand = confermaCommand;
             MostraNotePopupCommand = mostraNotePopupCommand;
 			CreaFaseNonPianificataCommand = creaFaseNonPianificataCommand;
+			FineLavoroCommand = fineLavoroCommand;
+			FineAttrezzaggioCommand = fineAttrezzaggioCommand;
 
             _dialogoOperatoreObserver.OnAttivitaSelezionataChanged += AttivitaStore_OnAttivitaSelezionataChanged;
 			_dialogoOperatoreObserver.OnOperazioneInCorsoChanged += DialogoOperatoreStore_OnOperazioneInCorsoChanged;
@@ -40,8 +46,8 @@ namespace IMAR_DialogoOperatore.ViewModels
 
         private void DialogoOperatoreStore_OnOperazioneInCorsoChanged()
 		{
-			if (!(_dialogoOperatoreObserver.OperazioneInCorso == Costanti.AVANZAMENTO || 
-					_dialogoOperatoreObserver.OperazioneInCorso == Costanti.INIZIO_LAVORO || 
+			if (!(_dialogoOperatoreObserver.OperazioneInCorso == Costanti.AVANZAMENTO ||
+					_dialogoOperatoreObserver.OperazioneInCorso == Costanti.INIZIO_LAVORO ||
 					_dialogoOperatoreObserver.OperazioneInCorso == Costanti.INIZIO_ATTREZZAGGIO))
 				_cercaAttivitaObserver.IsAttivitaCercata = false;
 
@@ -77,7 +83,9 @@ namespace IMAR_DialogoOperatore.ViewModels
 			if ((operazioneInCorso == null || operazioneInCorso == Costanti.NESSUNA) && attivitaSelezionata == null)
 				return false;
 
-			if ((operazioneInCorso != Costanti.INIZIO_LAVORO && operazioneInCorso != Costanti.INIZIO_ATTREZZAGGIO) && operazioneInCorso != Costanti.AVANZAMENTO && attivitaSelezionata == null)
+			if (operazioneInCorso != Costanti.INIZIO_LAVORO && operazioneInCorso != Costanti.INIZIO_ATTREZZAGGIO
+				&& operazioneInCorso != Costanti.AVANZAMENTO && operazioneInCorso != Costanti.FINE_LAVORO
+				&& operazioneInCorso != Costanti.FINE_ATTREZZAGGIO && attivitaSelezionata == null)
 				return false;
 
 			return true;

@@ -1,4 +1,4 @@
-﻿using IMAR_DialogoOperatore.Application;
+using IMAR_DialogoOperatore.Application;
 using IMAR_DialogoOperatore.Application.Interfaces.Services.Activities;
 using IMAR_DialogoOperatore.Domain.Models;
 using IMAR_DialogoOperatore.Interfaces.Helpers;
@@ -29,7 +29,7 @@ namespace IMAR_DialogoOperatore.Helpers
 			IAttivitaIndirettaObserver attivitaIndirettaObserver,
 			IOperatoreMapper operatoreMapper,
 			IAttivitaMapper AttivitaMapper)
-		{						
+		{
 			_attivitaGridViewModel = attivitaGridViewModel;
 			_operatoriService = operatoriService;
 			_attivitaService = attivitaService;
@@ -40,7 +40,7 @@ namespace IMAR_DialogoOperatore.Helpers
 			_attivitaMapper = AttivitaMapper;
 		}
 
-		public string? EseguiOperazione()
+		public async Task<string?> EseguiOperazioneAsync()
 		{
 			string? result = null;
 
@@ -51,27 +51,27 @@ namespace IMAR_DialogoOperatore.Helpers
 			switch (operazioneInCorso)
 			{
 				case Costanti.INIZIO_LAVORO:
-                    result = AggiungiAttivitaAdOperatore(false);
-                    AggiornaOperatoreSelezionato();
+                    result = await AggiungiAttivitaAdOperatoreAsync(false);
+                    await AggiornaOperatoreSelezionatoAsync();
                     break;
 
 				case Costanti.INIZIO_ATTREZZAGGIO:
-					result = AggiungiAttivitaAdOperatore(true);
-                    AggiornaOperatoreSelezionato();
+					result = await AggiungiAttivitaAdOperatoreAsync(true);
+                    await AggiornaOperatoreSelezionatoAsync();
                     break;
 
 				case Costanti.AVANZAMENTO:
-					result = AggiornaAttivitaAvanzata();
+					result = await AggiornaAttivitaAvanzataAsync();
 					break;
 
 				case Costanti.FINE_LAVORO:
-                    result = RimuoviAttivitaDaOperatore();
-                    AggiornaOperatoreSelezionato();
+                    result = await RimuoviAttivitaDaOperatoreAsync();
+                    await AggiornaOperatoreSelezionatoAsync();
                     break;
 
 				case Costanti.FINE_ATTREZZAGGIO:
-					result = GestisciFineAttrezzaggio();
-                    AggiornaOperatoreSelezionato();
+					result = await GestisciFineAttrezzaggioAsync();
+                    await AggiornaOperatoreSelezionatoAsync();
                     break;
 
 				default:
@@ -82,24 +82,24 @@ namespace IMAR_DialogoOperatore.Helpers
             return result;
         }
 
-        private string? GestisciFineAttrezzaggio()
+        private async Task<string?> GestisciFineAttrezzaggioAsync()
         {
 			string? result = null;
 
 			if (_dialogoOperatoreObserver.IsAperturaLavoroAutomaticaAttiva)
 			{
 				_attivitaIndirettaObserver.IsAttivitaIndiretta = false;
-                result = AggiungiAttivitaAdOperatore(false);
+                result = await AggiungiAttivitaAdOperatoreAsync(false);
 			}
 			else
-				result = RimuoviAttivitaDaOperatore();
+				result = await RimuoviAttivitaDaOperatoreAsync();
 
 			return result;
         }
 
-        private string? RimuoviAttivitaDaOperatore()
+        private async Task<string?> RimuoviAttivitaDaOperatoreAsync()
 		{
-            string? result = _operatoriService.RimuoviAttivitaDaOperatore(
+            string? result = await _operatoriService.RimuoviAttivitaDaOperatoreAsync(
                 _operatoreMapper.OperatoreViewModelToOperatore(_dialogoOperatoreObserver.OperatoreSelezionato),
 				_attivitaMapper.AttivitaViewModelToAttivita(_dialogoOperatoreObserver.AttivitaSelezionata),
                 _avanzamentoObserver.QuantitaProdotta != null ? (int)_avanzamentoObserver.QuantitaProdotta : 0,
@@ -111,12 +111,12 @@ namespace IMAR_DialogoOperatore.Helpers
             return result;
         }
 
-		private string? AggiornaAttivitaAvanzata()
+		private async Task<string?> AggiornaAttivitaAvanzataAsync()
         {
 			_dialogoOperatoreObserver.AttivitaSelezionata.QuantitaProdottaNonContabilizzata += _avanzamentoObserver.QuantitaProdotta != null ? (int)_avanzamentoObserver.QuantitaProdotta : 0;
 			_dialogoOperatoreObserver.AttivitaSelezionata.QuantitaScartataNonContabilizzata += _avanzamentoObserver.QuantitaScartata != null ? (int)_avanzamentoObserver.QuantitaScartata : 0;
 
-            string? result = _attivitaService.AvanzaAttivita(
+            string? result = await _attivitaService.AvanzaAttivitaAsync(
                 _operatoreMapper.OperatoreViewModelToOperatore(_dialogoOperatoreObserver.OperatoreSelezionato),
                 _attivitaMapper.AttivitaViewModelToAttivita(_dialogoOperatoreObserver.AttivitaSelezionata),
                 _avanzamentoObserver.QuantitaProdotta != null ? (int)_avanzamentoObserver.QuantitaProdotta : 0,
@@ -135,11 +135,11 @@ namespace IMAR_DialogoOperatore.Helpers
             _dialogoOperatoreObserver.IsRiaperturaAttiva = false;
         }
 
-        private string? AggiungiAttivitaAdOperatore(bool isAttrezzaggio)
+        private async Task<string?> AggiungiAttivitaAdOperatoreAsync(bool isAttrezzaggio)
         {
             _dialogoOperatoreObserver.AttivitaSelezionata.Causale = isAttrezzaggio ? Costanti.IN_ATTREZZAGGIO : Costanti.IN_LAVORO;
 
-            string? result = _operatoriService.AggiungiAttivitaAdOperatore(
+            string? result = await _operatoriService.AggiungiAttivitaAdOperatoreAsync(
                 isAttrezzaggio,
                 _operatoreMapper.OperatoreViewModelToOperatore(_dialogoOperatoreObserver.OperatoreSelezionato),
                 _attivitaMapper.AttivitaViewModelToAttivita(_dialogoOperatoreObserver.AttivitaSelezionata),
@@ -149,9 +149,9 @@ namespace IMAR_DialogoOperatore.Helpers
 			return result;
         }
 
-        private void AggiornaOperatoreSelezionato()
+        private async Task AggiornaOperatoreSelezionatoAsync()
         {
-            Operatore? operatore = _operatoriService.OttieniOperatore(_dialogoOperatoreObserver.OperatoreSelezionato.Badge);
+            Operatore? operatore = await _operatoriService.OttieniOperatoreAsync(_dialogoOperatoreObserver.OperatoreSelezionato.Badge);
 
             _dialogoOperatoreObserver.OperatoreSelezionato = operatore != null ? new OperatoreViewModel(operatore) : null;
         }

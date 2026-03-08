@@ -1,4 +1,4 @@
-﻿using IMAR_DialogoOperatore.Application;
+using IMAR_DialogoOperatore.Application;
 using IMAR_DialogoOperatore.Application.Interfaces.Clients;
 using IMAR_DialogoOperatore.Application.Interfaces.Services.Activities;
 using IMAR_DialogoOperatore.Application.Interfaces.Utilities;
@@ -19,6 +19,7 @@ namespace IMAR_DialogoOperatore.Commands
         private readonly IOperatoreService _operatoriService;
         private readonly IAutoLogoutUtility _autoLogoutUtility;
         private readonly ToastDisplayerUtility _toastDisplayerUtility;
+        private readonly ILoggingService _loggingService;
 
         public InizioFinePausaCommand(
             InfoOperatoreViewModel infoOperatoreViewModel,
@@ -28,7 +29,8 @@ namespace IMAR_DialogoOperatore.Commands
             IAttivitaService attivitaService,
             IOperatoreService operatoriService,
             IAutoLogoutUtility autoLogoutUtility,
-            ToastDisplayerUtility toastDisplayerUtility)
+            ToastDisplayerUtility toastDisplayerUtility,
+            ILoggingService loggingService)
         {
             _infoOperatoreViewModel = infoOperatoreViewModel;
             _dialogoOperatoreObserver = dialogoOperatoreObserver;
@@ -37,6 +39,7 @@ namespace IMAR_DialogoOperatore.Commands
             _operatoriService = operatoriService;
             _autoLogoutUtility = autoLogoutUtility;
             _toastDisplayerUtility = toastDisplayerUtility;
+            _loggingService = loggingService;
 
             _autoLogoutUtility.OnLogoutTriggered += AutoLogoutUtility_OnLogoutTriggered;
         }
@@ -65,18 +68,21 @@ namespace IMAR_DialogoOperatore.Commands
 
         public override async void Execute(object? parameter)
         {
-            if (_dialogoOperatoreObserver.OperatoreSelezionato.Stato == Costanti.IN_PAUSA)
-                await FinePausa();
-            else
-                await InizioPausa();
+            await SafeExecuteAsync(async () =>
+            {
+                if (_dialogoOperatoreObserver.OperatoreSelezionato.Stato == Costanti.IN_PAUSA)
+                    await FinePausa();
+                else
+                    await InizioPausa();
+            }, _loggingService, "InizioFinePausaCommand.Execute");
         }
 
         private async Task FinePausa()
         {
             _dialogoOperatoreObserver.IsLoaderVisibile = true;
             await Task.Delay(1);
-            _jmesApiClient.MesBreakEnd(_dialogoOperatoreObserver.OperatoreSelezionato.Badge.ToString());
-            _dialogoOperatoreObserver.OperatoreSelezionato = new OperatoreViewModel(_operatoriService.OttieniOperatore(_dialogoOperatoreObserver.OperatoreSelezionato.Badge));
+            await _jmesApiClient.MesBreakEndAsync(_dialogoOperatoreObserver.OperatoreSelezionato.Badge.ToString());
+            _dialogoOperatoreObserver.OperatoreSelezionato = new OperatoreViewModel(await _operatoriService.OttieniOperatoreAsync(_dialogoOperatoreObserver.OperatoreSelezionato.Badge));
             _dialogoOperatoreObserver.IsLoaderVisibile = false;
 
             _dialogoOperatoreObserver.OperatoreSelezionato.Stato = Costanti.PRESENTE;
@@ -97,9 +103,9 @@ namespace IMAR_DialogoOperatore.Commands
 
             _dialogoOperatoreObserver.IsLoaderVisibile = true;
             await Task.Delay(1);
-            _jmesApiClient.MesBreakStart(_dialogoOperatoreObserver.OperatoreSelezionato.Badge.ToString());
-            _dialogoOperatoreObserver.OperatoreSelezionato = new OperatoreViewModel(_operatoriService.OttieniOperatore(_dialogoOperatoreObserver.OperatoreSelezionato.Badge));
-           
+            await _jmesApiClient.MesBreakStartAsync(_dialogoOperatoreObserver.OperatoreSelezionato.Badge.ToString());
+            _dialogoOperatoreObserver.OperatoreSelezionato = new OperatoreViewModel(await _operatoriService.OttieniOperatoreAsync(_dialogoOperatoreObserver.OperatoreSelezionato.Badge));
+
             _dialogoOperatoreObserver.IsLoaderVisibile = false;
             _dialogoOperatoreObserver.IsExiting = true;
             await Task.Delay(1);

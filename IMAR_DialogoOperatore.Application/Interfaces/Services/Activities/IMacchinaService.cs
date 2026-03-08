@@ -1,4 +1,4 @@
-﻿using IMAR_DialogoOperatore.Domain.Models;
+using IMAR_DialogoOperatore.Domain.Models;
 
 namespace IMAR_DialogoOperatore.Application.Interfaces.Services.Activities
 {
@@ -6,8 +6,8 @@ namespace IMAR_DialogoOperatore.Application.Interfaces.Services.Activities
     {
         Macchina GetMacchinaRealeByAttivita(Attivita attivita);
         int GetCodiceJmesByCodice(string codiceMacchinaCompleto);
-        Macchina? GetMacchinaFittiziaByFirstAttivitaAperta(Attivita attivitaAperta, int idJMesOperatore);
-        Macchina? GetPrimaMacchinaFittiziaNonUtilizzata();
-        Macchina? GetMacchinaFittiziaDaAttivitaAttrezzata(Attivita attivitaDaAggiungere);
+        Task<Macchina?> GetMacchinaFittiziaByFirstAttivitaApertaAsync(Attivita attivitaAperta, int idJMesOperatore);
+        Task<Macchina?> GetPrimaMacchinaFittiziaNonUtilizzataAsync();
+        Task<Macchina?> GetMacchinaFittiziaDaAttivitaAttrezzataAsync(Attivita attivitaDaAggiungere);
     }
 }

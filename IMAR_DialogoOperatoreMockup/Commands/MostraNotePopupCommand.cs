@@ -6,13 +6,16 @@ namespace IMAR_DialogoOperatore.Commands
     public class MostraNotePopupCommand : CommandBase
     {
         private readonly NotePopupViewModel _notePopupViewModel;
+        private readonly NoteGridViewModel _noteGridViewModel;
         private readonly IDialogoOperatoreObserver _dialogoOperatoreObserver;
 
         public MostraNotePopupCommand(
             NotePopupViewModel notePopupViewModel,
+            NoteGridViewModel noteGridViewModel,
             IDialogoOperatoreObserver dialogoOperatoreObserver)
         {
             _notePopupViewModel = notePopupViewModel;
+            _noteGridViewModel = noteGridViewModel;
             _dialogoOperatoreObserver = dialogoOperatoreObserver;
         }
 
@@ -21,12 +24,13 @@ namespace IMAR_DialogoOperatore.Commands
             return _dialogoOperatoreObserver.AttivitaSelezionata != null &&
                     _dialogoOperatoreObserver.AttivitaSelezionata.Bolla != null &&
                     (_dialogoOperatoreObserver.AttivitaSelezionata.Bolla.Length == 6 ||
-                        (_dialogoOperatoreObserver.AttivitaSelezionata.Bolla.Length == 5 
+                        (_dialogoOperatoreObserver.AttivitaSelezionata.Bolla.Length == 5
                             && _dialogoOperatoreObserver.AttivitaSelezionata.Bolla.Contains("AI")));
         }
 
         public override void Execute(object? parameter)
         {
+            _noteGridViewModel.Note = _noteGridViewModel.GetNoteAttivita();
             _notePopupViewModel.IsVisible = true;
         }
     }

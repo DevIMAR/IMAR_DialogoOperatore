@@ -1,0 +1,32 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "DialogoOperatore (Blazor)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/IMAR_DialogoOperatoreMockup/bin/Debug/net9.0/IMAR_DialogoOperatore.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/IMAR_DialogoOperatoreMockup",
+            "stopAtEntry": false,
+            "serverReadyAction": {
+                "action": "openExternally",
+                "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
+            },
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            }
+        },
+        {
+            "name": "Esportatore Timbrature",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build-esportatore",
+            "program": "${workspaceFolder}/GeneratoreTimbratureTeamSystem/bin/Debug/net9.0/EsportatoreTimbratureTeamSystem.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/GeneratoreTimbratureTeamSystem",
+            "console": "integratedTerminal"
+        }
+    ]
+}

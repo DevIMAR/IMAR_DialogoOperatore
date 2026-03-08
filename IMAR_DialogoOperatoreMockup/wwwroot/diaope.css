@@ -188,6 +188,17 @@
     font-size: 3dvh !important;
 }
 
+.combobox-categoria-errore {
+    font-size: 2.5dvh !important;
+    border: 2px solid orange !important;
+    border-radius: 4px;
+}
+
+.combobox-categoria-errore input::placeholder {
+    color: orange !important;
+    opacity: 0.8;
+}
+
 .h-100 {
     height: 100% !important;
 }

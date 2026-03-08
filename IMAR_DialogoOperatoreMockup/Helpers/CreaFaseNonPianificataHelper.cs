@@ -1,4 +1,4 @@
-﻿using IMAR_DialogoOperatore.Application;
+using IMAR_DialogoOperatore.Application;
 using IMAR_DialogoOperatore.Application.Interfaces.Services.Activities;
 using IMAR_DialogoOperatore.Domain.Models;
 using IMAR_DialogoOperatore.Interfaces.Helpers;
@@ -41,11 +41,11 @@ namespace IMAR_DialogoOperatore.Helpers
             switch (_dialogoOperatoreObserver.OperazioneInCorso)
             {
                 case Costanti.INIZIO_ATTREZZAGGIO:
-                    result = _attivitaService.ApriAttrezzaggioFaseNonPianificata(_attivitaMapper.AttivitaViewModelToAttivita(_dialogoOperatoreObserver.AttivitaSelezionata),
+                    result = await _attivitaService.ApriAttrezzaggioFaseNonPianificataAsync(_attivitaMapper.AttivitaViewModelToAttivita(_dialogoOperatoreObserver.AttivitaSelezionata),
                                                                                  _operatoreMapper.OperatoreViewModelToOperatore(_dialogoOperatoreObserver.OperatoreSelezionato));
                     break;
                 case Costanti.INIZIO_LAVORO:
-                    result = _attivitaService.ApriLavoroFaseNonPianificata(_attivitaMapper.AttivitaViewModelToAttivita(_dialogoOperatoreObserver.AttivitaSelezionata),
+                    result = await _attivitaService.ApriLavoroFaseNonPianificataAsync(_attivitaMapper.AttivitaViewModelToAttivita(_dialogoOperatoreObserver.AttivitaSelezionata),
                                                                            _operatoreMapper.OperatoreViewModelToOperatore(_dialogoOperatoreObserver.OperatoreSelezionato));
                     break;
                 default:
@@ -57,14 +57,14 @@ namespace IMAR_DialogoOperatore.Helpers
 
             _dialogoOperatoreObserver.OperazioneInCorso = Costanti.NESSUNA;
             _dialogoOperatoreObserver.AttivitaSelezionata = null;
-            AggiornaOperatoreSelezionato();
+            await AggiornaOperatoreSelezionatoAsync();
 
             return result;
         }
 
-        private void AggiornaOperatoreSelezionato()
+        private async Task AggiornaOperatoreSelezionatoAsync()
         {
-            Operatore? operatore = _operatoreService.OttieniOperatore(_dialogoOperatoreObserver.OperatoreSelezionato.Badge);
+            Operatore? operatore = await _operatoreService.OttieniOperatoreAsync(_dialogoOperatoreObserver.OperatoreSelezionato.Badge);
 
             _dialogoOperatoreObserver.OperatoreSelezionato = operatore != null ? new OperatoreViewModel(operatore) : null;
         }

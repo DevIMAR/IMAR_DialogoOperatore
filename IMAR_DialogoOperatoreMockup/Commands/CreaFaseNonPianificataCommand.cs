@@ -1,5 +1,6 @@
 ﻿using IMAR_DialogoOperatore.Application;
 using IMAR_DialogoOperatore.Application.Interfaces.Services.Activities;
+using IMAR_DialogoOperatore.Application.Interfaces.Utilities;
 using IMAR_DialogoOperatore.Enums;
 using IMAR_DialogoOperatore.Interfaces.Helpers;
 using IMAR_DialogoOperatore.Interfaces.Observers;
@@ -14,13 +15,15 @@ namespace IMAR_DialogoOperatore.Commands
         private readonly ICreaFaseNonPianificataHelper _creaFaseNonPianificataHelper;
         private readonly IMacchinaService _macchinaService;
         private readonly IMessageBoxService _messageBoxService;
+        private readonly ILoggingService _loggingService;
 
         public CreaFaseNonPianificataCommand(
             IDialogoOperatoreObserver dialogoOperatoreObserver,
             IPopupObserver popupObserver,
             ICreaFaseNonPianificataHelper creaFaseNonPianificataHelper,
             IMacchinaService macchinaService,
-            IMessageBoxService messageBoxService)
+            IMessageBoxService messageBoxService,
+            ILoggingService loggingService)
         {
             _dialogoOperatoreObserver = dialogoOperatoreObserver;
             _popupObserver = popupObserver;
@@ -29,6 +32,7 @@ namespace IMAR_DialogoOperatore.Commands
 
             _macchinaService = macchinaService;
             _messageBoxService = messageBoxService;
+            _loggingService = loggingService;
         }
 
         public override bool CanExecute(object? parameter)
@@ -42,24 +46,31 @@ namespace IMAR_DialogoOperatore.Commands
 
         public override async void Execute(object? parameter)
         {
-            _dialogoOperatoreObserver.IsLoaderVisibile = true;
-            await Task.Delay(1);
+            await SafeExecuteAsync(async () =>
+            {
+                _dialogoOperatoreObserver.IsLoaderVisibile = true;
+                await Task.Delay(1);
 
-            AssegnaMacchinaFittiziaAdOperatore();
-            await EseguiOperazioneOMostraMessaggio();
+                await AssegnaMacchinaFittiziaAdOperatoreAsync();
+                await EseguiOperazioneOMostraMessaggio();
 
-            _dialogoOperatoreObserver.IsOperazioneGestita = true;
-            _dialogoOperatoreObserver.IsLoaderVisibile = false;
+                _dialogoOperatoreObserver.IsOperazioneGestita = true;
+                _dialogoOperatoreObserver.IsLoaderVisibile = false;
+            }, _loggingService, "CreaFaseNonPianificataCommand.Execute");
         }
 
-        private void AssegnaMacchinaFittiziaAdOperatore()
+        private async Task AssegnaMacchinaFittiziaAdOperatoreAsync()
         {
             if (_dialogoOperatoreObserver.OperatoreSelezionato.MacchineAssegnate.Any())
                 return;
 
-            _dialogoOperatoreObserver.OperatoreSelezionato.MacchineAssegnate.Add(_macchinaService.GetPrimaMacchinaFittiziaNonUtilizzata());
-            if (!_dialogoOperatoreObserver.OperatoreSelezionato.MacchineAssegnate.Any())
+            Domain.Models.Macchina? macchina = await _macchinaService.GetPrimaMacchinaFittiziaNonUtilizzataAsync();
+            if (macchina == null)
+            {
                 MostraPopupConTesto(Costanti.ERRORE_MACCHINE_FINITE);
+                return;
+            }
+            _dialogoOperatoreObserver.OperatoreSelezionato.MacchineAssegnate.Add(macchina);
         }
 
         private async Task EseguiOperazioneOMostraMessaggio()

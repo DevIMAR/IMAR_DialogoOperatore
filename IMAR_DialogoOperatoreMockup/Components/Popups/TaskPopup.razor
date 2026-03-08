@@ -37,7 +37,7 @@
 			<Items>
 				<DxGridLayoutItem Row="0" Column="1">
 					<Template>
-						<div class="d-flex justify-content-center align-items-center h-100 testo-piccolo mt-2">
+						<div class="d-flex justify-content-center align-items-center h-100 testo-grande mt-2">
 							<label>CATEGORIA ERRORE</label>
 						</div>
 					</Template>
@@ -47,7 +47,8 @@
 					<Template>
 						<DxComboBox Data="@TaskPopupViewModel.CategorieErrori"
 									@bind-Value="@TaskPopupViewModel.CategoriaErroreSelezionata"
-									CssClass="mt-2" />
+									NullText="Clicca qui per selezionare una causa"
+									CssClass="mt-2 combobox-categoria-errore" />
 					</Template>
 				</DxGridLayoutItem>
 
