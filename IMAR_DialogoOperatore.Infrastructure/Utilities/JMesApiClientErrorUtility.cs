@@ -15,8 +15,23 @@ namespace IMAR_DialogoOperatore.Infrastructure.Utilities
 
         public async Task<(string? errore, JMesResultDto? dati)> GestioneEventualeErroreAsync(HttpResponseMessage result)
         {
+            // Log della request inviata a JMes
+            string requestBody = "[nessun body]";
+            try
+            {
+                if (result.RequestMessage?.Content != null)
+                    requestBody = await result.RequestMessage.Content.ReadAsStringAsync();
+            }
+            catch { /* content già disposto, ignora */ }
+
             var rawJson = await result.Content.ReadAsStringAsync();
-            _loggingService.LogDebug($"Risposta JMES (HTTP {(int)result.StatusCode}): {rawJson}");
+
+            _loggingService.LogInfo($"JMES {result.RequestMessage?.Method} {result.RequestMessage?.RequestUri}" +
+                $" | Request: {requestBody}" +
+                $" | Response (HTTP {(int)result.StatusCode}): {(string.IsNullOrEmpty(rawJson) ? "[BODY VUOTO]" : rawJson)}");
+
+            if (string.IsNullOrWhiteSpace(rawJson))
+                return ($"L'API JMES ha restituito una risposta vuota (HTTP {(int)result.StatusCode})", null);
 
             JMesResultDto? jsonData = null;
             try
