@@ -1,11 +1,13 @@
 using IMAR_DialogoOperatore.Application;
 using IMAR_DialogoOperatore.Application.Interfaces.Services.Activities;
+using IMAR_DialogoOperatore.Application.Interfaces.Utilities;
 using IMAR_DialogoOperatore.Domain.Models;
 using IMAR_DialogoOperatore.Interfaces.Helpers;
 using IMAR_DialogoOperatore.Interfaces.Mappers;
 using IMAR_DialogoOperatore.Interfaces.Observers;
 using IMAR_DialogoOperatore.Observers;
 using IMAR_DialogoOperatore.ViewModels;
+using System.Diagnostics;
 
 namespace IMAR_DialogoOperatore.Helpers
 {
@@ -19,6 +21,7 @@ namespace IMAR_DialogoOperatore.Helpers
 		private readonly IAttivitaIndirettaObserver _attivitaIndirettaObserver;
 		private readonly IOperatoreMapper _operatoreMapper;
 		private readonly IAttivitaMapper _attivitaMapper;
+		private readonly ILoggingService _loggingService;
 
 		public ConfermaOperazioneHelper(
 			AttivitaGridViewModel attivitaGridViewModel,
@@ -28,7 +31,8 @@ namespace IMAR_DialogoOperatore.Helpers
 			IAvanzamentoObserver avanzamentoObserver,
 			IAttivitaIndirettaObserver attivitaIndirettaObserver,
 			IOperatoreMapper operatoreMapper,
-			IAttivitaMapper AttivitaMapper)
+			IAttivitaMapper AttivitaMapper,
+			ILoggingService loggingService)
 		{
 			_attivitaGridViewModel = attivitaGridViewModel;
 			_operatoriService = operatoriService;
@@ -38,39 +42,48 @@ namespace IMAR_DialogoOperatore.Helpers
 			_attivitaIndirettaObserver = attivitaIndirettaObserver;
 			_operatoreMapper = operatoreMapper;
 			_attivitaMapper = AttivitaMapper;
+			_loggingService = loggingService;
 		}
 
 		public async Task<string?> EseguiOperazioneAsync()
 		{
+			var swTotale = Stopwatch.StartNew();
 			string? result = null;
 
 			string? operazioneInCorso = _dialogoOperatoreObserver.OperazioneInCorso;
 			if (operazioneInCorso == null)
 				return null;
 
+			var swOperazione = Stopwatch.StartNew();
+
 			switch (operazioneInCorso)
 			{
 				case Costanti.INIZIO_LAVORO:
                     result = await AggiungiAttivitaAdOperatoreAsync(false);
+					_loggingService.LogInfo($"[TIMING] EseguiOperazione.AggiungiAttivita (Inizio Lavoro): {swOperazione.ElapsedMilliseconds}ms");
                     await AggiornaOperatoreSelezionatoAsync();
                     break;
 
 				case Costanti.INIZIO_ATTREZZAGGIO:
 					result = await AggiungiAttivitaAdOperatoreAsync(true);
+					_loggingService.LogInfo($"[TIMING] EseguiOperazione.AggiungiAttivita (Inizio Attrezzaggio): {swOperazione.ElapsedMilliseconds}ms");
                     await AggiornaOperatoreSelezionatoAsync();
                     break;
 
 				case Costanti.AVANZAMENTO:
 					result = await AggiornaAttivitaAvanzataAsync();
+					_loggingService.LogInfo($"[TIMING] EseguiOperazione.Avanzamento: {swOperazione.ElapsedMilliseconds}ms");
 					break;
 
 				case Costanti.FINE_LAVORO:
                     result = await RimuoviAttivitaDaOperatoreAsync();
+					_loggingService.LogInfo($"[TIMING] EseguiOperazione.RimuoviAttivita (Fine Lavoro): {swOperazione.ElapsedMilliseconds}ms");
                     await AggiornaOperatoreSelezionatoAsync();
                     break;
 
 				case Costanti.FINE_ATTREZZAGGIO:
 					result = await GestisciFineAttrezzaggioAsync();
+					_loggingService.LogInfo($"[TIMING] EseguiOperazione.FineAttrezzaggio: {swOperazione.ElapsedMilliseconds}ms");
                     await AggiornaOperatoreSelezionatoAsync();
                     break;
 
@@ -79,6 +92,7 @@ namespace IMAR_DialogoOperatore.Helpers
             }
             _attivitaGridViewModel.AttivitaSelezionata = null;
 
+			_loggingService.LogInfo($"[TIMING] EseguiOperazioneAsync TOTALE ({operazioneInCorso}): {swTotale.ElapsedMilliseconds}ms");
             return result;
         }
 
@@ -151,9 +165,11 @@ namespace IMAR_DialogoOperatore.Helpers
 
         private async Task AggiornaOperatoreSelezionatoAsync()
         {
+			var sw = Stopwatch.StartNew();
             Operatore? operatore = await _operatoriService.OttieniOperatoreAsync(_dialogoOperatoreObserver.OperatoreSelezionato.Badge);
 
             _dialogoOperatoreObserver.OperatoreSelezionato = operatore != null ? new OperatoreViewModel(operatore) : null;
+			_loggingService.LogInfo($"[TIMING] AggiornaOperatoreSelezionatoAsync: {sw.ElapsedMilliseconds}ms");
         }
     }
 }

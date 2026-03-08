@@ -1,0 +1,1804 @@
+{
+	"info": {
+		"_postman_id": "57cda2ce-146b-45cb-b397-951ac8ca255c",
+		"name": "JMES",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "29911972"
+	},
+	"item": [
+		{
+			"name": "AVANZAMENTO JMES",
+			"request": {
+				"auth": {
+					"type": "apikey",
+					"apikey": [
+						{
+							"key": "value",
+							"value": "7496CF7C6A6D25EA33F4DBA872AE2B42",
+							"type": "string"
+						},
+						{
+							"key": "in",
+							"value": "header",
+							"type": "string"
+						},
+						{
+							"key": "key",
+							"value": "token",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "token",
+						"value": "E5C64A6394D2CC48E2AA4C0CE154D797",
+						"type": "default",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"entity\": {\r\n    \"paramsIO\": {\r\n      \"qck\": true,\r\n      \"clkBdgCod\": \"187\",\r\n      \"notCod\": \"606819\",\r\n      \"clkMacUid\": 65,\r\n      \"producedQuantity\": 8.0\r\n    }\r\n  }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://i-s-023.imargroup.local:8080/synergy-ws/ws/spec/sys/wzd/start?token=7496CF7C6A6D25EA33F4DBA872AE2B42&wzdCod=MesAdvanceDeclaration",
+					"protocol": "http",
+					"host": [
+						"i-s-023",
+						"imargroup",
+						"local"
+					],
+					"port": "8080",
+					"path": [
+						"synergy-ws",
+						"ws",
+						"spec",
+						"sys",
+						"wzd",
+						"start"
+					],
+					"query": [
+						{
+							"key": "token",
+							"value": "7496CF7C6A6D25EA33F4DBA872AE2B42"
+						},
+						{
+							"key": "wzdCod",
+							"value": "MesAdvanceDeclaration"
+						}
+					]
+				},
+				"description": "Synergy Avanzamento"
+			},
+			"response": []
+		},
+		{
+			"name": "INIZIO ATTREZZAGGIO",
+			"request": {
+				"auth": {
+					"type": "apikey",
+					"apikey": [
+						{
+							"key": "value",
+							"value": "7496CF7C6A6D25EA33F4DBA872AE2B42",
+							"type": "string"
+						},
+						{
+							"key": "in",
+							"value": "header",
+							"type": "string"
+						},
+						{
+							"key": "key",
+							"value": "token",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "token",
+						"value": "E5C64A6394D2CC48E2AA4C0CE154D797",
+						"type": "default",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"entity\": {\r\n        \"paramsIO\": {\r\n            \"qck\": true,\r\n            \"clkBdgCod\": \"187\",\r\n            \"notCod\": \"845753\",\r\n            \"clkMacUid\": 40\r\n        }\r\n    }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://i-s-023.imargroup.local:8080/synergy-ws/ws/spec/sys/wzd/start?token=7496CF7C6A6D25EA33F4DBA872AE2B42&wzdCod=MesEquipStart",
+					"protocol": "http",
+					"host": [
+						"i-s-023",
+						"imargroup",
+						"local"
+					],
+					"port": "8080",
+					"path": [
+						"synergy-ws",
+						"ws",
+						"spec",
+						"sys",
+						"wzd",
+						"start"
+					],
+					"query": [
+						{
+							"key": "token",
+							"value": "7496CF7C6A6D25EA33F4DBA872AE2B42"
+						},
+						{
+							"key": "wzdCod",
+							"value": "MesEquipStart"
+						}
+					]
+				},
+				"description": "Synergy Avanzamento"
+			},
+			"response": []
+		},
+		{
+			"name": "FINE ATTREZZAGGIO",
+			"request": {
+				"auth": {
+					"type": "apikey",
+					"apikey": [
+						{
+							"key": "value",
+							"value": "7496CF7C6A6D25EA33F4DBA872AE2B42",
+							"type": "string"
+						},
+						{
+							"key": "in",
+							"value": "header",
+							"type": "string"
+						},
+						{
+							"key": "key",
+							"value": "token",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "token",
+						"value": "E5C64A6394D2CC48E2AA4C0CE154D797",
+						"type": "default",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"entity\": {\r\n        \"paramsIO\": {\r\n            \"qck\": true,\r\n            \"clkBdgCod\": \"187\",\r\n            \"clkDiaOpeUid\": 348\r\n        }\r\n    }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://i-s-023.imargroup.local:8080/synergy-ws/ws/spec/sys/wzd/start?token=7496CF7C6A6D25EA33F4DBA872AE2B42&wzdCod=MesEquipEnd",
+					"protocol": "http",
+					"host": [
+						"i-s-023",
+						"imargroup",
+						"local"
+					],
+					"port": "8080",
+					"path": [
+						"synergy-ws",
+						"ws",
+						"spec",
+						"sys",
+						"wzd",
+						"start"
+					],
+					"query": [
+						{
+							"key": "token",
+							"value": "7496CF7C6A6D25EA33F4DBA872AE2B42"
+						},
+						{
+							"key": "wzdCod",
+							"value": "MesEquipEnd"
+						}
+					]
+				},
+				"description": "Synergy Avanzamento"
+			},
+			"response": []
+		},
+		{
+			"name": "INIZIO PAUSA",
+			"request": {
+				"auth": {
+					"type": "apikey",
+					"apikey": [
+						{
+							"key": "value",
+							"value": "7496CF7C6A6D25EA33F4DBA872AE2B42",
+							"type": "string"
+						},
+						{
+							"key": "in",
+							"value": "header",
+							"type": "string"
+						},
+						{
+							"key": "key",
+							"value": "token",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "token",
+						"value": "E5C64A6394D2CC48E2AA4C0CE154D797",
+						"type": "default",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"entity\": {\r\n        \"paramsIO\": {\r\n            \"qck\": true,\r\n            \"clkBdgCod\": \"187\",\r\n            \"brkUid\": 1\r\n        }\r\n    }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://i-s-023.imargroup.local:8080/synergy-ws/ws/spec/sys/wzd/start?token=7496CF7C6A6D25EA33F4DBA872AE2B42&wzdCod=MesBreakStart",
+					"protocol": "http",
+					"host": [
+						"i-s-023",
+						"imargroup",
+						"local"
+					],
+					"port": "8080",
+					"path": [
+						"synergy-ws",
+						"ws",
+						"spec",
+						"sys",
+						"wzd",
+						"start"
+					],
+					"query": [
+						{
+							"key": "token",
+							"value": "7496CF7C6A6D25EA33F4DBA872AE2B42"
+						},
+						{
+							"key": "wzdCod",
+							"value": "MesBreakStart"
+						}
+					]
+				},
+				"description": "Synergy Avanzamento"
+			},
+			"response": []
+		},
+		{
+			"name": "FINE PAUSA",
+			"request": {
+				"auth": {
+					"type": "apikey",
+					"apikey": [
+						{
+							"key": "value",
+							"value": "7496CF7C6A6D25EA33F4DBA872AE2B42",
+							"type": "string"
+						},
+						{
+							"key": "in",
+							"value": "header",
+							"type": "string"
+						},
+						{
+							"key": "key",
+							"value": "token",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "token",
+						"value": "E5C64A6394D2CC48E2AA4C0CE154D797",
+						"type": "default",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"entity\": {\r\n        \"paramsIO\": {\r\n            \"qck\": true,\r\n            \"clkBdgCod\": \"40\"\r\n        }\r\n    }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://i-s-023.imargroup.local:8080/synergy-ws/ws/spec/sys/wzd/start?token=7496CF7C6A6D25EA33F4DBA872AE2B42&wzdCod=MesBreakEnd",
+					"protocol": "http",
+					"host": [
+						"i-s-023",
+						"imargroup",
+						"local"
+					],
+					"port": "8080",
+					"path": [
+						"synergy-ws",
+						"ws",
+						"spec",
+						"sys",
+						"wzd",
+						"start"
+					],
+					"query": [
+						{
+							"key": "token",
+							"value": "7496CF7C6A6D25EA33F4DBA872AE2B42"
+						},
+						{
+							"key": "wzdCod",
+							"value": "MesBreakEnd"
+						}
+					]
+				},
+				"description": "Synergy Avanzamento"
+			},
+			"response": []
+		},
+		{
+			"name": "AVANZAMENTO JMES DEFERRED",
+			"request": {
+				"auth": {
+					"type": "apikey",
+					"apikey": [
+						{
+							"key": "value",
+							"value": "5CB02E2120F5D34CF3FA5109A0A9C939",
+							"type": "string"
+						},
+						{
+							"key": "in",
+							"value": "header",
+							"type": "string"
+						},
+						{
+							"key": "key",
+							"value": "token",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "token",
+						"value": "E5C64A6394D2CC48E2AA4C0CE154D797",
+						"type": "default",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \"entity\" : { \r\n    \"paramsIO\" : { \r\n        \"qck\" = true, \r\n        \"clkBdgCod\" : \"101\", \r\n        \"notCod\" : \"652279\", \r\n        \"clkMacUid\" : 468, \r\n        \"producedQuantity\" : 5, \r\n        \"tssStr\" : \"20210923000000\", \r\n        \"tssEnd\" : \"20210923000000\", \r\n        \"isWrk\" : true \r\n        } \r\n    } \r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://i-s-023.imargroup.local:8080/synergy-ws/ws/spec/sys/wzd/start?token=7496CF7C6A6D25EA33F4DBA872AE2B42&wzdCod=MesWorkDeferred",
+					"protocol": "http",
+					"host": [
+						"i-s-023",
+						"imargroup",
+						"local"
+					],
+					"port": "8080",
+					"path": [
+						"synergy-ws",
+						"ws",
+						"spec",
+						"sys",
+						"wzd",
+						"start"
+					],
+					"query": [
+						{
+							"key": "token",
+							"value": "7496CF7C6A6D25EA33F4DBA872AE2B42"
+						},
+						{
+							"key": "wzdCod",
+							"value": "MesWorkDeferred"
+						}
+					]
+				},
+				"description": "Synergy Avanzamento"
+			},
+			"response": []
+		},
+		{
+			"name": "INIZIO LAVORO JMES",
+			"request": {
+				"auth": {
+					"type": "apikey",
+					"apikey": [
+						{
+							"key": "value",
+							"value": "7496CF7C6A6D25EA33F4DBA872AE2B42",
+							"type": "string"
+						},
+						{
+							"key": "in",
+							"value": "query",
+							"type": "string"
+						},
+						{
+							"key": "key",
+							"value": "token",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "token",
+						"value": "E5C64A6394D2CC48E2AA4C0CE154D797",
+						"type": "default",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"entity\": {\r\n    \"paramsIO\": {\r\n      \"qck\": true,\r\n      \"clkBdgCod\": \"40\",\r\n      \"notCod\": \"606819\",\r\n      \"clkMacUid\": 65\r\n    }\r\n  }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://192.168.10.214:8080/synergy-ws/ws/spec/sys/wzd/start?token=7496CF7C6A6D25EA33F4DBA872AE2B42&wzdCod=MesWorkStart",
+					"protocol": "http",
+					"host": [
+						"192",
+						"168",
+						"10",
+						"214"
+					],
+					"port": "8080",
+					"path": [
+						"synergy-ws",
+						"ws",
+						"spec",
+						"sys",
+						"wzd",
+						"start"
+					],
+					"query": [
+						{
+							"key": "token",
+							"value": "7496CF7C6A6D25EA33F4DBA872AE2B42"
+						},
+						{
+							"key": "wzdCod",
+							"value": "MesWorkStart"
+						}
+					]
+				},
+				"description": "Synergy Avanzamento"
+			},
+			"response": []
+		},
+		{
+			"name": "FINE LAVORO JMES",
+			"request": {
+				"auth": {
+					"type": "apikey",
+					"apikey": [
+						{
+							"key": "value",
+							"value": "7496CF7C6A6D25EA33F4DBA872AE2B42",
+							"type": "string"
+						},
+						{
+							"key": "in",
+							"value": "query",
+							"type": "string"
+						},
+						{
+							"key": "key",
+							"value": "token",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "token",
+						"value": "E5C64A6394D2CC48E2AA4C0CE154D797",
+						"type": "default",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"entity\": {\r\n    \"paramsIO\": { \"qck\": true, \"clkBdgCod\": \"187\", \"clkDiaOpeUid\": 356 }\r\n  }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://192.168.10.214:8080/synergy-ws/ws/spec/sys/wzd/start?token=7496CF7C6A6D25EA33F4DBA872AE2B42&wzdCod=MesWorkEnd",
+					"protocol": "http",
+					"host": [
+						"192",
+						"168",
+						"10",
+						"214"
+					],
+					"port": "8080",
+					"path": [
+						"synergy-ws",
+						"ws",
+						"spec",
+						"sys",
+						"wzd",
+						"start"
+					],
+					"query": [
+						{
+							"key": "token",
+							"value": "7496CF7C6A6D25EA33F4DBA872AE2B42"
+						},
+						{
+							"key": "wzdCod",
+							"value": "MesWorkEnd"
+						}
+					]
+				},
+				"description": "Synergy Avanzamento"
+			},
+			"response": []
+		},
+		{
+			"name": "INIZIO LAVORO JMES - INDIRETTO",
+			"request": {
+				"auth": {
+					"type": "apikey",
+					"apikey": [
+						{
+							"key": "value",
+							"value": "7496CF7C6A6D25EA33F4DBA872AE2B42",
+							"type": "string"
+						},
+						{
+							"key": "in",
+							"value": "query",
+							"type": "string"
+						},
+						{
+							"key": "key",
+							"value": "token",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "token",
+						"value": "E5C64A6394D2CC48E2AA4C0CE154D797",
+						"type": "default",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"entity\": {\r\n        \"paramsIO\": {\r\n            \"qck\": true,\r\n            \"clkBdgCod\": \"187\",\r\n            \"indCod\": \"000001\"\r\n        }\r\n    }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://192.168.10.214:8080/synergy-ws/ws/spec/sys/wzd/start?token=7496CF7C6A6D25EA33F4DBA872AE2B42&wzdCod=MesWorkStart",
+					"protocol": "http",
+					"host": [
+						"192",
+						"168",
+						"10",
+						"214"
+					],
+					"port": "8080",
+					"path": [
+						"synergy-ws",
+						"ws",
+						"spec",
+						"sys",
+						"wzd",
+						"start"
+					],
+					"query": [
+						{
+							"key": "token",
+							"value": "7496CF7C6A6D25EA33F4DBA872AE2B42"
+						},
+						{
+							"key": "wzdCod",
+							"value": "MesWorkStart"
+						}
+					]
+				},
+				"description": "Synergy Avanzamento"
+			},
+			"response": []
+		},
+		{
+			"name": "INVIO PART PROGRAM",
+			"request": {
+				"auth": {
+					"type": "apikey",
+					"apikey": [
+						{
+							"key": "in",
+							"value": "query",
+							"type": "string"
+						},
+						{
+							"key": "key",
+							"value": "token",
+							"type": "string"
+						},
+						{
+							"key": "value",
+							"value": "E5C64A6394D2CC48E2AA4C0CE154D797",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "token",
+						"value": "E5C64A6394D2CC48E2AA4C0CE154D797",
+						"type": "default",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"entity\":{\"paramsIO\":{\"qck\":true,\"clkBdgCod\":\"101\",\"notCod\":\"813743\",\"clkMacUid\":40,\"producedQuantity\":7}}}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://192.168.10.214:8080/synergy-ws/ws/spec/sys/wzd/start?token=E5C64A6394D2CC48E2AA4C0CE154D797&wzdCod=MesAdvanceDeclaration",
+					"protocol": "http",
+					"host": [
+						"192",
+						"168",
+						"10",
+						"214"
+					],
+					"port": "8080",
+					"path": [
+						"synergy-ws",
+						"ws",
+						"spec",
+						"sys",
+						"wzd",
+						"start"
+					],
+					"query": [
+						{
+							"key": "token",
+							"value": "E5C64A6394D2CC48E2AA4C0CE154D797"
+						},
+						{
+							"key": "wzdCod",
+							"value": "MesAdvanceDeclaration"
+						}
+					]
+				},
+				"description": "Synergy Avanzamento"
+			},
+			"response": []
+		},
+		{
+			"name": "JOIN TEAM",
+			"request": {
+				"auth": {
+					"type": "apikey",
+					"apikey": [
+						{
+							"key": "value",
+							"value": "7496CF7C6A6D25EA33F4DBA872AE2B42",
+							"type": "string"
+						},
+						{
+							"key": "in",
+							"value": "header",
+							"type": "string"
+						},
+						{
+							"key": "key",
+							"value": "token",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "token",
+						"value": "E5C64A6394D2CC48E2AA4C0CE154D797",
+						"type": "default",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"entity\": {\r\n        \"paramsIO\": {\r\n            \"qck\": true,\r\n            \"clkBdgCod\": \"40\",\r\n            \"clkDiaOpeUid\": 362\r\n        }\r\n    }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://192.168.10.214:8080/synergy-ws/ws/spec/sys/wzd/start?token=7496CF7C6A6D25EA33F4DBA872AE2B42&wzdCod=MesJoinTeam",
+					"protocol": "http",
+					"host": [
+						"192",
+						"168",
+						"10",
+						"214"
+					],
+					"port": "8080",
+					"path": [
+						"synergy-ws",
+						"ws",
+						"spec",
+						"sys",
+						"wzd",
+						"start"
+					],
+					"query": [
+						{
+							"key": "devCod",
+							"value": "A12D71",
+							"disabled": true
+						},
+						{
+							"key": "cnlCod",
+							"value": "",
+							"disabled": true
+						},
+						{
+							"key": "cnt",
+							"value": "100",
+							"disabled": true
+						},
+						{
+							"key": "execAdd",
+							"value": "true",
+							"disabled": true
+						},
+						{
+							"key": "token",
+							"value": "7496CF7C6A6D25EA33F4DBA872AE2B42"
+						},
+						{
+							"key": "wzdCod",
+							"value": "MesJoinTeam"
+						}
+					]
+				},
+				"description": "Synergy Avanzamento"
+			},
+			"response": []
+		},
+		{
+			"name": "LEAVE TEAM",
+			"request": {
+				"auth": {
+					"type": "apikey",
+					"apikey": [
+						{
+							"key": "value",
+							"value": "7496CF7C6A6D25EA33F4DBA872AE2B42",
+							"type": "string"
+						},
+						{
+							"key": "in",
+							"value": "header",
+							"type": "string"
+						},
+						{
+							"key": "key",
+							"value": "token",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "token",
+						"value": "E5C64A6394D2CC48E2AA4C0CE154D797",
+						"type": "default",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"entity\":{\"paramsIO\":{\"qck\": true, \"clkBdgCod\": \"40\", \"clkDiaOpeUid\": 364}}}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://192.168.10.214:8080/synergy-ws/ws/spec/sys/wzd/start?token=7496CF7C6A6D25EA33F4DBA872AE2B42&wzdCod=MesLeaveTeam",
+					"protocol": "http",
+					"host": [
+						"192",
+						"168",
+						"10",
+						"214"
+					],
+					"port": "8080",
+					"path": [
+						"synergy-ws",
+						"ws",
+						"spec",
+						"sys",
+						"wzd",
+						"start"
+					],
+					"query": [
+						{
+							"key": "devCod",
+							"value": "A12D71",
+							"disabled": true
+						},
+						{
+							"key": "cnlCod",
+							"value": "",
+							"disabled": true
+						},
+						{
+							"key": "cnt",
+							"value": "100",
+							"disabled": true
+						},
+						{
+							"key": "execAdd",
+							"value": "true",
+							"disabled": true
+						},
+						{
+							"key": "token",
+							"value": "7496CF7C6A6D25EA33F4DBA872AE2B42"
+						},
+						{
+							"key": "wzdCod",
+							"value": "MesLeaveTeam"
+						}
+					]
+				},
+				"description": "Synergy Avanzamento"
+			},
+			"response": []
+		},
+		{
+			"name": "TIMBRA INGRESSO",
+			"protocolProfileBehavior": {
+				"followOriginalHttpMethod": false
+			},
+			"request": {
+				"auth": {
+					"type": "apikey",
+					"apikey": [
+						{
+							"key": "value",
+							"value": "7496CF7C6A6D25EA33F4DBA872AE2B42",
+							"type": "string"
+						},
+						{
+							"key": "in",
+							"value": "header",
+							"type": "string"
+						},
+						{
+							"key": "key",
+							"value": "token",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "token",
+						"value": "E5C64A6394D2CC48E2AA4C0CE154D797",
+						"type": "default",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"entity\": {\r\n        \"paramsIO\": {\r\n            \"bdgCod\": \"187\",\r\n            \"clkSid\": true\r\n        }\r\n    }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://192.168.10.214:8080/synergy-ws/ws/spec/sys/wzd/start?token=7496CF7C6A6D25EA33F4DBA872AE2B42&wzdCod=MesAutoClock",
+					"protocol": "http",
+					"host": [
+						"192",
+						"168",
+						"10",
+						"214"
+					],
+					"port": "8080",
+					"path": [
+						"synergy-ws",
+						"ws",
+						"spec",
+						"sys",
+						"wzd",
+						"start"
+					],
+					"query": [
+						{
+							"key": "devCod",
+							"value": "A12D71",
+							"disabled": true
+						},
+						{
+							"key": "cnlCod",
+							"value": "",
+							"disabled": true
+						},
+						{
+							"key": "cnt",
+							"value": "100",
+							"disabled": true
+						},
+						{
+							"key": "execAdd",
+							"value": "true",
+							"disabled": true
+						},
+						{
+							"key": "token",
+							"value": "7496CF7C6A6D25EA33F4DBA872AE2B42"
+						},
+						{
+							"key": "wzdCod",
+							"value": "MesAutoClock"
+						}
+					]
+				},
+				"description": "Synergy Avanzamento"
+			},
+			"response": []
+		},
+		{
+			"name": "TIMBRA USCITA",
+			"protocolProfileBehavior": {
+				"followOriginalHttpMethod": false
+			},
+			"request": {
+				"auth": {
+					"type": "apikey",
+					"apikey": [
+						{
+							"key": "value",
+							"value": "7496CF7C6A6D25EA33F4DBA872AE2B42",
+							"type": "string"
+						},
+						{
+							"key": "in",
+							"value": "header",
+							"type": "string"
+						},
+						{
+							"key": "key",
+							"value": "token",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "token",
+						"value": "E5C64A6394D2CC48E2AA4C0CE154D797",
+						"type": "default",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"entity\": {\r\n        \"paramsIO\": {\r\n            \"bdgCod\": \"187\",\r\n            \"clkSid\": false,\r\n            \"noChkBrk\": true\r\n        }\r\n    }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://192.168.10.214:8080/synergy-ws/ws/spec/sys/wzd/start?token=7496CF7C6A6D25EA33F4DBA872AE2B42&wzdCod=MesAutoClock",
+					"protocol": "http",
+					"host": [
+						"192",
+						"168",
+						"10",
+						"214"
+					],
+					"port": "8080",
+					"path": [
+						"synergy-ws",
+						"ws",
+						"spec",
+						"sys",
+						"wzd",
+						"start"
+					],
+					"query": [
+						{
+							"key": "devCod",
+							"value": "A12D71",
+							"disabled": true
+						},
+						{
+							"key": "cnlCod",
+							"value": "",
+							"disabled": true
+						},
+						{
+							"key": "cnt",
+							"value": "100",
+							"disabled": true
+						},
+						{
+							"key": "execAdd",
+							"value": "true",
+							"disabled": true
+						},
+						{
+							"key": "token",
+							"value": "7496CF7C6A6D25EA33F4DBA872AE2B42"
+						},
+						{
+							"key": "wzdCod",
+							"value": "MesAutoClock"
+						}
+					]
+				},
+				"description": "Synergy Avanzamento"
+			},
+			"response": []
+		},
+		{
+			"name": "TIMBRA INGRESSO SYNERGY",
+			"protocolProfileBehavior": {
+				"followOriginalHttpMethod": false
+			},
+			"request": {
+				"auth": {
+					"type": "apikey",
+					"apikey": [
+						{
+							"key": "value",
+							"value": "7496CF7C6A6D25EA33F4DBA872AE2B42",
+							"type": "string"
+						},
+						{
+							"key": "in",
+							"value": "header",
+							"type": "string"
+						},
+						{
+							"key": "key",
+							"value": "token",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [
+					{
+						"key": "token",
+						"value": "E5C64A6394D2CC48E2AA4C0CE154D797",
+						"type": "default",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "http://192.168.10.214:8080/synergy-ws/ws/spec/mes/din/clock?token=7496CF7C6A6D25EA33F4DBA872AE2B42&bdgCod=187&clkSid=true",
+					"protocol": "http",
+					"host": [
+						"192",
+						"168",
+						"10",
+						"214"
+					],
+					"port": "8080",
+					"path": [
+						"synergy-ws",
+						"ws",
+						"spec",
+						"mes",
+						"din",
+						"clock"
+					],
+					"query": [
+						{
+							"key": "devCod",
+							"value": "A12D71",
+							"disabled": true
+						},
+						{
+							"key": "cnlCod",
+							"value": "",
+							"disabled": true
+						},
+						{
+							"key": "cnt",
+							"value": "100",
+							"disabled": true
+						},
+						{
+							"key": "execAdd",
+							"value": "true",
+							"disabled": true
+						},
+						{
+							"key": "token",
+							"value": "7496CF7C6A6D25EA33F4DBA872AE2B42"
+						},
+						{
+							"key": "bdgCod",
+							"value": "187"
+						},
+						{
+							"key": "clkSid",
+							"value": "true"
+						}
+					]
+				},
+				"description": "Synergy Avanzamento"
+			},
+			"response": []
+		},
+		{
+			"name": "CONTAPEZZI",
+			"request": {
+				"auth": {
+					"type": "apikey",
+					"apikey": [
+						{
+							"key": "value",
+							"value": "6E4F051C153655F12A78F43EA2467BC5",
+							"type": "string"
+						},
+						{
+							"key": "in",
+							"value": "query",
+							"type": "string"
+						},
+						{
+							"key": "key",
+							"value": "token",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [
+					{
+						"key": "token",
+						"value": "E5C64A6394D2CC48E2AA4C0CE154D797",
+						"type": "default",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "devCod",
+							"value": "F07081",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "cnt",
+							"value": "1",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "execAdd",
+							"value": "True",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "cnlCod",
+							"value": "F07081",
+							"type": "text",
+							"disabled": true
+						}
+					]
+				},
+				"url": {
+					"raw": "http://192.168.10.214:8080/synergy-ws/ws/spec/mes/din/counting?devCod=F07081&cnt=7&execAdd=True&cnlCod=",
+					"protocol": "http",
+					"host": [
+						"192",
+						"168",
+						"10",
+						"214"
+					],
+					"port": "8080",
+					"path": [
+						"synergy-ws",
+						"ws",
+						"spec",
+						"mes",
+						"din",
+						"counting"
+					],
+					"query": [
+						{
+							"key": "wzdCod",
+							"value": "MesAdvanceDeclaration",
+							"disabled": true
+						},
+						{
+							"key": "devCod",
+							"value": "F07081"
+						},
+						{
+							"key": "cnt",
+							"value": "7"
+						},
+						{
+							"key": "execAdd",
+							"value": "True"
+						},
+						{
+							"key": "cnlCod",
+							"value": ""
+						},
+						{
+							"key": "addPieces",
+							"value": "False",
+							"disabled": true
+						}
+					]
+				},
+				"description": "Synergy"
+			},
+			"response": [
+				{
+					"name": "CONTAPEZZI",
+					"originalRequest": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "token",
+								"value": "E5C64A6394D2CC48E2AA4C0CE154D797",
+								"type": "default",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "http://192.168.10.214:8080/synergy-ws/ws/spec/mes/din/counting?devCod=A12D71&cnlCod=&cnt=100&execAdd=true",
+							"protocol": "http",
+							"host": [
+								"192",
+								"168",
+								"10",
+								"214"
+							],
+							"port": "8080",
+							"path": [
+								"synergy-ws",
+								"ws",
+								"spec",
+								"mes",
+								"din",
+								"counting"
+							],
+							"query": [
+								{
+									"key": "wzdCod",
+									"value": "MesAdvanceDeclaration",
+									"disabled": true
+								},
+								{
+									"key": "devCod",
+									"value": "A12D71"
+								},
+								{
+									"key": "cnlCod",
+									"value": ""
+								},
+								{
+									"key": "cnt",
+									"value": "100"
+								},
+								{
+									"key": "execAdd",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Access-Control-Allow-Origin",
+							"value": "*"
+						},
+						{
+							"key": "Access-Control-Allow-Methods",
+							"value": "GET, POST, PUT, DELETE, OPTIONS, HEAD"
+						},
+						{
+							"key": "Access-Control-Allow-Credentials",
+							"value": "true"
+						},
+						{
+							"key": "Access-Control-Max-Age",
+							"value": "3600"
+						},
+						{
+							"key": "Access-Control-Allow-Headers",
+							"value": "Access-Control-Allow-Origin, X-Access_Token, Origin, X-Requested-With, x-auth-token, Content-Type, accept, Authorization, Access-Control-Allow-Headers, Content-Range, Content-Disposition, Content-Description, Engaged-Auth-Token, token"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Content-Length",
+							"value": "15"
+						},
+						{
+							"key": "Date",
+							"value": "Fri, 25 Aug 2023 13:14:46 GMT"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=20"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"result\": \"OK\"\n}"
+				}
+			]
+		},
+		{
+			"name": "CONTAPEZZI",
+			"request": {
+				"auth": {
+					"type": "apikey",
+					"apikey": [
+						{
+							"key": "value",
+							"value": "6E4F051C153655F12A78F43EA2467BC5",
+							"type": "string"
+						},
+						{
+							"key": "in",
+							"value": "query",
+							"type": "string"
+						},
+						{
+							"key": "key",
+							"value": "token",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [
+					{
+						"key": "token",
+						"value": "E5C64A6394D2CC48E2AA4C0CE154D797",
+						"type": "default",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "devCod",
+							"value": "F07081",
+							"type": "text"
+						},
+						{
+							"key": "cnt",
+							"value": "1",
+							"type": "text"
+						},
+						{
+							"key": "execAdd",
+							"value": "True",
+							"type": "text"
+						},
+						{
+							"key": "cnlCod",
+							"value": "",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://192.168.10.214:8080/synergy-ws/ws/spec/mes/din/counting",
+					"protocol": "http",
+					"host": [
+						"192",
+						"168",
+						"10",
+						"214"
+					],
+					"port": "8080",
+					"path": [
+						"synergy-ws",
+						"ws",
+						"spec",
+						"mes",
+						"din",
+						"counting"
+					],
+					"query": [
+						{
+							"key": "wzdCod",
+							"value": "MesAdvanceDeclaration",
+							"disabled": true
+						},
+						{
+							"key": "devCod",
+							"value": "F07081",
+							"disabled": true
+						},
+						{
+							"key": "cnt",
+							"value": "1",
+							"disabled": true
+						},
+						{
+							"key": "execAdd",
+							"value": "True",
+							"disabled": true
+						}
+					]
+				},
+				"description": "Synergy"
+			},
+			"response": [
+				{
+					"name": "CONTAPEZZI",
+					"originalRequest": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "token",
+								"value": "E5C64A6394D2CC48E2AA4C0CE154D797",
+								"type": "default",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "http://192.168.10.214:8080/synergy-ws/ws/spec/mes/din/counting?devCod=A12D71&cnlCod=&cnt=100&execAdd=true",
+							"protocol": "http",
+							"host": [
+								"192",
+								"168",
+								"10",
+								"214"
+							],
+							"port": "8080",
+							"path": [
+								"synergy-ws",
+								"ws",
+								"spec",
+								"mes",
+								"din",
+								"counting"
+							],
+							"query": [
+								{
+									"key": "wzdCod",
+									"value": "MesAdvanceDeclaration",
+									"disabled": true
+								},
+								{
+									"key": "devCod",
+									"value": "A12D71"
+								},
+								{
+									"key": "cnlCod",
+									"value": ""
+								},
+								{
+									"key": "cnt",
+									"value": "100"
+								},
+								{
+									"key": "execAdd",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Access-Control-Allow-Origin",
+							"value": "*"
+						},
+						{
+							"key": "Access-Control-Allow-Methods",
+							"value": "GET, POST, PUT, DELETE, OPTIONS, HEAD"
+						},
+						{
+							"key": "Access-Control-Allow-Credentials",
+							"value": "true"
+						},
+						{
+							"key": "Access-Control-Max-Age",
+							"value": "3600"
+						},
+						{
+							"key": "Access-Control-Allow-Headers",
+							"value": "Access-Control-Allow-Origin, X-Access_Token, Origin, X-Requested-With, x-auth-token, Content-Type, accept, Authorization, Access-Control-Allow-Headers, Content-Range, Content-Disposition, Content-Description, Engaged-Auth-Token, token"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Content-Length",
+							"value": "15"
+						},
+						{
+							"key": "Date",
+							"value": "Fri, 25 Aug 2023 13:14:46 GMT"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=20"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"result\": \"OK\"\n}"
+				}
+			]
+		},
+		{
+			"name": "GET TOKEN JMES",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://i-s-023.imargroup.local:8080/synergy-ws/ws/base/appLogin?app=imarConnect-jmes&key=1hWP47cnCCmH9Ob5WxFttYl2FP4O5lvqPfWIHJm9dnfN4Jx2OJQcn296rRxVZ4FEuPqAYy6PJx09bKl1qHgEqN6LM",
+					"protocol": "http",
+					"host": [
+						"i-s-023",
+						"imargroup",
+						"local"
+					],
+					"port": "8080",
+					"path": [
+						"synergy-ws",
+						"ws",
+						"base",
+						"appLogin"
+					],
+					"query": [
+						{
+							"key": "app",
+							"value": "imarConnect-jmes"
+						},
+						{
+							"key": "key",
+							"value": "1hWP47cnCCmH9Ob5WxFttYl2FP4O5lvqPfWIHJm9dnfN4Jx2OJQcn296rRxVZ4FEuPqAYy6PJx09bKl1qHgEqN6LM"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "INIZIO LAVORO JMES Synergy",
+			"request": {
+				"auth": {
+					"type": "apikey",
+					"apikey": [
+						{
+							"key": "value",
+							"value": "5CB02E2120F5D34CF3FA5109A0A9C939",
+							"type": "string"
+						},
+						{
+							"key": "in",
+							"value": "query",
+							"type": "string"
+						},
+						{
+							"key": "key",
+							"value": "token",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "token",
+						"value": "E5C64A6394D2CC48E2AA4C0CE154D797",
+						"type": "default",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"entity\": {\r\n        \"paramsIO\": {\r\n            \"qck\": true,\r\n            \"clkBdgCod\": \"101\",\r\n            \"notCod\": \"802388\",\r\n            \"clkMacUid\": 447\r\n        }\r\n    }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://i-s-023.imargroup.local:8080/synergy-ws/ws/spec/mes/din/workStart/828101/101/448",
+					"protocol": "http",
+					"host": [
+						"i-s-023",
+						"imargroup",
+						"local"
+					],
+					"port": "8080",
+					"path": [
+						"synergy-ws",
+						"ws",
+						"spec",
+						"mes",
+						"din",
+						"workStart",
+						"828101",
+						"101",
+						"448"
+					]
+				},
+				"description": "Synergy Acvanzamento"
+			},
+			"response": []
+		},
+		{
+			"name": "FINE LAVORO JMES Synergy",
+			"request": {
+				"auth": {
+					"type": "apikey",
+					"apikey": [
+						{
+							"key": "in",
+							"value": "header",
+							"type": "string"
+						},
+						{
+							"key": "value",
+							"value": "7496CF7C6A6D25EA33F4DBA872AE2B42",
+							"type": "string"
+						},
+						{
+							"key": "key",
+							"value": "token",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"entity\": {\r\n        \"paramsIO\": {\r\n            \"qck\": true,\r\n            \"clkBdgCod\": \"40\",\r\n            \"notCod\": \"606819\",\r\n            \"clkMacUid\": 65\r\n        }\r\n    }\r\n}"
+				},
+				"url": {
+					"raw": "http://i-s-023.imargroup.local:8080/synergy-ws/ws/spec/mes/din/workEnd/606819/40/65/0/0/0/0",
+					"protocol": "http",
+					"host": [
+						"i-s-023",
+						"imargroup",
+						"local"
+					],
+					"port": "8080",
+					"path": [
+						"synergy-ws",
+						"ws",
+						"spec",
+						"mes",
+						"din",
+						"workEnd",
+						"606819",
+						"40",
+						"65",
+						"0",
+						"0",
+						"0",
+						"0"
+					],
+					"query": [
+						{
+							"key": "token",
+							"value": "",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

@@ -1,5 +1,6 @@
 ﻿using IMAR_DialogoOperatore.Application.Interfaces.Clients;
 using IMAR_DialogoOperatore.Application.Interfaces.Repositories;
+using IMAR_DialogoOperatore.Application.Interfaces.Services;
 using IMAR_DialogoOperatore.Application.Interfaces.Services.Activities;
 using IMAR_DialogoOperatore.Application.Interfaces.Services.External;
 using IMAR_DialogoOperatore.Application.Interfaces.UoW;
@@ -53,6 +54,7 @@ namespace IMAR_DialogoOperatore.Infrastructure
 			services.AddScoped<INotaService, NotaService>();
 			services.AddScoped<ISegnalazioniDifformitaService, SegnalazioniDifformitaService>();
 			services.AddScoped<ITimbratureService, TimbratureService>();
+			services.AddScoped<IUtenteService, UtenteService>();
 
 			services.AddScoped<IImarApiClient, ImarApiClient>();
 			services.AddScoped<IJmesApiClient, JmesApiClient>();

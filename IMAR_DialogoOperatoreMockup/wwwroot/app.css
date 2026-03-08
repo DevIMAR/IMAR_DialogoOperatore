@@ -42,15 +42,8 @@ h1:focus {
     align-items: center;
 }
 
-.diaope-reconnect-modal[style*="display"] {
-    display: flex !important;
-}
-
-#components-reconnect-modal.components-reconnect-show,
-#components-reconnect-modal.components-reconnect-failed,
-#components-reconnect-modal.components-reconnect-rejected {
-    display: flex !important;
-}
+/* Le classi Blazor built-in non servono perché usiamo reconnectionHandler custom.
+   Il modale viene mostrato/nascosto via JS con style.display = 'flex'/'none'. */
 
 .diaope-reconnect-content {
     background: #1e1e2e;

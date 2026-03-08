@@ -6,6 +6,6 @@ namespace IMAR_DialogoOperatore.Interfaces.Helpers
     {
         TaskAsana TaskAsana { get; }
 
-        void CompilaTaskAsana(); 
+        Task CompilaTaskAsanaAsync();
     }
 }

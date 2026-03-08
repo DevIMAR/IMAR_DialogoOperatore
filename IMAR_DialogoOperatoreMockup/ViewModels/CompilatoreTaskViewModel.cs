@@ -1,4 +1,3 @@
-﻿using IMAR_DialogoOperatore.Application;
 using IMAR_DialogoOperatore.Interfaces.Observers;
 
 namespace IMAR_DialogoOperatore.ViewModels
@@ -8,35 +7,59 @@ namespace IMAR_DialogoOperatore.ViewModels
         private readonly ITaskCompilerObserver _taskCompilerObserver;
 
         private string _note;
-        private TimbraturaAttivitaViewModel? _eventoSelezionato;
+        private EventoRaggrupatoViewModel? _eventoRaggrupatoSelezionato;
+        private int _oraInizio;
+        private int _minutoInizio;
+        private int _oraFine;
+        private int _minutoFine;
 
-        public string CategoriaErroreSelezionata => _taskCompilerObserver.CategoriaErroreSelezionata;
-        public bool IsDescrizioneErroreAttiva => _taskCompilerObserver.CategoriaErroreSelezionata != null &&
-                                                 _taskCompilerObserver.CategoriaErroreSelezionata != Costanti.TASK_CHIUSURA_A_SALDO_ERRATA;
-        public bool ShowTimbratureInGriglia => string.IsNullOrWhiteSpace(_taskCompilerObserver.CategoriaErroreSelezionata) ||
-                                                !_taskCompilerObserver.CategoriaErroreSelezionata.ToLower().Contains("attività");
+        public bool IsRettificaQuantita => _taskCompilerObserver.IsRettificaQuantita;
+        public bool IsTogliSaldo => _taskCompilerObserver.IsTogliSaldo;
+        public bool IsCorreggiOrarioInizio => _taskCompilerObserver.IsCorreggiOrarioInizio;
+        public bool IsCorreggiOrarioFine => _taskCompilerObserver.IsCorreggiOrarioFine;
 
         public string Note
         {
             get { return _note; }
-            set 
-            { 
+            set
+            {
                 _note = value;
                 _taskCompilerObserver.Note = _note;
-
                 OnNotifyStateChanged();
             }
         }
-        public TimbraturaAttivitaViewModel? EventoSelezionato
+
+        public EventoRaggrupatoViewModel? EventoRaggrupatoSelezionato
         {
-            get { return _eventoSelezionato; }
+            get { return _eventoRaggrupatoSelezionato; }
             set
             {
-                _eventoSelezionato = value;
-                _taskCompilerObserver.EventoSelezionato = _eventoSelezionato;
-
+                _eventoRaggrupatoSelezionato = value;
+                _taskCompilerObserver.EventoRaggrupatoSelezionato = _eventoRaggrupatoSelezionato;
+                PrecompilaOrari();
                 OnNotifyStateChanged();
             }
+        }
+
+        public int OraInizio
+        {
+            get { return _oraInizio; }
+            set { _oraInizio = value; _taskCompilerObserver.OraInizio = value; OnNotifyStateChanged(); }
+        }
+        public int MinutoInizio
+        {
+            get { return _minutoInizio; }
+            set { _minutoInizio = value; _taskCompilerObserver.MinutoInizio = value; OnNotifyStateChanged(); }
+        }
+        public int OraFine
+        {
+            get { return _oraFine; }
+            set { _oraFine = value; _taskCompilerObserver.OraFine = value; OnNotifyStateChanged(); }
+        }
+        public int MinutoFine
+        {
+            get { return _minutoFine; }
+            set { _minutoFine = value; _taskCompilerObserver.MinutoFine = value; OnNotifyStateChanged(); }
         }
 
         public CompilatoreTaskViewModel(
@@ -44,29 +67,46 @@ namespace IMAR_DialogoOperatore.ViewModels
         {
             _taskCompilerObserver = taskCompilerObserver;
 
-            _taskCompilerObserver.OnCategoriaErroreSelezionataChanged += TaskCompilerObserver_OnCategoriaErroreSelezionataChanged;
+            _taskCompilerObserver.OnCorrezioniChanged += TaskCompilerObserver_OnCorrezioniChanged;
+            _taskCompilerObserver.OnIsPopupVisibleChanged += TaskCompilerObserver_OnIsPopupVisibleChanged;
         }
 
-        private void TaskCompilerObserver_OnCategoriaErroreSelezionataChanged()
+        private void TaskCompilerObserver_OnCorrezioniChanged()
         {
-            ModificaTestoPrecompilato();
+            // Se è stato spuntato "Togli saldo", precompila la nota
+            if (_taskCompilerObserver.IsTogliSaldo && string.IsNullOrWhiteSpace(_note))
+                Note = "Riportare in acconto";
+
             OnNotifyStateChanged();
         }
 
-        private void ModificaTestoPrecompilato()
+        private void TaskCompilerObserver_OnIsPopupVisibleChanged()
         {
-            switch (_taskCompilerObserver.CategoriaErroreSelezionata)
+            if (_taskCompilerObserver.IsPopupVisible)
             {
-                case Costanti.TASK_CHIUSURA_A_SALDO_ERRATA:
-                    Note = "Ho chiuso a saldo per sbaglio. Riportare in acconto";
-                    break;
+                Note = null;
+                _oraInizio = 0; _minutoInizio = 0;
+                _oraFine = 0; _minutoFine = 0;
+            }
+            OnNotifyStateChanged();
+        }
 
-                default:
-                    Note = null;
-                    break;
+        /// <summary>
+        /// Pre-compila i campi orario con gli orari dell'evento selezionato.
+        /// </summary>
+        private void PrecompilaOrari()
+        {
+            if (_eventoRaggrupatoSelezionato?.OraInizio != null)
+            {
+                OraInizio = _eventoRaggrupatoSelezionato.OraInizio.Value.Hour;
+                MinutoInizio = _eventoRaggrupatoSelezionato.OraInizio.Value.Minute;
             }
 
-            OnNotifyStateChanged();
+            if (_eventoRaggrupatoSelezionato?.OraFine != null)
+            {
+                OraFine = _eventoRaggrupatoSelezionato.OraFine.Value.Hour;
+                MinutoFine = _eventoRaggrupatoSelezionato.OraFine.Value.Minute;
+            }
         }
     }
 }

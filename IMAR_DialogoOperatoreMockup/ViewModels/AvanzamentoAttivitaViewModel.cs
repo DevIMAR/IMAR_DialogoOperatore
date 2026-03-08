@@ -65,10 +65,10 @@ namespace IMAR_DialogoOperatore.ViewModels
 			set 
 			{ 
 				_isFaseCompletabile = _dialogoOperatoreObserver.AttivitaSelezionata?.SaldoAcconto == Costanti.SALDO ? true :
-									  _taskCompilerObserver.EventoSelezionato?.SaldoAcconto == Costanti.SALDO ? true :
+									  _taskCompilerObserver.EventoRaggrupatoSelezionato?.SaldoAcconto == Costanti.SALDO ? true :
 											(_dialogoOperatoreObserver?.AttivitaSelezionata?.QuantitaProdotta + _dialogoOperatoreObserver?.AttivitaSelezionata?.QuantitaScartata > 0
 											|| _avanzamentoObserver.QuantitaProdotta + _avanzamentoObserver.QuantitaScartata > 0
-											|| _taskCompilerObserver.EventoSelezionato?.QuantitaProdotta + _taskCompilerObserver.EventoSelezionato?.QuantitaScartata > 0)
+											|| _taskCompilerObserver.EventoRaggrupatoSelezionato?.QuantitaProdotta + _taskCompilerObserver.EventoRaggrupatoSelezionato?.QuantitaScartata > 0)
 											&& value;
 
 				_avanzamentoObserver.SaldoAcconto = _isFaseCompletabile ? Costanti.SALDO : Costanti.ACCONTO;

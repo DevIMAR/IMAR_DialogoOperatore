@@ -1,4 +1,4 @@
-﻿using IMAR_DialogoOperatore.Application.Interfaces.Services.Activities;
+using IMAR_DialogoOperatore.Application.Interfaces.Services.Activities;
 using IMAR_DialogoOperatore.Interfaces.Mappers;
 using IMAR_DialogoOperatore.Interfaces.Observers;
 
@@ -14,13 +14,24 @@ namespace IMAR_DialogoOperatore.ViewModels
 		private readonly ITaskCompilerObserver _taskCompilerObserver;
 
 		private List<TimbraturaAttivitaViewModel> _cronologiaEventi;
+		private List<EventoRaggrupatoViewModel> _eventiRaggruppati;
 
 		public List<TimbraturaAttivitaViewModel> CronologiaEventi
         {
 			get { return _cronologiaEventi; }
-			set 
-			{ 
-				_cronologiaEventi = value; 
+			set
+			{
+				_cronologiaEventi = value;
+				OnNotifyStateChanged();
+			}
+		}
+
+		public List<EventoRaggrupatoViewModel> EventiRaggruppati
+		{
+			get { return _eventiRaggruppati; }
+			set
+			{
+				_eventiRaggruppati = value;
 				OnNotifyStateChanged();
 			}
 		}
@@ -45,6 +56,7 @@ namespace IMAR_DialogoOperatore.ViewModels
             _taskCompilerObserver = taskCompilerObserver;
 
             CronologiaEventi = new List<TimbraturaAttivitaViewModel>();
+            EventiRaggruppati = new List<EventoRaggrupatoViewModel>();
 
             _taskCompilerObserver.OnIsPopupVisibleChanged += TaskCompilerObserver_OnIsPopupVisibleChanged;
         }
@@ -52,7 +64,10 @@ namespace IMAR_DialogoOperatore.ViewModels
         private void TaskCompilerObserver_OnIsPopupVisibleChanged()
         {
             if (!_taskCompilerObserver.IsPopupVisible)
+            {
                 CronologiaEventi = new List<TimbraturaAttivitaViewModel>();
+                EventiRaggruppati = new List<EventoRaggrupatoViewModel>();
+            }
         }
 
         public void GetCronologiaEventi()
@@ -86,6 +101,20 @@ namespace IMAR_DialogoOperatore.ViewModels
 												(int)_dialogoOperatoreObserver.OperatoreSelezionato.IdJMes));
 
             CronologiaEventi = CronologiaEventi.Concat(attivita).ToList();
+        }
+
+        /// <summary>
+        /// Carica le attività raggruppate (Inizio+Fine in una riga) per il TaskPopup redesign.
+        /// </summary>
+        public void GetEventiRaggruppati()
+        {
+            if (_dialogoOperatoreObserver.OperatoreSelezionato == null)
+                return;
+
+            var attivitaList = _attivitaService.GetAttivitaOperatoreDellUltimaGiornata(
+                (int)_dialogoOperatoreObserver.OperatoreSelezionato.IdJMes);
+
+            EventiRaggruppati = _attivitaMapper.ListAttivitaToListEventiRaggruppati(attivitaList).ToList();
         }
     }
 }

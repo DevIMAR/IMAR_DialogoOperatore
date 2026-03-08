@@ -10,6 +10,7 @@ using IMAR_DialogoOperatore.Domain.Models;
 using IMAR_DialogoOperatore.Infrastructure.Mappers;
 using IMAR_DialogoOperatore.Infrastructure.Services;
 using IMAR_DialogoOperatore.Infrastructure.Utilities;
+using System.Diagnostics;
 
 
 namespace IMAR_DialogoOperatore.Services
@@ -22,6 +23,7 @@ namespace IMAR_DialogoOperatore.Services
         private readonly CaricamentoAttivitaInBackgroundService _caricamentoAttivitaInBackroundService;
         private readonly ISynergyJmesUoW _synergyJmesUoW;
         private readonly IAs400Repository _as400Repository;
+        private readonly ILoggingService _loggingService;
 
         public AttivitaService(
             IMacchinaService macchinaService,
@@ -29,7 +31,8 @@ namespace IMAR_DialogoOperatore.Services
             IJMesApiClientErrorUtility jMesApiClientErrorUtility,
             CaricamentoAttivitaInBackgroundService caricamentoAttivitaInBackroundService,
             ISynergyJmesUoW synergyJmesUoW,
-            IAs400Repository as400Repository)
+            IAs400Repository as400Repository,
+            ILoggingService loggingService)
         {
             _macchinaService = macchinaService;
 
@@ -40,6 +43,7 @@ namespace IMAR_DialogoOperatore.Services
 
             _as400Repository = as400Repository;
             _synergyJmesUoW = synergyJmesUoW;
+            _loggingService = loggingService;
         }
 
         public bool ConfrontaCausaliAttivita(IList<Attivita> listaAttivitaDaControllare, string bollaAttivitaDaConfrontare, string operazioneAttivitaDaConfrontare)
@@ -212,16 +216,24 @@ namespace IMAR_DialogoOperatore.Services
 
         public async Task<IList<Attivita>> OttieniAttivitaOperatoreAsync(Operatore operatore)
         {
-            IList<mesTskForOpe>? attivitaIndiretteOperatore = await OttieniAttivitaIndiretteOperatoreAsync(operatore.Badge);
-            if (attivitaIndiretteOperatore == null)
-                return new List<Attivita>();
+            var sw = Stopwatch.StartNew();
 
-            IList<mesDiaOpe>? attivitaAperte = await GetAttivitaAperteAsync();
-            if (attivitaAperte == null)
+            // Le 2 query JMes sono indipendenti: le lanciamo in parallelo
+            var taskIndirette = OttieniAttivitaIndiretteOperatoreAsync(operatore.Badge);
+            var taskAperte = GetAttivitaAperteAsync();
+            await Task.WhenAll(taskIndirette, taskAperte);
+
+            IList<mesTskForOpe>? attivitaIndiretteOperatore = await taskIndirette;
+            IList<mesDiaOpe>? attivitaAperte = await taskAperte;
+
+            _loggingService.LogInfo($"[TIMING] OttieniAttivitaOperatoreAsync query parallele: {sw.ElapsedMilliseconds}ms");
+
+            if (attivitaIndiretteOperatore == null || attivitaAperte == null)
                 return new List<Attivita>();
 
             IList<Attivita> attivitaOperatoreAperte = GetAttivitaOperatoreAperte(operatore, attivitaAperte, attivitaIndiretteOperatore);
 
+            _loggingService.LogInfo($"[TIMING] OttieniAttivitaOperatoreAsync totale: {sw.ElapsedMilliseconds}ms");
             return attivitaOperatoreAperte.OrderBy(x => x.Bolla).ToList();
         }
 
