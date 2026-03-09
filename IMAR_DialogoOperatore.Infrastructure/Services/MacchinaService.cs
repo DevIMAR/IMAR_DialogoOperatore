@@ -27,7 +27,9 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
 
         public Macchina GetMacchinaRealeByAttivita(Attivita attivita)
         {
-            PCIMP00F? pCIMP00F = _as400Repository.ExecuteQuery<PCIMP00F>($"SELECT * FROM IMA90DAT.PCIMP00F WHERE NRBLCI = '{attivita.Bolla}'").SingleOrDefault();
+            PCIMP00F? pCIMP00F = _as400Repository.ExecuteQuery<PCIMP00F>(
+                "SELECT * FROM IMA90DAT.PCIMP00F WHERE NRBLCI = ?",
+                new { attivita.Bolla }).SingleOrDefault();
             if (pCIMP00F == null)
                 return null;
 

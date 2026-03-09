@@ -129,6 +129,8 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
 			return nuoveAttivita;
 		}
 
+		// NB: batchOdp è costruito da ODP provenienti da query AS400 interna, non da input utente.
+		// ODBC non supporta array parameters per IN(), quindi la concatenazione è accettabile qui.
 		private List<Attivita> EseguiQueryAttivitaAs400(IAs400Repository as400Repository, string batchOdp)
 		{
 			return as400Repository.ExecuteQuery<Attivita>(@"WITH

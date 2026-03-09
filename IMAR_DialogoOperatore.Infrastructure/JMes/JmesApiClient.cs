@@ -2,6 +2,7 @@ using IMAR_DialogoOperatore.Application;
 using IMAR_DialogoOperatore.Application.Interfaces.Clients;
 using IMAR_DialogoOperatore.Application.Interfaces.Utilities;
 using IMAR_DialogoOperatore.Domain.Models;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
 using System.Diagnostics;
 using System.Text;
@@ -10,14 +11,15 @@ namespace IMAR_DialogoOperatore.Infrastructure.JMes
 {
     public class JmesApiClient : IJmesApiClient
     {
-        private const string SERVER = "http://i-s-023.imargroup.local:8080/synergy-ws/ws/";
         private const string JMES_LOGIN_PATH = "base/appLogin?app=imarConnect-jmes&key=";
         private const string DIAOPE_LOGIN_PATH = "base/appLogin?app=imarConnect-DiaOpe&key=";
-        private const string JMES_LOGIN_TOKEN = "1hWP47cnCCmH9Ob5WxFttYl2FP4O5lvqPfWIHJm9dnfN4Jx2OJQcn296rRxVZ4FEuPqAYy6PJx09bKl1qHgEqN6LM";
-        private const string DIAOPE_LOGIN_TOKEN = "ekmeJ216zWHSdHXuT2kxTqp6l3aWL2WUEKaODo57TzC5inv4I1FbQ5UNioMaOFg8b3f31WHl2FUWJ7AEUz5VhTfQDbljBFB3sadY";
         private const string WIZARD_WORK_PATH = "spec/sys/wzd/start";
         private const string QUERY_WORK_PATH = "spec/sys/qry/exec";
         private const string GET_QUERY_ID_PATH = "spec/sys/qry/byName";
+
+        private readonly string _server;
+        private readonly string _jmesLoginToken;
+        private readonly string _diaopeLoginToken;
 
         private HttpClient _jmesClient;
         private HttpClient _diaopeClient;
@@ -33,13 +35,17 @@ namespace IMAR_DialogoOperatore.Infrastructure.JMes
             IJSonUtility jSonUtility,
             IHttpClientUtility httpClientUtility,
             IJMesApiClientErrorUtility jMesApiClientErrorUtility,
-            ILoggingService loggingService)
+            ILoggingService loggingService,
+            IConfiguration configuration)
         {
             _jsonUtility = jSonUtility;
             _httpClientUtility = httpClientUtility;
-
             _jMesApiClientErrorUtility = jMesApiClientErrorUtility;
             _loggingService = loggingService;
+
+            _server = configuration["JmesApi:Server"]!;
+            _jmesLoginToken = configuration["JmesApi:JmesLoginToken"]!;
+            _diaopeLoginToken = configuration["JmesApi:DiaopeLoginToken"]!;
         }
 
         private async Task EnsureInitializedAsync()
@@ -53,8 +59,8 @@ namespace IMAR_DialogoOperatore.Infrastructure.JMes
 
                 var sw = Stopwatch.StartNew();
 
-                var jmesTask = _httpClientUtility.BuildAuthenticatedClient(SERVER + JMES_LOGIN_PATH + JMES_LOGIN_TOKEN);
-                var diaopeTask = _httpClientUtility.BuildAuthenticatedClient(SERVER + DIAOPE_LOGIN_PATH + DIAOPE_LOGIN_TOKEN);
+                var jmesTask = _httpClientUtility.BuildAuthenticatedClient(_server + JMES_LOGIN_PATH + _jmesLoginToken);
+                var diaopeTask = _httpClientUtility.BuildAuthenticatedClient(_server + DIAOPE_LOGIN_PATH + _diaopeLoginToken);
 
                 await Task.WhenAll(jmesTask, diaopeTask);
 
@@ -108,7 +114,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.JMes
             {
                 await EnsureInitializedAsync();
 
-                var urlStartWork = SERVER + GET_QUERY_ID_PATH + "/" + queryName + "?token=" + await GetTokenAsync();
+                var urlStartWork = _server + GET_QUERY_ID_PATH + "/" + queryName + "?token=" + await GetTokenAsync();
 
                 var result = await _diaopeClient.GetAsync(urlStartWork);
                 var jsonData = await result.Content.ReadAsStringAsync();
@@ -127,7 +133,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.JMes
         {
             await EnsureInitializedAsync();
 
-            string urlGetToken = SERVER + DIAOPE_LOGIN_PATH + DIAOPE_LOGIN_TOKEN;
+            string urlGetToken = _server + DIAOPE_LOGIN_PATH + _diaopeLoginToken;
 
             var result = await _diaopeClient.GetAsync(urlGetToken);
             var jsonData = await result.Content.ReadAsStringAsync();
@@ -140,7 +146,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.JMes
         {
             await EnsureInitializedAsync();
 
-            var urlStartWork = SERVER + QUERY_WORK_PATH + "/" + queryId + "?token=" + await GetTokenAsync();
+            var urlStartWork = _server + QUERY_WORK_PATH + "/" + queryId + "?token=" + await GetTokenAsync();
 
             var emptyContent = new StringContent("{}", Encoding.UTF8, "application/json");
 
@@ -155,7 +161,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.JMes
         {
             await EnsureInitializedAsync();
 
-            var urlStartWork = SERVER + QUERY_WORK_PATH + "/" + queryId + "?token=" + await GetTokenAsync();
+            var urlStartWork = _server + QUERY_WORK_PATH + "/" + queryId + "?token=" + await GetTokenAsync();
 
             var entity = new
             {
@@ -216,7 +222,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.JMes
                 }
             };
 
-            var urlStartWork = SERVER + WIZARD_WORK_PATH + wizardPath;
+            var urlStartWork = _server + WIZARD_WORK_PATH + wizardPath;
             var result = await _jmesClient.PostAsync(urlStartWork, _jsonUtility.BuildJsonContent(entity));
 
             _loggingService.LogInfo($"JmesApiClient.MesAdvanceDeclarationAsync completato in {sw.ElapsedMilliseconds}ms");
@@ -244,7 +250,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.JMes
                 }
             };
 
-            var urlStartWork = SERVER + WIZARD_WORK_PATH + wizardPath;
+            var urlStartWork = _server + WIZARD_WORK_PATH + wizardPath;
             var result = await _jmesClient.PostAsync(urlStartWork, _jsonUtility.BuildJsonContent(entity));
 
             _loggingService.LogInfo($"JmesApiClient.MesWorkStartAsync completato in {sw.ElapsedMilliseconds}ms");
@@ -273,7 +279,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.JMes
                 }
             };
 
-            var urlStartWork = SERVER + WIZARD_WORK_PATH + wizardPath;
+            var urlStartWork = _server + WIZARD_WORK_PATH + wizardPath;
             var result = await _jmesClient.PostAsync(urlStartWork, _jsonUtility.BuildJsonContent(entity));
 
             _loggingService.LogInfo($"JmesApiClient.MesWorkStartNotPlnAsync completato in {sw.ElapsedMilliseconds}ms");
@@ -300,7 +306,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.JMes
                 }
             };
 
-            var urlStartWork = SERVER + WIZARD_WORK_PATH + wizardPath;
+            var urlStartWork = _server + WIZARD_WORK_PATH + wizardPath;
             var result = await _jmesClient.PostAsync(urlStartWork, _jsonUtility.BuildJsonContent(entity));
 
             _loggingService.LogInfo($"JmesApiClient.MesWorkStartIndirettaAsync completato in {sw.ElapsedMilliseconds}ms");
@@ -330,7 +336,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.JMes
                 }
             };
 
-            var urlStartWork = SERVER + WIZARD_WORK_PATH + wizardPath;
+            var urlStartWork = _server + WIZARD_WORK_PATH + wizardPath;
             var result = await _jmesClient.PostAsync(urlStartWork, _jsonUtility.BuildJsonContent(entity));
 
             _loggingService.LogInfo($"JmesApiClient.MesWorkEndAsync completato in {sw.ElapsedMilliseconds}ms");
@@ -361,7 +367,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.JMes
                 }
             };
 
-            var urlStartWork = SERVER + WIZARD_WORK_PATH + wizardPath;
+            var urlStartWork = _server + WIZARD_WORK_PATH + wizardPath;
             var result = await _jmesClient.PostAsync(urlStartWork, _jsonUtility.BuildJsonContent(entity));
 
             _loggingService.LogInfo($"JmesApiClient.MesWorkSuspensionAsync completato in {sw.ElapsedMilliseconds}ms");
@@ -388,7 +394,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.JMes
                 }
             };
 
-            var urlStartWork = SERVER + WIZARD_WORK_PATH + wizardPath;
+            var urlStartWork = _server + WIZARD_WORK_PATH + wizardPath;
             var result = await _jmesClient.PostAsync(urlStartWork, _jsonUtility.BuildJsonContent(entity));
 
             _loggingService.LogInfo($"JmesApiClient.MesWorkResumeAsync completato in {sw.ElapsedMilliseconds}ms");
@@ -416,7 +422,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.JMes
                 }
             };
 
-            var urlStartWork = SERVER + WIZARD_WORK_PATH + wizardPath;
+            var urlStartWork = _server + WIZARD_WORK_PATH + wizardPath;
             var result = await _jmesClient.PostAsync(urlStartWork, _jsonUtility.BuildJsonContent(entity));
 
             _loggingService.LogInfo($"JmesApiClient.MesSuspensionStartAsync completato in {sw.ElapsedMilliseconds}ms");
@@ -443,7 +449,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.JMes
                 }
             };
 
-            var urlStartWork = SERVER + WIZARD_WORK_PATH + wizardPath;
+            var urlStartWork = _server + WIZARD_WORK_PATH + wizardPath;
             var result = await _jmesClient.PostAsync(urlStartWork, _jsonUtility.BuildJsonContent(entity));
 
             _loggingService.LogInfo($"JmesApiClient.MesSuspensionEndAsync completato in {sw.ElapsedMilliseconds}ms");
@@ -473,7 +479,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.JMes
                 }
             };
 
-            var urlStartWork = SERVER + WIZARD_WORK_PATH + wizardPath;
+            var urlStartWork = _server + WIZARD_WORK_PATH + wizardPath;
             var result = await _jmesClient.PostAsync(urlStartWork, _jsonUtility.BuildJsonContent(entity));
 
             _loggingService.LogInfo($"JmesApiClient.MesEquipStartAsync completato in {sw.ElapsedMilliseconds}ms");
@@ -502,7 +508,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.JMes
                 }
             };
 
-            var urlStartWork = SERVER + WIZARD_WORK_PATH + wizardPath;
+            var urlStartWork = _server + WIZARD_WORK_PATH + wizardPath;
             var result = await _jmesClient.PostAsync(urlStartWork, _jsonUtility.BuildJsonContent(entity));
 
             _loggingService.LogInfo($"JmesApiClient.MesEquipStartNotPlnAsync completato in {sw.ElapsedMilliseconds}ms");
@@ -529,7 +535,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.JMes
                 }
             };
 
-            var urlStartWork = SERVER + WIZARD_WORK_PATH + wizardPath;
+            var urlStartWork = _server + WIZARD_WORK_PATH + wizardPath;
             var result = await _jmesClient.PostAsync(urlStartWork, _jsonUtility.BuildJsonContent(entity));
 
             _loggingService.LogInfo($"JmesApiClient.MesEquipEndAsync completato in {sw.ElapsedMilliseconds}ms");
@@ -556,7 +562,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.JMes
                 }
             };
 
-            var urlStartWork = SERVER + WIZARD_WORK_PATH + wizardPath;
+            var urlStartWork = _server + WIZARD_WORK_PATH + wizardPath;
             var result = await _jmesClient.PostAsync(urlStartWork, _jsonUtility.BuildJsonContent(entity));
 
             _loggingService.LogInfo($"JmesApiClient.MesEquipRemoveAsync completato in {sw.ElapsedMilliseconds}ms");
@@ -584,7 +590,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.JMes
                 }
             };
 
-            var urlStartWork = SERVER + WIZARD_WORK_PATH + wizardPath;
+            var urlStartWork = _server + WIZARD_WORK_PATH + wizardPath;
             var result = await _jmesClient.PostAsync(urlStartWork, _jsonUtility.BuildJsonContent(entity));
 
             _loggingService.LogInfo($"JmesApiClient.MesEquipSuspensionAsync completato in {sw.ElapsedMilliseconds}ms");
@@ -611,7 +617,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.JMes
                 }
             };
 
-            var urlStartWork = SERVER + WIZARD_WORK_PATH + wizardPath;
+            var urlStartWork = _server + WIZARD_WORK_PATH + wizardPath;
             var result = await _jmesClient.PostAsync(urlStartWork, _jsonUtility.BuildJsonContent(entity));
 
             _loggingService.LogInfo($"JmesApiClient.MesEquipResumeAsync completato in {sw.ElapsedMilliseconds}ms");
@@ -638,7 +644,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.JMes
                 }
             };
 
-            var urlStartWork = SERVER + WIZARD_WORK_PATH + wizardPath;
+            var urlStartWork = _server + WIZARD_WORK_PATH + wizardPath;
             var result = await _jmesClient.PostAsync(urlStartWork, _jsonUtility.BuildJsonContent(entity));
 
             _loggingService.LogInfo($"JmesApiClient.MesBreakStartAsync completato in {sw.ElapsedMilliseconds}ms");
@@ -664,7 +670,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.JMes
                 }
             };
 
-            var urlStartWork = SERVER + WIZARD_WORK_PATH + wizardPath;
+            var urlStartWork = _server + WIZARD_WORK_PATH + wizardPath;
             var result = await _jmesClient.PostAsync(urlStartWork, _jsonUtility.BuildJsonContent(entity));
 
             _loggingService.LogInfo($"JmesApiClient.MesBreakEndAsync completato in {sw.ElapsedMilliseconds}ms");
@@ -691,7 +697,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.JMes
                 }
             };
 
-            var urlStartWork = SERVER + WIZARD_WORK_PATH + wizardPath;
+            var urlStartWork = _server + WIZARD_WORK_PATH + wizardPath;
             var result = await _jmesClient.PostAsync(urlStartWork, _jsonUtility.BuildJsonContent(entity));
 
             _loggingService.LogInfo($"JmesApiClient.MesAutoClockAsync completato in {sw.ElapsedMilliseconds}ms");

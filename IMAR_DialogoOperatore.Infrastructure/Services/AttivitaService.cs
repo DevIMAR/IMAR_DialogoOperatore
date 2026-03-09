@@ -140,7 +140,8 @@ namespace IMAR_DialogoOperatore.Services
 																		    FROM IMA90DAT.PCIMP00F pf2
 																		    JOIN IMA90DAT.MGART00F mf ON pf2.CDARCI = mf.CDARMA
 																		    LEFT JOIN NONCONTABILIZZATE ra ON ra.NRTSKJM = pf2.NRBLCI
-																		    WHERE pf2.ORPRCI = (SELECT ORPRCI FROM IMA90DAT.PCIMP00F WHERE NRBLCI = '" + bolla + "')").ToList();
+																		    WHERE pf2.ORPRCI = (SELECT ORPRCI FROM IMA90DAT.PCIMP00F WHERE NRBLCI = ?)",
+                    new { bolla }).ToList();
 
                 QuantitaOrdineCalculator.Calcola(tutteLeFasiOdp);
                 attivitaTrovata = tutteLeFasiOdp.SingleOrDefault(x => x.Bolla == bolla);
@@ -190,7 +191,8 @@ namespace IMAR_DialogoOperatore.Services
 																		    FROM IMA90DAT.PCIMP00F pf2
 																		    JOIN IMA90DAT.MGART00F mf ON pf2.CDARCI = mf.CDARMA
 																		    LEFT JOIN NONCONTABILIZZATE ra ON ra.NRTSKJM = pf2.NRBLCI
-																		    WHERE pf2.ORPRCI = '" + odp + "'").ToList();
+																		    WHERE pf2.ORPRCI = ?",
+                    new { odp }).ToList();
 
                 QuantitaOrdineCalculator.Calcola(risultati);
                 attivitaFiltrate = risultati;
@@ -364,9 +366,11 @@ namespace IMAR_DialogoOperatore.Services
                 return null;
 
             // 1. Cerca in PCMOV12L (contabilizzato)
+            string bollaTrimmed = bollaFasePrecedente.Trim();
             string? codiceOperatore = _as400Repository.ExecuteQuery<string>(
                 @"SELECT MAX(TRIM(CDDICM)) FROM IMA90DAT.PCMOV12L
-                  WHERE CDDTCM = '01' AND TRIM(NRBLCM) = '" + bollaFasePrecedente.Trim() + "'")
+                  WHERE CDDTCM = '01' AND TRIM(NRBLCM) = ?",
+                new { bollaTrimmed })
                 .FirstOrDefault();
 
             // 2. Fallback JMRILM00F (non contabilizzato)
@@ -374,7 +378,8 @@ namespace IMAR_DialogoOperatore.Services
             {
                 codiceOperatore = _as400Repository.ExecuteQuery<string>(
                     @"SELECT MAX(TRIM(CDOPEJM)) FROM IMA90DAT.JMRILM00F
-                      WHERE TRIM(NRTSKJM) = '" + bollaFasePrecedente.Trim() + "'")
+                      WHERE TRIM(NRTSKJM) = ?",
+                    new { bollaTrimmed })
                     .FirstOrDefault();
             }
 

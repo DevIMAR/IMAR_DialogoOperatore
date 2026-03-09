@@ -20,7 +20,9 @@ using log4net.Config;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System.Net.Http.Headers;
 using System.Reflection;
+using System.Text;
 
 namespace IMAR_DialogoOperatore.Infrastructure
 {
@@ -56,6 +58,15 @@ namespace IMAR_DialogoOperatore.Infrastructure
 			services.AddScoped<ITimbratureService, TimbratureService>();
 			services.AddScoped<IUtenteService, UtenteService>();
 
+			// HttpClient per IMAR API con autenticazione Basic pre-configurata
+			services.AddHttpClient("ImarApi", (sp, client) =>
+			{
+				var config = sp.GetRequiredService<IConfiguration>();
+				client.BaseAddress = new Uri(config["ImarApi:BaseUrl"]!);
+				var credentials = Convert.ToBase64String(
+					Encoding.ASCII.GetBytes($"{config["ImarApi:Username"]}:{config["ImarApi:Password"]}"));
+				client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", credentials);
+			});
 			services.AddScoped<IImarApiClient, ImarApiClient>();
 			services.AddScoped<IJmesApiClient, JmesApiClient>();
 

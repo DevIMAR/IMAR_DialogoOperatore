@@ -4,6 +4,7 @@
     {
         IEnumerable<T> GetAll<T>();
         IEnumerable<T> ExecuteQuery<T>(string query);
+        IEnumerable<T> ExecuteQuery<T>(string query, object param);
         int ExecuteCommand(string sql, object? param = null);
     }
 }

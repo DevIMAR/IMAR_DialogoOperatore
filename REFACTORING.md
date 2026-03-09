@@ -1,74 +1,102 @@
 # Refactoring Plan - DialogoOperatore
 
-## Completati (rischio zero)
+## Completati
 
-- [x] `Operatore.AttivitaAperte` e `MacchineAssegnate` inizializzati a lista vuota (previene NullReferenceException)
-- [x] `CaricamentoAttivitaInBackgroundService.UpdateAttivitaAsync()` scomposto da 137 righe in 6 metodi privati
-- [x] Null-check in `AttivitaService.ConfrontaCausaliAttivita()` per lista null
-- [x] Null-check in `TimbratureService.GetTimbratureOperatore()` per operatore non trovato
+- [x] `Operatore.AttivitaAperte` e `MacchineAssegnate` inizializzati a lista vuota
+- [x] `CaricamentoAttivitaInBackgroundService.UpdateAttivitaAsync()` scomposto in 6 metodi privati
+- [x] Null-check in `AttivitaService.ConfrontaCausaliAttivita()` e `TimbratureService.GetTimbratureOperatore()`
 - [x] Fix `IsAttivitaNonSchedulata`: escluse attivita indirette dall'avviso
+- [x] Redesign TaskPopup: multi-checkbox, grid raggruppata, follower automatici Asana
 
 ---
 
-## Priorita 1 - Rischio basso (refactoring interni, stessa classe)
+## P1 - CRITICO: Sicurezza
 
-### AttivitaService.cs (522 righe, 13+ metodi) - God Class
-- [ ] Estrarre query SQL duplicata 3 volte (`OttieniAttivitaApertaDaBolla`, `GetAttivitaPerOdp`, background service) in un metodo condiviso `QueryAttivitaAs400(string filtroOdp)`
+### Credenziali hardcoded nel codice sorgente
+- [ ] `ImarApiClient.cs:124` — Basic auth `user_spc:BsaKqh8YzA%W5pLy` hardcoded
+- [ ] `JmesApiClient.cs:16-17` — Token login hardcoded come `const`
+- [ ] **Azione**: spostare in `appsettings.json` sezione dedicata, iniettare via `IOptions<T>` o `IConfiguration`
+
+### SQL Injection nelle query AS400
+- [ ] `AttivitaService.cs:143,193,367-376` — concatenazione stringhe con valori utente
+- [ ] `MacchinaService.cs:30` — stessa vulnerabilita
+- [ ] **Azione**: usare query parametrizzate Dapper `@param`
+
+### HttpClient leak — `new HttpClient()` per ogni request
+- [ ] `ImarApiClient.cs:23,34,48,63,79,88,107` — crea nuovo HttpClient ad ogni chiamata
+- [ ] **Azione**: usare `IHttpClientFactory` con named/typed client
+
+### Config Asana hardcoded
+- [ ] `AsanaTaskCompilerHelper.cs:122-127` — Workspace, Project, Followers, Assignee hardcoded
+- [ ] **Azione**: spostare in `appsettings.json` sezione `AsanaConfig`
+
+---
+
+## P2 - ALTO: SRP e codice duplicato
+
+### AttivitaService.cs — God Class (566 righe, 7 dipendenze)
+- [ ] Estrarre query SQL duplicata 3 volte in metodo condiviso `QueryAttivitaAs400(string whereClause)`
+- [ ] Unificare `GetAttivitaOperatoreDellUltimaGiornataNonContabilizzate/Contabilizzate` in metodo generico
 - [ ] Scomporre `GetAttivitaOperatoreAperte()` (44 righe, 4 LINQ join) in passi intermedi
-- [ ] Unificare `GetAttivitaOperatoreDellUltimaGiornataNonContabilizzate()` e `Contabilizzate()` in metodo generico con parametro tabella
-
-### OperatoreService.cs (223 righe)
-- [ ] Scomporre `OttieniOperatoreAsync()` (36 righe) in: `CaricaTimbrature()`, `PopolaDatiOperatore()`, `CalcolaStato()`
-
----
-
-## Priorita 2 - Rischio medio (spostamento logica tra layer)
-
-### Business logic nei Helpers UI -> Servizi Application
-
-#### PopupConfermaHelper.cs (210 righe) -> `IActivityValidationService`
-Contiene regole di validazione che dovrebbero stare nel layer Application/Infrastructure:
-- Validazione precedenza fasi
-- Rilevamento attivita concorrenti su stessa bolla
-- Controllo stato saldo
-- Validazione quantita prodotte
-
-**Piano**: Creare `IActivityValidationService` in Application, implementare in Infrastructure, iniettare nell'Helper ridotto.
-
-#### ConfermaOperazioneHelper.cs (159 righe) -> `IActivityOperationService`
-E' uno state machine dispatcher con 7 case nel switch. Dovrebbe essere un servizio:
-- `BeginWorkAsync()`, `EndWorkAsync()`, `AdvanceAsync()`, `BeginEquipmentAsync()`, `EndEquipmentAsync()`
-
-**Anti-pattern critico**: Dipende da `AttivitaGridViewModel` (concrete UI class nel costruttore). Sostituire con interfaccia observer.
-
----
-
-## Priorita 3 - Rischio medio-alto (refactoring strutturali)
-
-### ConfermaCommand.cs - 8 parametri nel costruttore
-Responsabilita multiple: segnalazioni difformita, assegnazione macchine, orchestrazione conferma.
-- [ ] Estrarre logica segnalazioni difformita in servizio dedicato
-- [ ] Ridurre a 4-5 parametri
+- [ ] Dipende da `CaricamentoAttivitaInBackgroundService` concreto → estrarre interfaccia
 
 ### Codice duplicato: `CreaEdInviaSegnalazioneDifformita()`
-Metodo identico in `ConfermaCommand.cs` e `InviaTaskCommand.cs`.
-- [ ] Estrarre in `ISegnalazioneDifformitaHelper` condiviso
+- [ ] `ConfermaCommand.cs:84-111` e `InviaTaskCommand.cs:111-138` — quasi identici
+- [ ] Magic number `CostoGestioneDifformita = 5`
+- [ ] **Azione**: estrarre in `ISegnalazioneDifformitaHelper` condiviso
+
+### `AggiornaOperatoreSelezionatoAsync()` triplicato
+- [ ] `ConfermaOperazioneHelper.cs:166`, `CreaFaseNonPianificataHelper.cs:65`, `IngressoUscitaCommand.cs:165`
+- [ ] **Azione**: estrarre in helper/servizio condiviso
+
+### Helper/Command dipendono da ViewModel concreti
+- [ ] `ConfermaOperazioneHelper.cs:16` → `AttivitaGridViewModel` concreto
+- [ ] `IngressoUscitaCommand.cs:18` → `InfoOperatoreViewModel` concreto
+- [ ] **Azione**: passare per observer invece che manipolare direttamente il ViewModel
 
 ---
 
-## Note architetturali
+## P3 - MEDIO: Architettura e performance
 
-### Cosa funziona bene
-- Confini dei layer rispettati (nessuna violazione Domain->Infrastructure)
-- Repository/UoW pattern corretto
-- Observer pattern per stato UI ben implementato
-- Dependency direction corretta in tutti i progetti
+### DialogoOperatoreObserver — God Object (12 proprietà, 12 eventi)
+- [ ] Splittare in sub-observer: `IOperatoreStateObserver`, `IOperazioneStateObserver`, `IUIStateObserver`
 
-### Metriche attuali
+### Full table load in memoria
+- [ ] `TimbratureService.cs` — `.Get().ToList()` su tabelle intere (AngRes, TblResClk, TblResBrk)
+- [ ] `OperatoreService.cs:56-58` — carica tutti gli operatori poi filtra in C#
+- [ ] **Azione**: push filtri server-side via IQueryable
+
+### OperatoreService — stato mutabile
+- [ ] `OperatoreService.cs:22` — proprietà `Operatore` mutabile in un service scoped
+- [ ] **Azione**: rendere stateless, restituire da metodi senza memorizzare
+
+### Business logic in UI layer
+- [ ] `PopupConfermaHelper.cs` — validazione precedenza fasi, concorrenza bolla, saldo, quantità
+- [ ] **Azione**: estrarre in `IActivityValidationService` in Application layer
+
+### Costruttori con troppi parametri (>5)
+- [ ] `ConfermaCommand` (9), `InviaTaskCommand` (9), `IngressoUscitaCommand` (9)
+- [ ] `PulsantieraGeneraleViewModel` (9) — cast a ViewModel concreto per event subscribe
+
+### Badge esclusione timbrature hardcoded
+- [ ] `TimbratureService.cs:110-113` — 22 badge hardcoded
+- [ ] **Azione**: spostare in configurazione o tabella DB
+
+### Event subscription senza unsubscribe
+- [ ] `ConfermaCommand`, `InviaTaskCommand` — subscribe in costruttore, no Dispose override
+
+---
+
+## Metriche attuali
+
 | Metrica | Valore | Target |
 |---------|--------|--------|
+| Credenziali hardcoded | 3 | 0 |
+| SQL injection potenziale | 5 query | 0 |
+| HttpClient leak | 7 istanze | 0 |
 | Servizi >200 righe | 2 | 0 |
-| Costruttori >5 param | 3 | 0 |
+| Costruttori >5 param | 4 | 0 |
 | Business logic in UI | 2 helper | 0 |
-| Codice duplicato | 2 casi | 0 |
+| Codice duplicato | 3 casi | 0 |
+| Full table load | 5 query | 0 |
 | Violazioni layer | 0 | 0 |
