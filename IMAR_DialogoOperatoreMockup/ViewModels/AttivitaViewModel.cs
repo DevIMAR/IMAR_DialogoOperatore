@@ -34,6 +34,7 @@ namespace IMAR_DialogoOperatore.ViewModels
 		public Macchina? MacchinaFittizia => _attivita?.MacchinaFittizia;
 		public Macchina? MacchinaReale => _attivita?.MacchinaReale;
 		public string CausaleEstesa => _attivita?.CausaleEstesa;
+        public string? Flusso => _attivita?.Flusso;
         public DateTime? DataSchedulata => _attivita?.DataSchedulata;
         public DateTime? InizioAttivita => _attivita?.InizioAttivita;
 		public DateTime? FineAttivita => _attivita?.FineAttivita;

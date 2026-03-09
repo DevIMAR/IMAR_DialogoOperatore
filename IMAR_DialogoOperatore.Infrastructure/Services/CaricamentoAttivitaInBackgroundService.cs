@@ -163,7 +163,8 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
 																				pf2.TIRECI AS TIPORICEVIMENTO,
 																				CASE WHEN ra.MAX_SAACCJM IS NULL THEN pf2.TIRECI ELSE ra.MAX_SAACCJM END AS SALDOACCONTO,
 																				ra.MAX_SAACCJM AS SALDOACCONTOJMES,
-																				pf2.FLSFCI AS ISNONPIANIFICATA
+																				pf2.FLSFCI AS ISNONPIANIFICATA,
+																			CASE WHEN TRIM(pf2.CDRICI) = '' THEN '09' ELSE TRIM(LEFT(pf2.CDRICI, 2)) END AS FLUSSO
 																			FROM IMA90DAT.PCIMP00F pf2
 																			JOIN IMA90DAT.MGART00F mf ON pf2.CDARCI = mf.CDARMA
 																			LEFT JOIN NONCONTABILIZZATE ra ON ra.NRTSKJM = pf2.NRBLCI

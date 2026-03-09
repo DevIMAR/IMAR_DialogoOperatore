@@ -89,10 +89,8 @@ namespace IMAR_DialogoOperatore.Commands
                 ? await _segnalazioniDifformitaService.GetCostiArticolo(attivita.CodiceArticolo)
                 : new CostiArticoloDTO();
 
-            // Flusso della fase di apertura NC (sempre dalla fase corrente)
-            string? flusso = attivita?.Odp != null && attivita?.CodiceFase != null
-                ? _segnalazioniDifformitaService.GetFlussoByOdpFase(attivita.Odp, attivita.CodiceFase)
-                : null;
+            // Flusso della fase di apertura NC (dai dati AS400 già in pancia)
+            string? flusso = attivita?.Flusso;
 
             // Se "Errore fase attuale" non è spuntato, FaseDifformita vuota + nota nascosta
             bool isErroreFaseAttuale = _segnalazioneObserver.IsErroreFaseAttuale;

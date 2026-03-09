@@ -129,6 +129,7 @@ namespace IMAR_DialogoOperatore.Mappers
                 QuantitaProdotta = a.QuantitaProdotta,
                 QuantitaScartata = a.QuantitaScartata,
                 SaldoAcconto = a.SaldoAcconto,
+                Flusso = a.Flusso,
                 OraInizio = a.InizioAttivita,
                 OraFine = a.FineAttivita
             }).ToList();

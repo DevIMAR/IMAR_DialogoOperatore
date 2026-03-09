@@ -28,6 +28,7 @@ namespace IMAR_DialogoOperatore.Interfaces.ViewModels
         Macchina? MacchinaFittizia { get; }
         Macchina? MacchinaReale { get; }
         string CausaleEstesa { get; }
+        string? Flusso { get; }
         DateTime? DataSchedulata { get; }
         DateTime? InizioAttivita { get; }
         DateTime? FineAttivita { get; }

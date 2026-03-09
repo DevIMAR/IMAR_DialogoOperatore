@@ -125,7 +125,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
 			{
 				using var connection = new SqlConnection(_connectionString);
 				return connection.Query<string>(
-					"SELECT DISTINCT CategoriaDifformita FROM SegnalazioneDifformita WHERE CategoriaDifformita IS NOT NULL AND CategoriaDifformita <> '' ORDER BY CategoriaDifformita")
+					"SELECT DISTINCT CategoriaDifformita FROM SegnalazioneDifformita WHERE CategoriaDifformita IS NOT NULL AND CategoriaDifformita <> '' AND CategoriaDifformita <> 'Test' ORDER BY CategoriaDifformita")
 					.ToList();
 			}
 			catch (Exception ex)
