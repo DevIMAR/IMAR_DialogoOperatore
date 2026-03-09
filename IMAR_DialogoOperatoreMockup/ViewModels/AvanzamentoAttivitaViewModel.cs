@@ -62,14 +62,20 @@ namespace IMAR_DialogoOperatore.ViewModels
 		public bool IsFaseCompletabile
 		{
 			get { return _isFaseCompletabile; }
-			set 
-			{ 
-				_isFaseCompletabile = _dialogoOperatoreObserver.AttivitaSelezionata?.SaldoAcconto == Costanti.SALDO ? true :
-									  _taskCompilerObserver.EventoRaggrupatoSelezionato?.SaldoAcconto == Costanti.SALDO ? true :
-											(_dialogoOperatoreObserver?.AttivitaSelezionata?.QuantitaProdotta + _dialogoOperatoreObserver?.AttivitaSelezionata?.QuantitaScartata > 0
-											|| _avanzamentoObserver.QuantitaProdotta + _avanzamentoObserver.QuantitaScartata > 0
-											|| _taskCompilerObserver.EventoRaggrupatoSelezionato?.QuantitaProdotta + _taskCompilerObserver.EventoRaggrupatoSelezionato?.QuantitaScartata > 0)
-											&& value;
+			set
+			{
+				// Nel popup "Invio notifica errore" il toggle saldo/acconto è libero
+				if (_taskCompilerObserver.EventoRaggrupatoSelezionato != null)
+				{
+					_isFaseCompletabile = value;
+				}
+				else
+				{
+					_isFaseCompletabile = _dialogoOperatoreObserver.AttivitaSelezionata?.SaldoAcconto == Costanti.SALDO ? true :
+							(_dialogoOperatoreObserver?.AttivitaSelezionata?.QuantitaProdotta + _dialogoOperatoreObserver?.AttivitaSelezionata?.QuantitaScartata > 0
+							|| _avanzamentoObserver.QuantitaProdotta + _avanzamentoObserver.QuantitaScartata > 0)
+							&& value;
+				}
 
 				_avanzamentoObserver.SaldoAcconto = _isFaseCompletabile ? Costanti.SALDO : Costanti.ACCONTO;
 
@@ -97,7 +103,23 @@ namespace IMAR_DialogoOperatore.ViewModels
 
 			_avanzamentoObserver.OnQuantitaProdottaChanged += AvanzamentoStore_OnQuantitaChanged;
 			_avanzamentoObserver.OnQuantitaScartataChanged += AvanzamentoStore_OnQuantitaChanged;
+
+			_taskCompilerObserver.OnCorrezioniChanged += TaskCompilerObserver_OnCorrezioniChanged;
 		}
+
+        /// <summary>
+        /// Quando si spunta "Rettifica quantità" nel popup, prepopola con i dati della riga selezionata
+        /// </summary>
+        private void TaskCompilerObserver_OnCorrezioniChanged()
+        {
+            if (_taskCompilerObserver.IsRettificaQuantita && _taskCompilerObserver.EventoRaggrupatoSelezionato != null)
+            {
+                var evento = _taskCompilerObserver.EventoRaggrupatoSelezionato;
+                QuantitaProdotta = (uint?)(evento.QuantitaProdotta ?? 0);
+                QuantitaScartata = (uint?)(evento.QuantitaScartata ?? 0);
+                IsFaseCompletabile = evento.SaldoAcconto == Costanti.SALDO;
+            }
+        }
 
         private void DialogoOperatoreObserver_OnIsDettaglioAttivitaOpenChanged()
         {

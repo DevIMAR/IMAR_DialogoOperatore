@@ -9,7 +9,8 @@
 <div>
 	@* Grid attività raggruppate (Inizio + Fine in una riga) *@
 	<DxGrid Data="@CronologiaAttivitaGridViewModel.EventiRaggruppati"
-			AllowSort="false"
+			AllowSort="true"
+			SortMode="GridSortMode.Multiple"
 			AllowColumnReorder="false"
 			ShowAllRows="true"
 			AllowSelectRowByClick="true"
@@ -29,7 +30,8 @@
 							  FieldName="@(nameof(EventoRaggrupatoViewModel.CodiceFase))" />
 			<DxGridDataColumn Caption="Inizio"
 							  FieldName="@(nameof(EventoRaggrupatoViewModel.OraInizio))"
-							  DisplayFormat="HH:mm" />
+							  DisplayFormat="HH:mm"
+							  SortIndex="0" SortOrder="GridColumnSortOrder.Ascending" />
 			<DxGridDataColumn Caption="Fine"
 							  FieldName="@(nameof(EventoRaggrupatoViewModel.OraFine))"
 							  DisplayFormat="HH:mm" />
@@ -46,6 +48,7 @@
 	@* Checkbox correzioni *@
 	<div class="d-flex flex-wrap gap-4 mt-3 testo-piccolo">
 		<DxCheckBox @bind-Checked="@TaskPopupViewModel.IsRettificaQuantita"
+					Enabled="@IsRettificaQuantitaAbilitata"
 					Alignment="CheckBoxContentAlignment.Center">
 			Rettifica quantità
 		</DxCheckBox>
@@ -80,12 +83,14 @@
 					<label>INIZIO:</label>
 					<DxSpinEdit @bind-Value="@CompilatoreTaskViewModel.OraInizio"
 								MinValue="0" MaxValue="24"
+								DisplayFormat="00"
 								ShowSpinButtons="false"
 								CssClass="dxbl-text-edit"
 								style="width: 60px;" />
 					<label>:</label>
 					<DxSpinEdit @bind-Value="@CompilatoreTaskViewModel.MinutoInizio"
 								MinValue="0" MaxValue="59"
+								DisplayFormat="00"
 								ShowSpinButtons="false"
 								CssClass="dxbl-text-edit"
 								style="width: 60px;" />
@@ -97,12 +102,14 @@
 					<label>FINE:</label>
 					<DxSpinEdit @bind-Value="@CompilatoreTaskViewModel.OraFine"
 								MinValue="0" MaxValue="24"
+								DisplayFormat="00"
 								ShowSpinButtons="false"
 								CssClass="dxbl-text-edit"
 								style="width: 60px;" />
 					<label>:</label>
 					<DxSpinEdit @bind-Value="@CompilatoreTaskViewModel.MinutoFine"
 								MinValue="0" MaxValue="59"
+								DisplayFormat="00"
 								ShowSpinButtons="false"
 								CssClass="dxbl-text-edit"
 								style="width: 60px;" />
@@ -147,6 +154,10 @@
 	private bool IsTogliSaldoAbilitato =>
 		CompilatoreTaskViewModel.EventoRaggrupatoSelezionato?.SaldoAcconto == Costanti.SALDO;
 
+	/// <summary>"Rettifica quantità" disabilitata sugli attrezzaggi (non hanno quantità)</summary>
+	private bool IsRettificaQuantitaAbilitata =>
+		CompilatoreTaskViewModel.EventoRaggrupatoSelezionato?.Causale != Costanti.IN_ATTREZZAGGIO;
+
 	private void OnEventoSelezionatoChanged(object nuovoEvento)
 	{
 		CompilatoreTaskViewModel.EventoRaggrupatoSelezionato = (EventoRaggrupatoViewModel?)nuovoEvento;
@@ -154,5 +165,9 @@
 		// Se la riga selezionata è in Acconto, deseleziona "Togli saldo"
 		if (!IsTogliSaldoAbilitato && TaskPopupViewModel.IsTogliSaldo)
 			TaskPopupViewModel.IsTogliSaldo = false;
+
+		// Se la riga selezionata è un attrezzaggio, deseleziona "Rettifica quantità"
+		if (!IsRettificaQuantitaAbilitata && TaskPopupViewModel.IsRettificaQuantita)
+			TaskPopupViewModel.IsRettificaQuantita = false;
 	}
 }

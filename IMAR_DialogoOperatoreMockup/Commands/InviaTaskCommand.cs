@@ -116,11 +116,23 @@ namespace IMAR_DialogoOperatore.Commands
                 ? await _segnalazioniDifformitaService.GetCostiArticolo(evento.CodiceArticolo)
                 : new CostiArticoloDTO();
 
+            // Flusso della fase di apertura NC (sempre dalla fase corrente)
+            string? flusso = evento?.Odp != null && evento?.CodiceFase != null
+                ? _segnalazioniDifformitaService.GetFlussoByOdpFase(evento.Odp, evento.CodiceFase)
+                : null;
+
+            // Se "Errore fase attuale" non è spuntato, FaseDifformita vuota + nota nascosta
+            bool isErroreFaseAttuale = _segnalazioneObserver.IsErroreFaseAttuale;
+            string descrizione = _segnalazioneObserver.DescrizioneDifetto ?? "";
+            if (!isErroreFaseAttuale)
+                descrizione = (descrizione + " #Errore in fase precedente o materia prima#").Trim();
+
             _segnalazioniDifformitaService.InsertSegnalazione(new SegnalazioneDifformita
             {
                 OrigineSegnalazione = "I",
                 Richiedente = _dialogoOperatoreObserver.OperatoreSelezionato.Badge + " - " + _dialogoOperatoreObserver.OperatoreSelezionato.Cognome + " " + _dialogoOperatoreObserver.OperatoreSelezionato.Nome,
-                FaseDifformita = evento?.CodiceFase,
+                Flusso = flusso,
+                FaseDifformita = isErroreFaseAttuale ? evento?.CodiceFase : null,
                 DescrizioneFase = evento?.DescrizioneFase,
                 Odp = evento?.Odp,
                 Articolo = evento?.CodiceArticolo,
@@ -130,7 +142,7 @@ namespace IMAR_DialogoOperatore.Commands
                 CostoGestioneDifformita = 5,
                 CostoUnitarioMateriale = Math.Round(costiArticoloDTO.CostoUnitarioMateriale, 2),
                 CostoLavorazione = Math.Round(costiArticoloDTO.CostoUnitarioLavorazione, 2),
-                DescrizioneDifformita = _segnalazioneObserver.DescrizioneDifetto,
+                DescrizioneDifformita = descrizione,
                 CategoriaDifformita = _segnalazioneObserver.Categoria,
                 QtaDifformiRecuperati = _segnalazioneObserver.QuantitaRecuperata,
                 Sorgente = "DialogoOperatore"

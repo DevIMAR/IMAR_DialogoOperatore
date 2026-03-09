@@ -1,4 +1,5 @@
-﻿using IMAR_DialogoOperatore.Interfaces.Observers;
+﻿using IMAR_DialogoOperatore.Application.Interfaces.Services.External;
+using IMAR_DialogoOperatore.Interfaces.Observers;
 
 namespace IMAR_DialogoOperatore.ViewModels
 {
@@ -6,18 +7,20 @@ namespace IMAR_DialogoOperatore.ViewModels
     {
         private readonly IAvanzamentoObserver _avanzamentoObserver;
         private readonly ISegnalazioneObserver _segnalazioneObserver;
+        private readonly ISegnalazioniDifformitaService _segnalazioniDifformitaService;
 
         private uint? _quantitaScartata;
         private uint? _quantitaRecuperata;
         private string _categoria;
         private bool _isErroreFaseAttuale;
         private string _descrizioneDifetto;
+        private List<string>? _listaCategorie;
 
         public string? Bolla => _segnalazioneObserver.AttivitaPerSegnalazione?.Bolla;
         public string? Odp => _segnalazioneObserver.AttivitaPerSegnalazione?.Odp;
         public string? Fase => _segnalazioneObserver.AttivitaPerSegnalazione?.CodiceFase;
         public string? DescrizioneFase => _segnalazioneObserver.AttivitaPerSegnalazione?.DescrizioneFase;
-        public List<string> ListaCategorie => new List<string> { "Dimensionale", "Finitura", "Materiale", "Strutturale", "Quantitativo", "Errore Disegno/Distinta", "Varie Imballo" };
+        public List<string> ListaCategorie => _listaCategorie ??= _segnalazioniDifformitaService.GetCategorie();
 
         public uint? QuantitaScartata
         {
@@ -81,10 +84,12 @@ namespace IMAR_DialogoOperatore.ViewModels
 
         public FormSegnalazioneDifformitaViewModel(
             IAvanzamentoObserver avanzamentoObserver,
-            ISegnalazioneObserver segnalazioneObserver)
+            ISegnalazioneObserver segnalazioneObserver,
+            ISegnalazioniDifformitaService segnalazioniDifformitaService)
         {
             _avanzamentoObserver = avanzamentoObserver;
             _segnalazioneObserver = segnalazioneObserver;
+            _segnalazioniDifformitaService = segnalazioniDifformitaService;
 
             QuantitaScartata = _avanzamentoObserver.QuantitaScartata;
             Inizializza();
@@ -101,7 +106,7 @@ namespace IMAR_DialogoOperatore.ViewModels
         private void Inizializza()
         {
             QuantitaRecuperata = 0;
-            Categoria = "Dimensionale";
+            Categoria = ListaCategorie.FirstOrDefault() ?? "";
             IsErroreFaseAttuale = true;
             DescrizioneDifetto = string.Empty;
         }

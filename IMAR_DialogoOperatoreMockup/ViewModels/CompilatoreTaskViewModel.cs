@@ -73,10 +73,6 @@ namespace IMAR_DialogoOperatore.ViewModels
 
         private void TaskCompilerObserver_OnCorrezioniChanged()
         {
-            // Se è stato spuntato "Togli saldo", precompila la nota
-            if (_taskCompilerObserver.IsTogliSaldo && string.IsNullOrWhiteSpace(_note))
-                Note = "Riportare in acconto";
-
             OnNotifyStateChanged();
         }
 
