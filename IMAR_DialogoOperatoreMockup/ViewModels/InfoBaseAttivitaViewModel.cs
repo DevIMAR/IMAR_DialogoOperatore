@@ -31,6 +31,8 @@ namespace IMAR_DialogoOperatore.ViewModels
                                              (_attivitaSelezionata.IsIndiretta ||
                                              (_dialogoOperatoreObserver.AttivitaSelezionata?.Bolla == Bolla &&
                                               _dialogoOperatoreObserver.AttivitaSelezionata?.Odp == Odp));
+        public bool IsIndirettaSelezionata => _attivitaSelezionata?.IsIndiretta == true;
+
         public bool IsDataSchedulataLontana => _attivitaSelezionata?.DataSchedulata > DateTime.Today.AddDays(Costanti.LIMITE_GIORNO_VICINO);
         public bool IsAttivitaSaldata => _attivitaSelezionata != null && _attivitaSelezionata.SaldoAcconto == Costanti.SALDO;
         public bool IsAttivitaNonSchedulata => _attivitaSelezionata != null && !IsAttivitaSaldata &&

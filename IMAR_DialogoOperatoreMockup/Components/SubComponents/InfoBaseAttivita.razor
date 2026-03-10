@@ -53,7 +53,8 @@
 							   CssClass="dxbl-text-edit mt-2 bolla-input"
 							   @ref="@BollaRef"
 							   inputmode="text"
-							   enterkeyhint="enter">
+							   enterkeyhint="enter"
+							   Enabled="@(!InfoBaseAttivitaViewModel.IsIndirettaSelezionata)">
 						<Buttons>
 							<DxEditorButton Text="Ind"
 											Tooltip="Apri indiretta"
@@ -74,7 +75,8 @@
 							   CssClass="dxbl-text-edit mt-2 odp-input"
 							   @ref="@OdpRef"
 							   inputmode="text"
-							   enterkeyhint="enter">
+							   enterkeyhint="enter"
+							   Enabled="@(!InfoBaseAttivitaViewModel.IsIndirettaSelezionata)">
 				</DxMaskedInput>
 			</Template>
 		</DxGridLayoutItem>
