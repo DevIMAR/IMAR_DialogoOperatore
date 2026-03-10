@@ -12,6 +12,7 @@ namespace IMAR_DialogoOperatore.Interfaces.Observers
         bool IsTogliSaldo { get; set; }
         bool IsCorreggiOrarioInizio { get; set; }
         bool IsCorreggiOrarioFine { get; set; }
+        bool IsEliminaAttivita { get; set; }
 
         // Evento raggruppato selezionato nella grid
         EventoRaggrupatoViewModel? EventoRaggrupatoSelezionato { get; set; }

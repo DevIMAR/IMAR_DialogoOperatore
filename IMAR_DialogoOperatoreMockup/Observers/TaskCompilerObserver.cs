@@ -11,6 +11,7 @@ namespace IMAR_DialogoOperatore.Observers
         private bool _isTogliSaldo;
         private bool _isCorreggiOrarioInizio;
         private bool _isCorreggiOrarioFine;
+        private bool _isEliminaAttivita;
         private EventoRaggrupatoViewModel? _eventoRaggrupatoSelezionato;
         private int _oraInizio;
         private int _minutoInizio;
@@ -73,6 +74,16 @@ namespace IMAR_DialogoOperatore.Observers
             set
             {
                 _isCorreggiOrarioFine = value;
+                InvokeAsync(OnCorrezioniChanged);
+            }
+        }
+
+        public bool IsEliminaAttivita
+        {
+            get { return _isEliminaAttivita; }
+            set
+            {
+                _isEliminaAttivita = value;
                 InvokeAsync(OnCorrezioniChanged);
             }
         }

@@ -95,6 +95,13 @@ namespace IMAR_DialogoOperatore.Helpers
                 TaskAsana.Html_notes += "CORREGGI ORARIO FINE: " + orarioOriginale + " → " + nuovoOrario + "\n";
             }
 
+            // Elimina attività
+            if (_taskCompilerObserver.IsEliminaAttivita)
+            {
+                nomiCorrezioni.Add("Elimina attività");
+                TaskAsana.Html_notes += "RICHIESTA ELIMINAZIONE ATTIVITA\n";
+            }
+
             // Titolo task: ODP FASE - Richiesta: correzioni
             string prefisso = evento != null ? evento.Odp + " " + evento.CodiceFase + " - " : "";
             TaskAsana.Name = prefisso + "Richiesta: " + string.Join(" + ", nomiCorrezioni);

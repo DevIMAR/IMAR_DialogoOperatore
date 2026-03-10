@@ -119,7 +119,7 @@ namespace IMAR_DialogoOperatore.Mappers
             {
                 CodiceJMes = a.CodiceJMes,
                 Causale = a.Causale,
-                CausaleEstesa = a.CausaleEstesa,
+                CausaleEstesa = a.FineAttivita != null ? RimuoviPrefissoIn(a.CausaleEstesa) : a.CausaleEstesa,
                 Bolla = a.Bolla,
                 Odp = a.Odp,
                 CodiceFase = a.Fase,
@@ -131,8 +131,19 @@ namespace IMAR_DialogoOperatore.Mappers
                 SaldoAcconto = a.SaldoAcconto,
                 Flusso = a.Flusso,
                 OraInizio = a.InizioAttivita,
-                OraFine = a.FineAttivita
+                OraFine = a.FineAttivita,
+                IsIndiretta = a.IsIndiretta
             }).ToList();
+        }
+
+        /// <summary>
+        /// "In lavoro" → "Lavoro", "In attrezzaggio" → "Attrezzaggio" per attività completate.
+        /// </summary>
+        private static string RimuoviPrefissoIn(string causaleEstesa)
+        {
+            if (causaleEstesa == Costanti.JMES_IN_LAVORO) return "Lavoro";
+            if (causaleEstesa == Costanti.JMES_IN_ATTREZZAGGIO) return "Attrezzaggio";
+            return causaleEstesa;
         }
     }
 }

@@ -400,6 +400,9 @@ namespace IMAR_DialogoOperatore.Services
 			attivitaOperatoreDellUltimaGiornata.AddRange(GetAttivitaOperatoreDellUltimaGiornataNonContabilizzate(idJmesOperatore, ieriAlle2045, oggiAlle2115));
 			attivitaOperatoreDellUltimaGiornata.AddRange(GetAttivitaOperatoreDellUltimaGiornataContabilizzate(idJmesOperatore, ieriAlle2045, oggiAlle2115));
 
+			// Arricchisci le indirette con codice 5 cifre e descrizione
+			ArricchisciDescrizioneIndirette(attivitaOperatoreDellUltimaGiornata);
+
 			return attivitaOperatoreDellUltimaGiornata;
 		}
 
@@ -408,15 +411,16 @@ namespace IMAR_DialogoOperatore.Services
 			IList<Attivita> attivitaOperatoreDellUltimaGiornata = _synergyJmesUoW.MesEvt
 																				 .Get(x => (int)x.ResEffStrUid == idJmesOperatore)
 																				 .Where(x => x.TssStr >= ieriAlle2045 &&
-																							 x.TssStr <= oggiAlle2115 &&
-																							 x.EvtTypUid != 3) //evito le sospensioni
+																							 x.TssStr <= oggiAlle2115)
 																				 .Join(_synergyJmesUoW.MesEvtDet.Get(),
 																					   me => me.Uid,
 																					   med => med.EvtUid,
 																					   (me, med) => new { me, med })
-																				 .Join(_synergyJmesUoW.MesEvtMacDet.Get(),
+																				 .GroupJoin(_synergyJmesUoW.MesEvtMacDet.Get(),
 																					   x => x.med.Uid,
 																					   memd => memd.EvtDetUid,
+																					   (x, memds) => new { x.me, x.med, memds })
+																				 .SelectMany(x => x.memds.DefaultIfEmpty(),
 																					   (x, memd) =>
 																					   new Attivita
 																					   {
@@ -425,11 +429,13 @@ namespace IMAR_DialogoOperatore.Services
 																						   Bolla = x.med.DocCod,
 																						   Odp = x.med.PrdOrdCod,
 																						   Fase = x.med.PrdPhsCod,
-																						   QuantitaProdotta = (int)memd.QtyPrd,
-																						   QuantitaScartata = (int)memd.QtyRej,
+																						   DescrizioneFase = x.med.PrdPhsDsc,
+																						   QuantitaProdotta = memd != null ? (int)memd.QtyPrd : 0,
+																						   QuantitaScartata = memd != null ? (int)memd.QtyRej : 0,
 																						   InizioAttivita = x.me.TssStr,
 																						   FineAttivita = x.me.TssEnd,
-																						   SaldoAcconto = memd.DecAdv == -1 ? Costanti.ACCONTO : memd.DecAdv == 0 ? Costanti.SALDO : ""
+																						   SaldoAcconto = memd != null ? (memd.DecAdv == -1 ? Costanti.ACCONTO : memd.DecAdv == 0 ? Costanti.SALDO : "") : "",
+																						   IsIndiretta = x.med.DocCod != null && x.med.DocCod.StartsWith("AI")
 																					   })
 																				 .ToList();
 			return attivitaOperatoreDellUltimaGiornata;
@@ -440,15 +446,16 @@ namespace IMAR_DialogoOperatore.Services
 			IList<Attivita> attivitaOperatoreDellUltimaGiornata = _synergyJmesUoW.MesBckEvt
 																				 .Get(x => (int)x.ResEffStrUid == idJmesOperatore)
 																				 .Where(x => x.TssStr >= ieriAlle2045 &&
-																							 x.TssStr <= oggiAlle2115 &&
-																							 x.EvtTypUid != 3) //evito le sospensioni
+																							 x.TssStr <= oggiAlle2115)
 																				 .Join(_synergyJmesUoW.MesBckEvtDet.Get(),
 																					   me => me.Uid,
 																					   med => med.EvtUid,
 																					   (me, med) => new { me, med })
-																				 .Join(_synergyJmesUoW.MesBckEvtMacDet.Get(),
+																				 .GroupJoin(_synergyJmesUoW.MesBckEvtMacDet.Get(),
 																					   x => x.med.Uid,
 																					   memd => memd.EvtDetUid,
+																					   (x, memds) => new { x.me, x.med, memds })
+																				 .SelectMany(x => x.memds.DefaultIfEmpty(),
 																					   (x, memd) =>
 																					   new Attivita
 																					   {
@@ -457,14 +464,39 @@ namespace IMAR_DialogoOperatore.Services
 																						   Bolla = x.med.DocCod,
 																						   Odp = x.med.PrdOrdCod,
 																						   Fase = x.med.PrdPhsCod,
-																						   QuantitaProdotta = (int)memd.QtyPrd,
-																						   QuantitaScartata = (int)memd.QtyRej,
+																						   DescrizioneFase = x.med.PrdPhsDsc,
+																						   QuantitaProdotta = memd != null ? (int)memd.QtyPrd : 0,
+																						   QuantitaScartata = memd != null ? (int)memd.QtyRej : 0,
 																						   InizioAttivita = x.me.TssStr,
 																						   FineAttivita = x.me.TssEnd,
-																						   SaldoAcconto = memd.DecAdv == -1 ? Costanti.ACCONTO : memd.DecAdv == 0 ? Costanti.SALDO : ""
+																						   SaldoAcconto = memd != null ? (memd.DecAdv == -1 ? Costanti.ACCONTO : memd.DecAdv == 0 ? Costanti.SALDO : "") : "",
+																						   IsIndiretta = x.med.DocCod != null && x.med.DocCod.StartsWith("AI")
 																					   })
 																				 .ToList();
 			return attivitaOperatoreDellUltimaGiornata;
+		}
+
+		/// <summary>
+		/// Per le indirette: sostituisce Bolla con codice 5 cifre e Odp con descrizione dalla cache stdMesIndTsk.
+		/// </summary>
+		private void ArricchisciDescrizioneIndirette(List<Attivita> attivita)
+		{
+			var indirette = _caricamentoAttivitaInBackroundService.GetAttivitaIndirette();
+
+			foreach (var att in attivita.Where(a => a.IsIndiretta))
+			{
+				// Prova match per descrizione (PrdPhsDsc = ID_Ind3464)
+				var def = indirette.FirstOrDefault(i => i.ID_Ind3464 == att.DescrizioneFase);
+				if (def != null)
+				{
+					att.Bolla = def.ID_Ind3463;      // Codice 5 cifre (es. "00016")
+					att.Odp = def.ID_Ind3464;         // Descrizione (es. "MIGLIORAMENTO")
+				}
+				else
+				{
+					att.Odp = att.DescrizioneFase ?? "Attività indiretta";
+				}
+			}
 		}
 
     }

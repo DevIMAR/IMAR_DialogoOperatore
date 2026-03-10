@@ -48,22 +48,29 @@
 	@* Checkbox correzioni *@
 	<div class="d-flex flex-wrap gap-4 mt-3 testo-piccolo">
 		<DxCheckBox @bind-Checked="@TaskPopupViewModel.IsRettificaQuantita"
-					Enabled="@IsRettificaQuantitaAbilitata"
+					Enabled="@(IsRettificaQuantitaAbilitata && !TaskPopupViewModel.IsEliminaAttivita)"
 					Alignment="CheckBoxContentAlignment.Center">
 			Rettifica quantità
 		</DxCheckBox>
 		<DxCheckBox @bind-Checked="@TaskPopupViewModel.IsTogliSaldo"
-					Enabled="@IsTogliSaldoAbilitato"
+					Enabled="@(IsTogliSaldoAbilitato && !TaskPopupViewModel.IsEliminaAttivita)"
 					Alignment="CheckBoxContentAlignment.Center">
 			Togli saldo
 		</DxCheckBox>
 		<DxCheckBox @bind-Checked="@TaskPopupViewModel.IsCorreggiOrarioInizio"
+					Enabled="@(!TaskPopupViewModel.IsEliminaAttivita)"
 					Alignment="CheckBoxContentAlignment.Center">
 			Correggi orario inizio
 		</DxCheckBox>
 		<DxCheckBox @bind-Checked="@TaskPopupViewModel.IsCorreggiOrarioFine"
+					Enabled="@(!TaskPopupViewModel.IsEliminaAttivita)"
 					Alignment="CheckBoxContentAlignment.Center">
 			Correggi orario fine
+		</DxCheckBox>
+		<DxCheckBox @bind-Checked="@TaskPopupViewModel.IsEliminaAttivita"
+					Enabled="@IsEliminaAttivitaAbilitata"
+					Alignment="CheckBoxContentAlignment.Center">
+			Elimina attività
 		</DxCheckBox>
 	</div>
 
@@ -150,13 +157,19 @@
 	private async void CronologiaAttivitaGridViewModel_NotifyStateChanged() => await InvokeAsync(StateHasChanged);
 	private async void TaskPopupViewModel_NotifyStateChanged() => await InvokeAsync(StateHasChanged);
 
-	/// <summary>"Togli saldo" abilitato solo se la riga selezionata è a Saldo</summary>
+	/// <summary>"Togli saldo" abilitato solo per attività dirette a Saldo</summary>
 	private bool IsTogliSaldoAbilitato =>
-		CompilatoreTaskViewModel.EventoRaggrupatoSelezionato?.SaldoAcconto == Costanti.SALDO;
+		CompilatoreTaskViewModel.EventoRaggrupatoSelezionato != null &&
+		CompilatoreTaskViewModel.EventoRaggrupatoSelezionato.PuoRettificareQuantita &&
+		CompilatoreTaskViewModel.EventoRaggrupatoSelezionato.SaldoAcconto == Costanti.SALDO;
 
-	/// <summary>"Rettifica quantità" disabilitata sugli attrezzaggi (non hanno quantità)</summary>
+	/// <summary>"Rettifica quantità" abilitata solo per attività dirette non-attrezzaggio</summary>
 	private bool IsRettificaQuantitaAbilitata =>
-		CompilatoreTaskViewModel.EventoRaggrupatoSelezionato?.Causale != Costanti.IN_ATTREZZAGGIO;
+		CompilatoreTaskViewModel.EventoRaggrupatoSelezionato?.PuoRettificareQuantita == true;
+
+	/// <summary>"Elimina attività" abilitata solo per attività (dirette o indirette, non timbrature)</summary>
+	private bool IsEliminaAttivitaAbilitata =>
+		CompilatoreTaskViewModel.EventoRaggrupatoSelezionato?.IsAttivita == true;
 
 	private void OnEventoSelezionatoChanged(object nuovoEvento)
 	{
@@ -166,8 +179,12 @@
 		if (!IsTogliSaldoAbilitato && TaskPopupViewModel.IsTogliSaldo)
 			TaskPopupViewModel.IsTogliSaldo = false;
 
-		// Se la riga selezionata è un attrezzaggio, deseleziona "Rettifica quantità"
+		// Se la riga selezionata è un attrezzaggio/indiretta/timbratura, deseleziona "Rettifica quantità"
 		if (!IsRettificaQuantitaAbilitata && TaskPopupViewModel.IsRettificaQuantita)
 			TaskPopupViewModel.IsRettificaQuantita = false;
+
+		// Se la riga selezionata non è un'attività, deseleziona "Elimina attività"
+		if (!IsEliminaAttivitaAbilitata && TaskPopupViewModel.IsEliminaAttivita)
+			TaskPopupViewModel.IsEliminaAttivita = false;
 	}
 }

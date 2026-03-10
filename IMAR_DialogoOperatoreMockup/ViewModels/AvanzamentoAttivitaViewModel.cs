@@ -14,6 +14,7 @@ namespace IMAR_DialogoOperatore.ViewModels
 		private uint? _quantitaProdotta;
 		private uint? _quantitaScartata;
 		private bool _isFaseCompletabile;
+		private bool _wasRettificaQuantita;
 
 		public object? AttivitaSelezionata => _dialogoOperatoreObserver.AttivitaSelezionata;
 
@@ -108,17 +109,22 @@ namespace IMAR_DialogoOperatore.ViewModels
 		}
 
         /// <summary>
-        /// Quando si spunta "Rettifica quantità" nel popup, prepopola con i dati della riga selezionata
+        /// Quando si spunta "Rettifica quantità" nel popup, prepopola con i dati della riga selezionata.
+        /// Pre-popola solo al momento dell'attivazione, non ad ogni cambio di altri checkbox.
         /// </summary>
         private void TaskCompilerObserver_OnCorrezioniChanged()
         {
-            if (_taskCompilerObserver.IsRettificaQuantita && _taskCompilerObserver.EventoRaggrupatoSelezionato != null)
+            bool isRettifica = _taskCompilerObserver.IsRettificaQuantita;
+
+            if (isRettifica && !_wasRettificaQuantita && _taskCompilerObserver.EventoRaggrupatoSelezionato != null)
             {
                 var evento = _taskCompilerObserver.EventoRaggrupatoSelezionato;
                 QuantitaProdotta = (uint?)(evento.QuantitaProdotta ?? 0);
                 QuantitaScartata = (uint?)(evento.QuantitaScartata ?? 0);
                 IsFaseCompletabile = evento.SaldoAcconto == Costanti.SALDO;
             }
+
+            _wasRettificaQuantita = isRettifica;
         }
 
         private void DialogoOperatoreObserver_OnIsDettaglioAttivitaOpenChanged()

@@ -1,3 +1,4 @@
+using IMAR_DialogoOperatore.Application;
 using IMAR_DialogoOperatore.Application.Interfaces.Services.Activities;
 using IMAR_DialogoOperatore.Interfaces.Mappers;
 using IMAR_DialogoOperatore.Interfaces.Observers;
@@ -104,7 +105,7 @@ namespace IMAR_DialogoOperatore.ViewModels
         }
 
         /// <summary>
-        /// Carica le attività raggruppate (Inizio+Fine in una riga) per il TaskPopup redesign.
+        /// Carica le attività raggruppate (Inizio+Fine in una riga) + timbrature per il TaskPopup.
         /// </summary>
         public void GetEventiRaggruppati()
         {
@@ -114,7 +115,44 @@ namespace IMAR_DialogoOperatore.ViewModels
             var attivitaList = _attivitaService.GetAttivitaOperatoreDellUltimaGiornata(
                 (int)_dialogoOperatoreObserver.OperatoreSelezionato.IdJMes);
 
-            EventiRaggruppati = _attivitaMapper.ListAttivitaToListEventiRaggruppati(attivitaList).ToList();
+            var eventiRaggruppati = _attivitaMapper.ListAttivitaToListEventiRaggruppati(attivitaList).ToList();
+
+            // Aggiungi timbrature (Ingresso/Uscita/Pause)
+            var timbratureList = _timbratureService.GetTimbratureOperatore(
+                _dialogoOperatoreObserver.OperatoreSelezionato.Badge.ToString());
+
+            // Raggruppa Inizio Pausa + Fine Pausa in una sola riga
+            var iniziPausa = timbratureList
+                .Where(t => t.Causale == Costanti.INIZIO_PAUSA)
+                .OrderBy(t => t.Timestamp)
+                .ToList();
+            var finiPausa = timbratureList
+                .Where(t => t.Causale == Costanti.FINE_PAUSA)
+                .OrderBy(t => t.Timestamp)
+                .ToList();
+
+            for (int i = 0; i < iniziPausa.Count; i++)
+            {
+                eventiRaggruppati.Add(new EventoRaggrupatoViewModel
+                {
+                    CausaleEstesa = "Pausa",
+                    OraInizio = iniziPausa[i].Timestamp,
+                    OraFine = i < finiPausa.Count ? finiPausa[i].Timestamp : null
+                });
+            }
+
+            // Aggiungi Ingresso/Uscita come righe singole
+            foreach (var timbratura in timbratureList.Where(t =>
+                t.Causale != Costanti.INIZIO_PAUSA && t.Causale != Costanti.FINE_PAUSA))
+            {
+                eventiRaggruppati.Add(new EventoRaggrupatoViewModel
+                {
+                    CausaleEstesa = timbratura.Causale,
+                    OraInizio = timbratura.Timestamp
+                });
+            }
+
+            EventiRaggruppati = eventiRaggruppati;
         }
     }
 }

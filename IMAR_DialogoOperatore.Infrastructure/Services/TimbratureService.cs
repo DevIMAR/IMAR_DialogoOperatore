@@ -39,8 +39,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
             decimal idOperatore = operatore.Uid;
             var res = _synergyJmesUoW.TblResBrk.Get(x => x.ResUid.Equals(idOperatore), asNoTracking: true).ToList();
 
-            return res.Where(x => GetEffectiveInizioPausa(x) >= inizioTurnoNotturnoDiIeri &&
-                                  GetEffectiveFinePausa(x) <= inizioTurnoNotturnoDiOggi);
+            return res.Where(x => GetEffectiveInizioPausa(x) >= inizioTurnoNotturnoDiIeri);
         }
 
         private IEnumerable<TblResClk> GetIngressiUsciteOperatoreDiOggi(AngRes? operatore)

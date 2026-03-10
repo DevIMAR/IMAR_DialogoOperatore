@@ -22,8 +22,17 @@ namespace IMAR_DialogoOperatore.ViewModels
 
         public DateTime? OraInizio { get; set; }
         public DateTime? OraFine { get; set; }
+        public bool IsIndiretta { get; set; }
 
         /// <summary>True se è un'attività (ha Bolla), false se è una timbratura (Ingresso/Uscita)</summary>
         public bool IsAttivita => !string.IsNullOrEmpty(Bolla);
+
+        /// <summary>True se è una timbratura o pausa (Ingresso/Uscita/Inizio pausa/Fine pausa)</summary>
+        public bool IsTimbraturaOPausa => !IsAttivita;
+
+        /// <summary>True se ha senso rettificare quantità (solo attività dirette non-attrezzaggio e non-sospensione)</summary>
+        public bool PuoRettificareQuantita => IsAttivita && !IsIndiretta &&
+            CausaleEstesa != null && !CausaleEstesa.Contains("Attrezzaggio") &&
+            !CausaleEstesa.Contains("sospeso");
     }
 }

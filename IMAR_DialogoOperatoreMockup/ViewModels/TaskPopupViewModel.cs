@@ -13,6 +13,7 @@ namespace IMAR_DialogoOperatore.ViewModels
         private bool _isTogliSaldo;
         private bool _isCorreggiOrarioInizio;
         private bool _isCorreggiOrarioFine;
+        private bool _isEliminaAttivita;
 
         public ICommand InviaTaskCommand { get; }
 
@@ -75,7 +76,28 @@ namespace IMAR_DialogoOperatore.ViewModels
             }
         }
 
-        public bool HasAlmenoUnaCorrezione => _isRettificaQuantita || _isTogliSaldo || _isCorreggiOrarioInizio || _isCorreggiOrarioFine;
+        public bool IsEliminaAttivita
+        {
+            get { return _isEliminaAttivita; }
+            set
+            {
+                _isEliminaAttivita = value;
+                _taskCompilerObserver.IsEliminaAttivita = value;
+
+                // Se si spunta "Elimina", deseleziona tutte le altre correzioni
+                if (value)
+                {
+                    IsRettificaQuantita = false;
+                    IsTogliSaldo = false;
+                    IsCorreggiOrarioInizio = false;
+                    IsCorreggiOrarioFine = false;
+                }
+
+                OnNotifyStateChanged();
+            }
+        }
+
+        public bool HasAlmenoUnaCorrezione => _isRettificaQuantita || _isTogliSaldo || _isCorreggiOrarioInizio || _isCorreggiOrarioFine || _isEliminaAttivita;
 
         public TaskPopupViewModel(
             InviaTaskCommand inviaTaskCommand,
@@ -94,10 +116,12 @@ namespace IMAR_DialogoOperatore.ViewModels
             _isTogliSaldo = false;
             _isCorreggiOrarioInizio = false;
             _isCorreggiOrarioFine = false;
+            _isEliminaAttivita = false;
             _taskCompilerObserver.IsRettificaQuantita = false;
             _taskCompilerObserver.IsTogliSaldo = false;
             _taskCompilerObserver.IsCorreggiOrarioInizio = false;
             _taskCompilerObserver.IsCorreggiOrarioFine = false;
+            _taskCompilerObserver.IsEliminaAttivita = false;
         }
     }
 }
