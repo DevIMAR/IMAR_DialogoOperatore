@@ -390,6 +390,9 @@ namespace IMAR_DialogoOperatore.Services
             IList<mesDiaOpe>? attivitaAperte = await GetAttivitaAperteAsync();
             IList<mesRcpActOpe>? riepilogoAttivitaOperatore = await _jmesApiClient.ChiamaQueryGetJmesAsync<mesRcpActOpe>();
 
+            if (attivitaAperte == null || riepilogoAttivitaOperatore == null)
+                return new List<string>();
+
             return attivitaAperte
                    .Join(riepilogoAttivitaOperatore,
                          aa => aa.ID_Det3350,

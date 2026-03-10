@@ -197,6 +197,13 @@ namespace IMAR_DialogoOperatore.Infrastructure.JMes
 
             string wizardPath = "?wzdCod=MesAdvanceDeclaration";
 
+            var macchina = operatore.MacchineAssegnate.FirstOrDefault();
+            if (macchina == null)
+            {
+                _loggingService.LogError($"MesAdvanceDeclarationAsync: operatore {operatore.Badge} non ha macchine assegnate, impossibile avanzare bolla {attivita.Bolla}");
+                return new HttpResponseMessage(System.Net.HttpStatusCode.BadRequest);
+            }
+
             var entity = new
             {
                 entity = new
@@ -211,7 +218,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.JMes
                         producedQuantity = quantitaProdotta,
                         rejectedQuantity = quantitaScartata,
                         defDecAdv = attivita.SaldoAcconto == Costanti.ACCONTO,
-                        clkMacUid = operatore.MacchineAssegnate.First().CodiceJMes
+                        clkMacUid = macchina.CodiceJMes
                     }
                 }
             };
@@ -268,7 +275,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.JMes
                         clkBdgCod = operatore.Badge,
                         notPlnCod = codiceFase,
                         notPlnNotCod = attivita.Bolla,
-                        clkMacUid = attivita.MacchinaReale != null ? attivita.MacchinaReale.CodiceJMes : operatore.MacchineAssegnate.First().CodiceJMes
+                        clkMacUid = attivita.MacchinaReale?.CodiceJMes ?? operatore.MacchineAssegnate.FirstOrDefault()?.CodiceJMes
 					}
                 }
             };
@@ -455,7 +462,12 @@ namespace IMAR_DialogoOperatore.Infrastructure.JMes
             var sw = Stopwatch.StartNew();
             await EnsureInitializedAsync();
 
-            macchina = macchina ?? operatore.MacchineAssegnate.First();
+            macchina = macchina ?? operatore.MacchineAssegnate.FirstOrDefault();
+            if (macchina == null)
+            {
+                _loggingService.LogError($"MesEquipStartAsync: operatore {operatore.Badge} non ha macchine assegnate per bolla {bolla}");
+                return new HttpResponseMessage(System.Net.HttpStatusCode.BadRequest);
+            }
 
 			string wizardPath = "?wzdCod=MesEquipStart";
 
@@ -497,7 +509,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.JMes
                         clkBdgCod = operatore.Badge,
                         notPlnCod = codiceFase,
                         notPlnNotCod = bolla,
-                        clkMacUid = operatore.MacchineAssegnate.First().CodiceJMes
+                        clkMacUid = operatore.MacchineAssegnate.FirstOrDefault()?.CodiceJMes
                     }
                 }
             };
