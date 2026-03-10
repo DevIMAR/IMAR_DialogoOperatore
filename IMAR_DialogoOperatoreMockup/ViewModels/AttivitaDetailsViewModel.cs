@@ -78,12 +78,14 @@ namespace IMAR_DialogoOperatore.ViewModels
 
 			OnNotifyStateChanged();
 		}
-		private bool IsAttivitaIndiretta()
-		{
-			return _dialogoOperatoreObserver.AttivitaSelezionata != null &&
-					_dialogoOperatoreObserver.AttivitaSelezionata.DescrizioneArticolo != null &&
-					_dialogoOperatoreObserver.AttivitaSelezionata.DescrizioneArticolo.Contains(Costanti.FASE_INDIRETTA);
-		}
+		public bool IsAttivitaIndiretta() =>
+			_attivitaSelezionata?.IsIndiretta == true;
+
+		public string DescrizioneFaseIndiretta =>
+			_attivitaSelezionata?.DescrizioneFase ?? string.Empty;
+
+		public string BollaIndiretta =>
+			_attivitaSelezionata?.Bolla ?? string.Empty;
 
 		public override void Dispose()
         {

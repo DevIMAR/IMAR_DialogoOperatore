@@ -305,13 +305,16 @@ namespace IMAR_DialogoOperatore.Services
 
         private List<Attivita> OttieniAttivitaIndiretteOperatoreAperte(IList<mesDiaOpe> attivitaAperte, IList<mesTskForOpe> attivitaIndiretteOperatore)
         {
+            // Cache delle indirette per recuperare il codice a 5 cifre (es. "00016") dalla descrizione
+            var indirette = _caricamentoAttivitaInBackroundService.GetAttivitaIndirette();
+
             List<Attivita> attivitaOperatoreAperte = attivitaAperte
                                                     .Join(attivitaIndiretteOperatore,
                                                             aa => aa.ID_Evt3240,
                                                             ao => ao.ID_Evt3240,
                                                             (aa, ao) => new Attivita
                                                             {
-                                                                Bolla = aa.ID_Det3350,
+                                                                Bolla = indirette.FirstOrDefault(i => i.ID_Ind3464 == aa.ID_Det3356)?.ID_Ind3463,
                                                                 DescrizioneArticolo = Costanti.FASE_INDIRETTA,
                                                                 DescrizioneFase = aa.ID_Det3356,
                                                                 CodiceJMes = aa.ID_Det3348,

@@ -1,4 +1,4 @@
-﻿@using DevExpress.Blazor.Internal
+@using DevExpress.Blazor.Internal
 @using IMAR_DialogoOperatore.Interfaces.Observers
 @using IMAR_DialogoOperatore.ViewModels
 @using System.Text
@@ -7,146 +7,188 @@
 @inject IDialogoOperatoreObserver DialogoOperatoreObserver
 @inject IJSRuntime JSRuntime
 
-<DxGridLayout CssClass="testo-piccolo">
-	<Rows>
-		<DxGridLayoutRow Height="auto" />
-		<DxGridLayoutRow Height="auto" />
-		<DxGridLayoutRow Height="auto" />
-		<DxGridLayoutRow Height="auto" />
-		<DxGridLayoutRow Height="auto" />
-		<DxGridLayoutRow Height="auto" />
-		<DxGridLayoutRow Height="auto" />
-		<DxGridLayoutRow />
-	</Rows>
-	<Columns>
-		<DxGridLayoutColumn />
-		<DxGridLayoutColumn />
-		<DxGridLayoutColumn />
-		<DxGridLayoutColumn />
-		<DxGridLayoutColumn />
-		<DxGridLayoutColumn />
-		<DxGridLayoutColumn />
-		<DxGridLayoutColumn />
-		<DxGridLayoutColumn />
-		<DxGridLayoutColumn />
-		<DxGridLayoutColumn />
-		<DxGridLayoutColumn />
-	</Columns>
+@if (AttivitaDetailsViewModel.IsAttivitaIndiretta())
+{
+	<div style="padding: 10px;">
+		<div class="d-flex justify-content-center align-items-center testo-piccolo mt-2">
+			<label style="color: gray;">BOLLA</label>
+		</div>
+		<div class="d-flex justify-content-center align-items-center mt-1">
+			<span style="font-size: 1.6rem; color: gray; font-weight: bold; letter-spacing: 2px;">
+				@AttivitaDetailsViewModel.BollaIndiretta
+			</span>
+		</div>
 
-	<Items>
-		<DxGridLayoutItem Row="0"
-						  Column="1" ColumnSpan="10">
-			<Template>
-				<InfoBaseAttivita InfoBaseInserite="@InfoBaseInserite"
-								  ShowArticolo="true"
-								  ShowDescrizioni="true"
-								  ShowDataSchedulata="true"
-								  ShowBottoneIndirette="true" />
-			</Template>
-		</DxGridLayoutItem>
+		<div class="d-flex justify-content-center align-items-center mt-3">
+			<label style="color: gray; font-size: 0.85rem;">ATTIVITA INDIRETTA IN CORSO</label>
+		</div>
 
-		<DxGridLayoutItem Row="1" RowSpan="3"
-						  Column="1" ColumnSpan="2">
-			<Template>
-				<DxProgressBar Type="ProgressBarType.Horizontal"
-							   MaxValue="@AttivitaDetailsViewModel.QuantitaOrdine"
-							   Value="@AttivitaDetailsViewModel.QuantitaProdottaPrecedentemente"
-							   Size="12dvw"
-							   Thickness="2dvh"
-							   Label="@AttivitaDetailsViewModel.CompletamentoFase"
-							   LabelPosition="ProgressBarLabelPosition.Top"
-							   ShowLabel="true" 
-							   CssClass="mt-2" />
-			</Template>
-		</DxGridLayoutItem>
+		<div style="background-color: darkorange;
+					border-radius: 12px;
+					padding: 18px 20px;
+					margin: 12px 10px;
+					text-align: center;">
+			<span style="font-size: 1.8rem; color: white; font-weight: bold;">
+				@AttivitaDetailsViewModel.DescrizioneFaseIndiretta
+			</span>
+		</div>
 
-		<DxGridLayoutItem Row="1"
-						  Column="6" ColumnSpan="5">
-			<Template>
-				<div class="d-flex h-100 testo-piccolo mt-2">
-					<label>Qt. RESIDUA: @AttivitaDetailsViewModel.QuantitaResidua</label>
-				</div>
-			</Template>
-		</DxGridLayoutItem>
+		<div class="d-flex justify-content-center align-items-center mt-3 testo-piccolo">
+			<label>@AttivitaDetailsViewModel.StatoAttivita</label>
+		</div>
 
-		<DxGridLayoutItem Row="2"
-						  Column="6" ColumnSpan="5">
-			<Template>
-				<div class="d-flex h-100 testo-piccolo">
-					<label>Qt. SCARTATA TOTALE: @AttivitaDetailsViewModel.QuantitaScartataTotale</label>
-				</div>
-			</Template>
-		</DxGridLayoutItem>
+		<div class="mt-4" style="padding: 0 10px;">
+			<label class="testo-piccolo" style="color: gray;">NOTE</label>
+			<DxMemo @bind-Text="@_notaIndiretta"
+					Rows="4"
+					CssClass="mt-1"
+					NullText="Scrivi una nota..." />
+		</div>
+	</div>
+}
+else
+{
+	<DxGridLayout CssClass="testo-piccolo">
+		<Rows>
+			<DxGridLayoutRow Height="auto" />
+			<DxGridLayoutRow Height="auto" />
+			<DxGridLayoutRow Height="auto" />
+			<DxGridLayoutRow Height="auto" />
+			<DxGridLayoutRow Height="auto" />
+			<DxGridLayoutRow Height="auto" />
+			<DxGridLayoutRow Height="auto" />
+			<DxGridLayoutRow />
+		</Rows>
+		<Columns>
+			<DxGridLayoutColumn />
+			<DxGridLayoutColumn />
+			<DxGridLayoutColumn />
+			<DxGridLayoutColumn />
+			<DxGridLayoutColumn />
+			<DxGridLayoutColumn />
+			<DxGridLayoutColumn />
+			<DxGridLayoutColumn />
+			<DxGridLayoutColumn />
+			<DxGridLayoutColumn />
+			<DxGridLayoutColumn />
+			<DxGridLayoutColumn />
+		</Columns>
 
-		<DxGridLayoutItem Row="3"
-						  Column="6" ColumnSpan="5">
-			<Template>
-				<div class="d-flex h-100 testo-piccolo">
-					<label>@AttivitaDetailsViewModel.StatoAttivita</label>
-				</div>
-			</Template>
-		</DxGridLayoutItem>
+		<Items>
+			<DxGridLayoutItem Row="0"
+							  Column="1" ColumnSpan="10">
+				<Template>
+					<InfoBaseAttivita InfoBaseInserite="@InfoBaseInserite"
+									  ShowArticolo="true"
+									  ShowDescrizioni="true"
+									  ShowDataSchedulata="true"
+									  ShowBottoneIndirette="true" />
+				</Template>
+			</DxGridLayoutItem>
 
-		<DxGridLayoutItem Row="4"
-						  Column="1" ColumnSpan="10"
-						  Visible="@AttivitaDetailsViewModel.IsAvanzamento">
-			<Template>
-				<AvanzamentoAttivitaView DatiAvanzamentoInseriti="@DatiAvanzamentoInseriti"
-										 @ref="@Avanzamento" />
-			</Template>
-		</DxGridLayoutItem>
+			<DxGridLayoutItem Row="1" RowSpan="3"
+							  Column="1" ColumnSpan="2">
+				<Template>
+					<DxProgressBar Type="ProgressBarType.Horizontal"
+								   MaxValue="@AttivitaDetailsViewModel.QuantitaOrdine"
+								   Value="@AttivitaDetailsViewModel.QuantitaProdottaPrecedentemente"
+								   Size="12dvw"
+								   Thickness="2dvh"
+								   Label="@AttivitaDetailsViewModel.CompletamentoFase"
+								   LabelPosition="ProgressBarLabelPosition.Top"
+								   ShowLabel="true"
+								   CssClass="mt-2" />
+				</Template>
+			</DxGridLayoutItem>
 
-		<DxGridLayoutItem Row="5"
-						  Column="1" ColumnSpan="10"
-						  Visible="@AttivitaDetailsViewModel.IsFineAttrezzaggio">
-			<Template>
-				<div class="d-flex justify-content-center align-items-center h-100 testo-piccolo">
-					<label>APRI COME LAVORO</label>
-				</div>
-			</Template>
-		</DxGridLayoutItem>
+			<DxGridLayoutItem Row="1"
+							  Column="6" ColumnSpan="5">
+				<Template>
+					<div class="d-flex h-100 testo-piccolo mt-2">
+						<label>Qt. RESIDUA: @AttivitaDetailsViewModel.QuantitaResidua</label>
+					</div>
+				</Template>
+			</DxGridLayoutItem>
 
-		<DxGridLayoutItem Row="6"
-						  Column="1" ColumnSpan="10"
-						  Visible="@AttivitaDetailsViewModel.IsFineAttrezzaggio">
-			<Template>
-				<DxCheckBox CheckType="CheckType.Switch"
-							@bind-Checked="@AttivitaDetailsViewModel.IsAperturaLavoroAutomaticaAttiva"
-							LabelPosition="LabelPosition.Left"
-							Alignment="CheckBoxContentAlignment.Center"
-							SizeMode="SizeMode.Large"
-							CssClass="testo-piccolo"
-							@ref="@InizioLavoro"
-							@onkeydown="HandleInizioLavoroKeyPress" />
-			</Template>
-		</DxGridLayoutItem>
+			<DxGridLayoutItem Row="2"
+							  Column="6" ColumnSpan="5">
+				<Template>
+					<div class="d-flex h-100 testo-piccolo">
+						<label>Qt. SCARTATA TOTALE: @AttivitaDetailsViewModel.QuantitaScartataTotale</label>
+					</div>
+				</Template>
+			</DxGridLayoutItem>
 
-		<DxGridLayoutItem Row="5"
-						  Column="1" ColumnSpan="10"
-						  Visible="@AttivitaDetailsViewModel.IsFineAttivitaInUscita">
-			<Template>
-				<div class="d-flex justify-content-center align-items-center h-100 testo-piccolo">
-					<label>ATTIVA RIAPERTURA AUTOMATICA</label>
-				</div>
-			</Template>
-		</DxGridLayoutItem>
+			<DxGridLayoutItem Row="3"
+							  Column="6" ColumnSpan="5">
+				<Template>
+					<div class="d-flex h-100 testo-piccolo">
+						<label>@AttivitaDetailsViewModel.StatoAttivita</label>
+					</div>
+				</Template>
+			</DxGridLayoutItem>
 
-		<DxGridLayoutItem Row="6"
-						  Column="1" ColumnSpan="10"
-						  Visible="@AttivitaDetailsViewModel.IsFineAttivitaInUscita">
-			<Template>
-				<DxCheckBox CheckType="CheckType.Switch"
-							@bind-Checked="@AttivitaDetailsViewModel.IsRiaperturaAttiva"
-							LabelPosition="LabelPosition.Left"
-							Alignment="CheckBoxContentAlignment.Center"
-							SizeMode="SizeMode.Large"
-							CssClass="testo-piccolo"
-							@ref="@Riapertura"
-							@onkeydown="HandleRiaperturaKeyPress" />
-			</Template>
-		</DxGridLayoutItem>
-	</Items>
-</DxGridLayout>
+			<DxGridLayoutItem Row="4"
+							  Column="1" ColumnSpan="10"
+							  Visible="@AttivitaDetailsViewModel.IsAvanzamento">
+				<Template>
+					<AvanzamentoAttivitaView DatiAvanzamentoInseriti="@DatiAvanzamentoInseriti"
+											 @ref="@Avanzamento" />
+				</Template>
+			</DxGridLayoutItem>
+
+			<DxGridLayoutItem Row="5"
+							  Column="1" ColumnSpan="10"
+							  Visible="@AttivitaDetailsViewModel.IsFineAttrezzaggio">
+				<Template>
+					<div class="d-flex justify-content-center align-items-center h-100 testo-piccolo">
+						<label>APRI COME LAVORO</label>
+					</div>
+				</Template>
+			</DxGridLayoutItem>
+
+			<DxGridLayoutItem Row="6"
+							  Column="1" ColumnSpan="10"
+							  Visible="@AttivitaDetailsViewModel.IsFineAttrezzaggio">
+				<Template>
+					<DxCheckBox CheckType="CheckType.Switch"
+								@bind-Checked="@AttivitaDetailsViewModel.IsAperturaLavoroAutomaticaAttiva"
+								LabelPosition="LabelPosition.Left"
+								Alignment="CheckBoxContentAlignment.Center"
+								SizeMode="SizeMode.Large"
+								CssClass="testo-piccolo"
+								@ref="@InizioLavoro"
+								@onkeydown="HandleInizioLavoroKeyPress" />
+				</Template>
+			</DxGridLayoutItem>
+
+			<DxGridLayoutItem Row="5"
+							  Column="1" ColumnSpan="10"
+							  Visible="@AttivitaDetailsViewModel.IsFineAttivitaInUscita">
+				<Template>
+					<div class="d-flex justify-content-center align-items-center h-100 testo-piccolo">
+						<label>ATTIVA RIAPERTURA AUTOMATICA</label>
+					</div>
+				</Template>
+			</DxGridLayoutItem>
+
+			<DxGridLayoutItem Row="6"
+							  Column="1" ColumnSpan="10"
+							  Visible="@AttivitaDetailsViewModel.IsFineAttivitaInUscita">
+				<Template>
+					<DxCheckBox CheckType="CheckType.Switch"
+								@bind-Checked="@AttivitaDetailsViewModel.IsRiaperturaAttiva"
+								LabelPosition="LabelPosition.Left"
+								Alignment="CheckBoxContentAlignment.Center"
+								SizeMode="SizeMode.Large"
+								CssClass="testo-piccolo"
+								@ref="@Riapertura"
+								@onkeydown="HandleRiaperturaKeyPress" />
+				</Template>
+			</DxGridLayoutItem>
+		</Items>
+	</DxGridLayout>
+}
 
 @code {
 	[Parameter] public EventCallback WorkDoneCallback { get; set; }
@@ -157,6 +199,7 @@
 	private AvanzamentoAttivitaView Avanzamento;
 	private DxCheckBox<bool> Riapertura;
 	private DxCheckBox<bool> InizioLavoro;
+	private string _notaIndiretta = string.Empty;
 
 	protected override Task OnInitializedAsync()
 	{

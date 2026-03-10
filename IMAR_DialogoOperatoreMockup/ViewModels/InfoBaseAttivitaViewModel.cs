@@ -149,9 +149,9 @@ namespace IMAR_DialogoOperatore.ViewModels
 
             if (_attivitaSelezionata.IsIndiretta)
             {
-                // Per le indirette non mostriamo bolla/odp (sono progressivi JMes inutili per l'operatore)
+                // Per le indirette mostriamo il codice a 5 cifre e nascondiamo l'ODP
+                _bolla = _attivitaSelezionata.Bolla ?? string.Empty;
                 _odp = string.Empty;
-                _bolla = string.Empty;
             }
             else
             {
