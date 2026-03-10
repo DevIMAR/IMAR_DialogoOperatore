@@ -1,7 +1,8 @@
-﻿@using IMAR_DialogoOperatore.Interfaces.ViewModels
+@using IMAR_DialogoOperatore.Interfaces.ViewModels
 @using IMAR_DialogoOperatore.ViewModels
 
 @inject NoteGridViewModel NoteGridViewModel
+@inject IJSRuntime JS
 
 <DxGrid @bind-Data="@NoteGridViewModel.Note"
 		AllowSort="false"
@@ -14,7 +15,7 @@
         id="grid-id">
     <ToolbarTemplate>
         <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
-            <DxToolbarItem Text="Aggiungi" 
+            <DxToolbarItem Text="Aggiungi"
                            Click="NewItem_Click"
                            RenderStyle="ButtonRenderStyle.Warning"
                            RenderStyleMode="ToolbarItemRenderStyleMode.Plain"
@@ -32,22 +33,40 @@
 	</Columns>
 
     <EditFormTemplate Context="EditFormContext">
+        @{
+            var nota = (INotaViewModel)EditFormContext.EditModel;
+        }
         <DxFormLayout CssClass="w-100">
             <DxFormLayoutItem Caption="Testo:" ColSpanMd="12">
-                @EditFormContext.GetEditor("Testo")
+                <div class="d-flex align-items-start gap-2">
+                    <DxMemo @bind-Text="@nota.Testo"
+                            Rows="3"
+                            CssClass="flex-grow-1" />
+                    <DxButton Text="@(_isRecording ? "Stop" : "Registra")"
+                              RenderStyle="@(_isRecording ? ButtonRenderStyle.Danger : ButtonRenderStyle.Info)"
+                              Click="@(() => ToggleRecording(nota))"
+                              CssClass="testo-piccolo" />
+                </div>
             </DxFormLayoutItem>
         </DxFormLayout>
     </EditFormTemplate>
 </DxGrid>
 
+@implements IAsyncDisposable
+
 @code {
     IGrid Grid { get; set; }
     bool EditItemsEnabled { get; set; }
+
+    private DotNetObjectReference<NoteGrid>? _speechDotNetRef;
+    private bool _isRecording;
+    private INotaViewModel? _currentEditModel;
 
     protected override void OnInitialized()
     {
         base.OnInitialized();
         NoteGridViewModel.NotifyStateChanged += NoteGridViewModel_NotifyStateChanged;
+        _speechDotNetRef = DotNetObjectReference.Create(this);
     }
 
     protected override Task OnParametersSetAsync()
@@ -79,6 +98,10 @@
 
     async Task Grid_EditModelSaving(GridEditModelSavingEventArgs e)
     {
+        // Ferma eventuale registrazione in corso prima di salvare
+        if (_isRecording)
+            await StopRecording();
+
         if (e.IsNew)
         {
             NoteGridViewModel.InsertNuovaNota((INotaViewModel)e.EditModel);
@@ -95,5 +118,65 @@
     async Task LoadGridDataAsync()
     {
         NoteGridViewModel.Note = NoteGridViewModel.GetNoteAttivita();
+    }
+
+    // --- Speech-to-Text ---
+
+    private async Task ToggleRecording(INotaViewModel nota)
+    {
+        if (_isRecording)
+        {
+            await StopRecording();
+        }
+        else
+        {
+            _currentEditModel = nota;
+            _isRecording = true;
+            await JS.InvokeVoidAsync("startSpeechRecognition", _speechDotNetRef);
+        }
+    }
+
+    private async Task StopRecording()
+    {
+        _isRecording = false;
+        _currentEditModel = null;
+        await JS.InvokeVoidAsync("stopSpeechRecognition");
+    }
+
+    [JSInvokable]
+    public async Task OnSpeechResult(string text)
+    {
+        if (_currentEditModel == null)
+            return;
+
+        _currentEditModel.Testo = string.IsNullOrEmpty(_currentEditModel.Testo)
+            ? text
+            : _currentEditModel.Testo + " " + text;
+
+        await InvokeAsync(StateHasChanged);
+    }
+
+    [JSInvokable]
+    public async Task OnSpeechEnded()
+    {
+        _isRecording = false;
+        _currentEditModel = null;
+        await InvokeAsync(StateHasChanged);
+    }
+
+    [JSInvokable]
+    public async Task OnSpeechError(string error)
+    {
+        _isRecording = false;
+        _currentEditModel = null;
+        await InvokeAsync(StateHasChanged);
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_isRecording)
+            await StopRecording();
+
+        _speechDotNetRef?.Dispose();
     }
 }

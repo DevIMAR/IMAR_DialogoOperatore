@@ -90,3 +90,48 @@ function setupSearchInputs(dotNetRef) {
 		}
 	}, true);
 }
+
+// --- Speech-to-Text (Web Speech API) ---
+var _speechRecognition = null;
+
+function startSpeechRecognition(dotNetRef) {
+	var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+	if (!SpeechRecognition) {
+		dotNetRef.invokeMethodAsync('OnSpeechError', 'Speech recognition non supportato in questo browser');
+		return;
+	}
+
+	_speechRecognition = new SpeechRecognition();
+	_speechRecognition.lang = 'it-IT';
+	_speechRecognition.continuous = true;
+	_speechRecognition.interimResults = false;
+
+	_speechRecognition.onresult = function (event) {
+		var transcript = '';
+		for (var i = event.resultIndex; i < event.results.length; i++) {
+			if (event.results[i].isFinal) {
+				transcript += event.results[i][0].transcript;
+			}
+		}
+		if (transcript) {
+			dotNetRef.invokeMethodAsync('OnSpeechResult', transcript);
+		}
+	};
+
+	_speechRecognition.onerror = function (event) {
+		dotNetRef.invokeMethodAsync('OnSpeechError', event.error);
+	};
+
+	_speechRecognition.onend = function () {
+		dotNetRef.invokeMethodAsync('OnSpeechEnded');
+	};
+
+	_speechRecognition.start();
+}
+
+function stopSpeechRecognition() {
+	if (_speechRecognition) {
+		_speechRecognition.stop();
+		_speechRecognition = null;
+	}
+}

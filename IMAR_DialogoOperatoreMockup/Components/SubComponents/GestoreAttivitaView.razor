@@ -17,7 +17,8 @@
 	<BodyTemplate>
 		<div style="border:3px solid @GetBorderColor();
 					border-radius:8px;
-					height:stretch;">
+					height:stretch;
+					width:100%;">
 			<AttivitaDetails @ref="@AttivitaDetails"
 							 WorkDoneCallback="@Conferma" />
 		</div>
@@ -26,17 +27,19 @@
 	<FooterTemplate>
 		@if (AttivitaDetailsViewModel.IsAttivitaIndiretta())
 		{
-			<DxButton Text="Fine Attivita Indiretta"
-					  style="margin-right: 3%; background-color: darkorange; border-color: darkorange; color: white;"
-					  Click="@GestoreAttivitaViewModel.FineLavoroCommand.Execute"
-					  Enabled="@GestoreAttivitaViewModel.FineLavoroCommand.CanExecute(null)"
-					  CssClass="d-flex justify-content-center align-items-center conferma-dettagli" />
+			<div class="d-flex justify-content-center align-items-center w-100" style="gap: 15px;">
+				<DxButton Text="Fine Attivita Indiretta"
+						  style="background-color: dodgerblue; border-color: dodgerblue; color: white;"
+						  Click="@GestoreAttivitaViewModel.FineLavoroCommand.Execute"
+						  Enabled="@GestoreAttivitaViewModel.FineLavoroCommand.CanExecute(null)"
+						  CssClass="d-flex justify-content-center align-items-center conferma-dettagli" />
 
-			<DxButton Text="Conferma"
-					  RenderStyle="ButtonRenderStyle.Warning"
-					  Enabled="@GestoreAttivitaViewModel.ConfermaCommand.CanExecute(null)"
-					  Click="@GestoreAttivitaViewModel.ConfermaCommand.Execute"
-					  CssClass="d-flex justify-content-center align-items-center conferma-dettagli" />
+				<DxButton Text="Conferma"
+						  RenderStyle="ButtonRenderStyle.Warning"
+						  Enabled="@GestoreAttivitaViewModel.ConfermaCommand.CanExecute(null)"
+						  Click="@GestoreAttivitaViewModel.ConfermaCommand.Execute"
+						  CssClass="d-flex justify-content-center align-items-center conferma-dettagli" />
+			</div>
 		}
 		else
 		{

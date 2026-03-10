@@ -9,9 +9,9 @@
 
 @if (AttivitaDetailsViewModel.IsAttivitaIndiretta())
 {
-	<div style="padding: 15px;">
+	<div style="padding: 20px; height: 100%;">
 		<div class="d-flex justify-content-center align-items-center testo-piccolo mt-2">
-			<label style="color: gray;">BOLLA</label>
+			<label style="color: white;">BOLLA</label>
 		</div>
 		<div class="d-flex justify-content-center align-items-center mt-1">
 			<span style="font-size: 1.6rem; color: gray; font-weight: bold; letter-spacing: 2px;">
@@ -19,16 +19,16 @@
 			</span>
 		</div>
 
-		<div class="d-flex justify-content-center align-items-center mt-3">
-			<label style="color: gray; font-size: 0.85rem;">ATTIVITA INDIRETTA IN CORSO</label>
+		<div class="d-flex justify-content-center align-items-center mt-4">
+			<label style="color: white; font-size: 0.9rem;">ATTIVITA INDIRETTA IN CORSO</label>
 		</div>
 
 		<div style="background-color: darkorange;
 					border-radius: 12px;
-					padding: 20px;
-					margin: 12px 0;
+					padding: 25px;
+					margin: 15px 0;
 					text-align: center;">
-			<span style="font-size: 1.8rem; color: white; font-weight: bold;">
+			<span style="font-size: 2.2rem; color: white; font-weight: bold;">
 				@AttivitaDetailsViewModel.DescrizioneFaseIndiretta
 			</span>
 		</div>
@@ -38,9 +38,9 @@
 		</div>
 
 		<div class="mt-4">
-			<label class="testo-piccolo" style="color: gray;">NOTE</label>
+			<label style="color: white; font-size: 0.85rem;">NOTE</label>
 			<DxMemo @bind-Text="@_notaIndiretta"
-					Rows="8"
+					Rows="10"
 					CssClass="mt-1"
 					style="font-size: 1.1rem;"
 					NullText="Scrivi una nota..." />
