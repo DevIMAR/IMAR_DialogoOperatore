@@ -9,7 +9,7 @@
 
 @if (AttivitaDetailsViewModel.IsAttivitaIndiretta())
 {
-	<div style="padding: 10px;">
+	<div style="padding: 15px;">
 		<div class="d-flex justify-content-center align-items-center testo-piccolo mt-2">
 			<label style="color: gray;">BOLLA</label>
 		</div>
@@ -25,8 +25,8 @@
 
 		<div style="background-color: darkorange;
 					border-radius: 12px;
-					padding: 18px 20px;
-					margin: 12px 10px;
+					padding: 20px;
+					margin: 12px 0;
 					text-align: center;">
 			<span style="font-size: 1.8rem; color: white; font-weight: bold;">
 				@AttivitaDetailsViewModel.DescrizioneFaseIndiretta
@@ -37,11 +37,12 @@
 			<label>@AttivitaDetailsViewModel.StatoAttivita</label>
 		</div>
 
-		<div class="mt-4" style="padding: 0 10px;">
+		<div class="mt-4">
 			<label class="testo-piccolo" style="color: gray;">NOTE</label>
 			<DxMemo @bind-Text="@_notaIndiretta"
-					Rows="4"
+					Rows="8"
 					CssClass="mt-1"
+					style="font-size: 1.1rem;"
 					NullText="Scrivi una nota..." />
 		</div>
 	</div>
