@@ -18,34 +18,16 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
 
         public List<Timbratura> GetTimbratureOperatore(string badgeOperatore)
         {
-            List<Timbratura> timbrature = new List<Timbratura>();
-            List<Timbratura> timbraturePause = new List<Timbratura>();
-            List<Timbratura> timbratureIngressiUscite = new List<Timbratura>();
-
             AngRes operatore = _synergyJmesUoW.AngRes.Get().ToList().SingleOrDefault(o => o.ResCod == badgeOperatore.PadLeft(4, '0'));
 
             if (operatore == null)
-                return timbrature;
+                return new List<Timbratura>();
 
-            List<TblResBrk> pause = GetPauseOperatoreDiOggi(operatore).ToList();
-            List<TblResClk> ingressiUscite = GetIngressiUsciteOperatoreDiOggi(operatore).ToList();
+            var operatori = new List<AngRes> { operatore };
+            var pause = GetPauseOperatoreDiOggi(operatore).ToList();
+            var ingressiUscite = GetIngressiUsciteOperatoreDiOggi(operatore).ToList();
 
-            Task taskPause = Task.Run(() =>
-            {
-                timbraturePause = GetTimbraturePause(new List<AngRes> { operatore }, pause);
-            });
-
-            Task taskIngressiUscite = Task.Run(() =>
-            {
-                timbratureIngressiUscite = GetTimbratureIngressiUscite(new List<AngRes> { operatore }, ingressiUscite);
-            });
-
-            Task.WaitAll(taskPause, taskIngressiUscite);
-
-            timbrature.AddRange(timbraturePause);
-            timbrature.AddRange(timbratureIngressiUscite);
-
-            return timbrature;
+            return CalcolaTimbrature(operatori, pause, ingressiUscite);
         }
 
         private IEnumerable<TblResBrk> GetPauseOperatoreDiOggi(AngRes? operatore)
@@ -80,13 +62,17 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
 
         public List<Timbratura> GetTimbratureOperatoriDiIeri()
         {
-            List<Timbratura> timbrature = new List<Timbratura>();
+            var operatori = GetIdOperatori().ToList();
+            var pause = GetPauseDiIeri(operatori).ToList();
+            var ingressiUscite = GetIngressiUsciteDiIeri(operatori).ToList();
+
+            return CalcolaTimbrature(operatori, pause, ingressiUscite);
+        }
+
+        private List<Timbratura> CalcolaTimbrature(List<AngRes> operatori, List<TblResBrk> pause, List<TblResClk> ingressiUscite)
+        {
             List<Timbratura> timbraturePause = new List<Timbratura>();
             List<Timbratura> timbratureIngressiUscite = new List<Timbratura>();
-
-            List<AngRes> operatori = GetIdOperatori().ToList();
-            List<TblResBrk> pause = GetPauseDiIeri(operatori).ToList();
-            List<TblResClk> ingressiUscite = GetIngressiUsciteDiIeri(operatori).ToList();
 
             Task taskPause = Task.Run(() =>
             {
@@ -100,6 +86,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
 
             Task.WaitAll(taskPause, taskIngressiUscite);
 
+            var timbrature = new List<Timbratura>();
             timbrature.AddRange(timbraturePause);
             timbrature.AddRange(timbratureIngressiUscite);
             return timbrature;

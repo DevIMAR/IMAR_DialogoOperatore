@@ -13,7 +13,7 @@ namespace IMAR_DialogoOperatore.Helpers
     {
         private readonly IAttivitaMapper _attivitaMapper;
         private readonly IOperatoreMapper _operatoreMapper;
-        private readonly IAttivitaService _attivitaService;
+        private readonly IFaseNonPianificataService _faseNonPianificataService;
         private readonly IForzaturaService _forzaturaService;
         private readonly IOperatoreService _operatoreService;
         private readonly IDialogoOperatoreObserver _dialogoOperatoreObserver;
@@ -21,14 +21,14 @@ namespace IMAR_DialogoOperatore.Helpers
         public CreaFaseNonPianificataHelper(
             IAttivitaMapper attivitaMapper,
             IOperatoreMapper operatoreMapper,
-            IAttivitaService attivitaService,
+            IFaseNonPianificataService faseNonPianificataService,
             IForzaturaService forzaturaService,
             IOperatoreService operatoreService,
             IDialogoOperatoreObserver dialogoOperatoreObserver)
         {
             _attivitaMapper = attivitaMapper;
             _operatoreMapper = operatoreMapper;
-            _attivitaService = attivitaService;
+            _faseNonPianificataService = faseNonPianificataService;
             _forzaturaService = forzaturaService;
             _operatoreService = operatoreService;
             _dialogoOperatoreObserver = dialogoOperatoreObserver;
@@ -41,11 +41,11 @@ namespace IMAR_DialogoOperatore.Helpers
             switch (_dialogoOperatoreObserver.OperazioneInCorso)
             {
                 case Costanti.INIZIO_ATTREZZAGGIO:
-                    result = await _attivitaService.ApriAttrezzaggioFaseNonPianificataAsync(_attivitaMapper.AttivitaViewModelToAttivita(_dialogoOperatoreObserver.AttivitaSelezionata),
+                    result = await _faseNonPianificataService.ApriAttrezzaggioFaseNonPianificataAsync(_attivitaMapper.AttivitaViewModelToAttivita(_dialogoOperatoreObserver.AttivitaSelezionata),
                                                                                  _operatoreMapper.OperatoreViewModelToOperatore(_dialogoOperatoreObserver.OperatoreSelezionato));
                     break;
                 case Costanti.INIZIO_LAVORO:
-                    result = await _attivitaService.ApriLavoroFaseNonPianificataAsync(_attivitaMapper.AttivitaViewModelToAttivita(_dialogoOperatoreObserver.AttivitaSelezionata),
+                    result = await _faseNonPianificataService.ApriLavoroFaseNonPianificataAsync(_attivitaMapper.AttivitaViewModelToAttivita(_dialogoOperatoreObserver.AttivitaSelezionata),
                                                                            _operatoreMapper.OperatoreViewModelToOperatore(_dialogoOperatoreObserver.OperatoreSelezionato));
                     break;
                 default:

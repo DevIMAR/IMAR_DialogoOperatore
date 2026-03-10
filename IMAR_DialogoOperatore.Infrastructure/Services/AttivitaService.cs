@@ -1,5 +1,4 @@
 using IMAR_DialogoOperatore.Application;
-using IMAR_DialogoOperatore.Application.DTOs;
 using IMAR_DialogoOperatore.Application.Interfaces.Clients;
 using IMAR_DialogoOperatore.Application.Interfaces.Repositories;
 using IMAR_DialogoOperatore.Application.Interfaces.Services.Activities;
@@ -17,6 +16,43 @@ namespace IMAR_DialogoOperatore.Services
 {
     public class AttivitaService : IAttivitaService
     {
+        // Query AS400 per caricare attività da PCIMP00F con quantità non contabilizzate
+        private const string QUERY_BASE_ATTIVITA_AS400 = @"WITH
+            NONCONTABILIZZATE AS (
+                SELECT
+                    NRTSKJM,
+                    SUM(QTVERJM) AS TOT_QTA_NC,
+                    SUM(QTSCAJM) AS TOT_SCARTO_NC,
+                    SUM(QTNCOJM) AS TOT_NONCONF_NC,
+                    MAX(SAACCJM) AS MAX_SAACCJM
+                FROM IMA90DAT.JMRILM00F
+                WHERE QCONTJM = ''
+                GROUP BY NRTSKJM
+            )
+            SELECT
+                pf2.NRBLCI AS BOLLA,
+                pf2.ORPRCI AS ODP,
+                pf2.CDARCI AS ARTICOLO,
+                TRIM(mf.DSARMA) AS DESCRIZIONEARTICOLO,
+                pf2.CDFACI AS FASE,
+                pf2.DSFACI AS DESCRIZIONEFASE,
+                pf2.QORDCI AS QUANTITAORDINEORIGINALE,
+                0 AS QUANTITAORDINE,
+                COALESCE(ra.TOT_QTA_NC, 0) AS QUANTITAPRODOTTANONCONTABILIZZATA,
+                pf2.QPROCI AS QUANTITAPRODOTTACONTABILIZZATA,
+                COALESCE(ra.TOT_SCARTO_NC, 0) AS QUANTITASCARTATANONCONTABILIZZATA,
+                pf2.QSCACI AS QUANTITASCARTATACONTABILIZZATA,
+                COALESCE(ra.TOT_NONCONF_NC, 0) AS QTANONCONFORMENONCONTABILIZZATA,
+                pf2.QRESCI AS QTANONCONFORMECONTABILIZZATA,
+                pf2.TIRECI AS TIPORICEVIMENTO,
+                CASE WHEN ra.MAX_SAACCJM IS NULL THEN pf2.TIRECI ELSE ra.MAX_SAACCJM END AS SALDOACCONTO,
+                ra.MAX_SAACCJM AS SALDOACCONTOJMES,
+                pf2.FLSFCI AS ISNONPIANIFICATA,
+                CASE WHEN TRIM(pf2.CDRICI) = '' THEN '09' ELSE TRIM(LEFT(pf2.CDRICI, 2)) END AS FLUSSO
+            FROM IMA90DAT.PCIMP00F pf2
+            JOIN IMA90DAT.MGART00F mf ON pf2.CDARCI = mf.CDARMA
+            LEFT JOIN NONCONTABILIZZATE ra ON ra.NRTSKJM = pf2.NRBLCI";
+
         private readonly IMacchinaService _macchinaService;
         private readonly IJmesApiClient _jmesApiClient;
         private readonly IJMesApiClientErrorUtility _jMesApiClientErrorUtility;
@@ -106,41 +142,8 @@ namespace IMAR_DialogoOperatore.Services
             if (attivitaTrovata == null)
             {
                 // Fetch tutte le fasi dello stesso ODP (necessario per il calcolo QuantitaOrdine in C#)
-                var tutteLeFasiOdp = _as400Repository.ExecuteQuery<Attivita>(@"WITH
-																		    NONCONTABILIZZATE AS (
-																			    SELECT
-																				    NRTSKJM,
-																				    SUM(QTVERJM) AS TOT_QTA_NC,
-																				    SUM(QTSCAJM) AS TOT_SCARTO_NC,
-																				    SUM(QTNCOJM) AS TOT_NONCONF_NC,
-																				    MAX(SAACCJM) AS MAX_SAACCJM
-																			    FROM IMA90DAT.JMRILM00F
-																			    WHERE QCONTJM = ''
-																			    GROUP BY NRTSKJM
-																		    )
-																		    SELECT
-																			    pf2.NRBLCI AS BOLLA,
-																			    pf2.ORPRCI AS ODP,
-																			    pf2.CDARCI AS ARTICOLO,
-																			    TRIM(mf.DSARMA) AS DESCRIZIONEARTICOLO,
-																			    pf2.CDFACI AS FASE,
-																			    pf2.DSFACI AS DESCRIZIONEFASE,
-																			    pf2.QORDCI AS QUANTITAORDINEORIGINALE,
-																			    0 AS QUANTITAORDINE,
-																			    COALESCE(ra.TOT_QTA_NC, 0) AS QUANTITAPRODOTTANONCONTABILIZZATA,
-																			    pf2.QPROCI AS QUANTITAPRODOTTACONTABILIZZATA,
-																			    COALESCE(ra.TOT_SCARTO_NC, 0) AS QUANTITASCARTATANONCONTABILIZZATA,
-																			    pf2.QSCACI AS QUANTITASCARTATACONTABILIZZATA,
-																			    COALESCE(ra.TOT_NONCONF_NC, 0) AS QTANONCONFORMENONCONTABILIZZATA,
-																			    pf2.QRESCI AS QTANONCONFORMECONTABILIZZATA,
-																			    pf2.TIRECI AS TIPORICEVIMENTO,
-																			    CASE WHEN ra.MAX_SAACCJM IS NULL THEN pf2.TIRECI ELSE ra.MAX_SAACCJM END AS SALDOACCONTO,
-																			    ra.MAX_SAACCJM AS SALDOACCONTOJMES,
-																			    pf2.FLSFCI AS ISNONPIANIFICATA
-																		    FROM IMA90DAT.PCIMP00F pf2
-																		    JOIN IMA90DAT.MGART00F mf ON pf2.CDARCI = mf.CDARMA
-																		    LEFT JOIN NONCONTABILIZZATE ra ON ra.NRTSKJM = pf2.NRBLCI
-																		    WHERE pf2.ORPRCI = (SELECT ORPRCI FROM IMA90DAT.PCIMP00F WHERE NRBLCI = ?)",
+                var tutteLeFasiOdp = _as400Repository.ExecuteQuery<Attivita>(
+                    QUERY_BASE_ATTIVITA_AS400 + " WHERE pf2.ORPRCI = (SELECT ORPRCI FROM IMA90DAT.PCIMP00F WHERE NRBLCI = ?)",
                     new { bolla }).ToList();
 
                 QuantitaOrdineCalculator.Calcola(tutteLeFasiOdp);
@@ -157,41 +160,8 @@ namespace IMAR_DialogoOperatore.Services
 
             if (attivitaFiltrate == null || !attivitaFiltrate.Any())
             {
-                var risultati = _as400Repository.ExecuteQuery<Attivita>(@"WITH
-																		    NONCONTABILIZZATE AS (
-																			    SELECT
-																				    NRTSKJM,
-																				    SUM(QTVERJM) AS TOT_QTA_NC,
-																				    SUM(QTSCAJM) AS TOT_SCARTO_NC,
-																				    SUM(QTNCOJM) AS TOT_NONCONF_NC,
-																				    MAX(SAACCJM) AS MAX_SAACCJM
-																			    FROM IMA90DAT.JMRILM00F
-																			    WHERE QCONTJM = ''
-																			    GROUP BY NRTSKJM
-																		    )
-																		    SELECT
-																			    pf2.NRBLCI AS BOLLA,
-																			    pf2.ORPRCI AS ODP,
-																			    pf2.CDARCI AS ARTICOLO,
-																			    TRIM(mf.DSARMA) AS DESCRIZIONEARTICOLO,
-																			    pf2.CDFACI AS FASE,
-																			    pf2.DSFACI AS DESCRIZIONEFASE,
-																			    pf2.QORDCI AS QUANTITAORDINEORIGINALE,
-																			    0 AS QUANTITAORDINE,
-																			    COALESCE(ra.TOT_QTA_NC, 0) AS QUANTITAPRODOTTANONCONTABILIZZATA,
-																			    pf2.QPROCI AS QUANTITAPRODOTTACONTABILIZZATA,
-																			    COALESCE(ra.TOT_SCARTO_NC, 0) AS QUANTITASCARTATANONCONTABILIZZATA,
-																			    pf2.QSCACI AS QUANTITASCARTATACONTABILIZZATA,
-																			    COALESCE(ra.TOT_NONCONF_NC, 0) AS QTANONCONFORMENONCONTABILIZZATA,
-																			    pf2.QRESCI AS QTANONCONFORMECONTABILIZZATA,
-																			    pf2.TIRECI AS TIPORICEVIMENTO,
-																			    CASE WHEN ra.MAX_SAACCJM IS NULL THEN pf2.TIRECI ELSE ra.MAX_SAACCJM END AS SALDOACCONTO,
-																			    ra.MAX_SAACCJM AS SALDOACCONTOJMES,
-																			    pf2.FLSFCI AS ISNONPIANIFICATA
-																		    FROM IMA90DAT.PCIMP00F pf2
-																		    JOIN IMA90DAT.MGART00F mf ON pf2.CDARCI = mf.CDARMA
-																		    LEFT JOIN NONCONTABILIZZATE ra ON ra.NRTSKJM = pf2.NRBLCI
-																		    WHERE pf2.ORPRCI = ?",
+                var risultati = _as400Repository.ExecuteQuery<Attivita>(
+                    QUERY_BASE_ATTIVITA_AS400 + " WHERE pf2.ORPRCI = ?",
                     new { odp }).ToList();
 
                 QuantitaOrdineCalculator.Calcola(risultati);
@@ -489,83 +459,5 @@ namespace IMAR_DialogoOperatore.Services
 			return attivitaOperatoreDellUltimaGiornata;
 		}
 
-		public async Task<string?> ApriAttrezzaggioFaseNonPianificataAsync(Attivita attivita, Operatore operatore)
-        {
-            string codiceFase = GetCodiceFase(attivita); ;
-
-            HttpResponseMessage responseMessage = await _jmesApiClient.MesEquipStartNotPlnAsync(operatore, attivita.Bolla, codiceFase);
-
-            var (errore, jsonData) = await _jMesApiClientErrorUtility.GestioneEventualeErroreAsync(responseMessage);
-            if (errore != null)
-                return errore;
-
-            if (jsonData != null)
-                return jsonData.result.instanceRef.model.diaOpe.evtUid.ToString();
-
-            return null;
-        }
-
-        public async Task<string?> ApriLavoroFaseNonPianificataAsync(Attivita attivita, Operatore operatore)
-        {
-            string codiceFase = GetCodiceFase(attivita);
-
-            HttpResponseMessage responseMessage = await _jmesApiClient.MesWorkStartNotPlnAsync(operatore, attivita, codiceFase);
-
-            var (errore, jsonData) = await _jMesApiClientErrorUtility.GestioneEventualeErroreAsync(responseMessage);
-            if (errore != null)
-                return errore;
-
-            if (jsonData != null)
-                return jsonData.result.instanceRef.model.diaOpe.evtUid.ToString();
-
-            return null;
-        }
-
-        private string GetCodiceFase(Attivita attivita)
-        {
-            string descrizioneFaseNonPianificata = Costanti.PREFISSO_RILAVORAZIONE + " " + attivita.DescrizioneFase;
-            AngMesNotPlnLng? angMesNotPlnLng = _synergyJmesUoW.AngMesNotPlnLng.Get(x => x.NotPlnDsc.Equals(descrizioneFaseNonPianificata))
-                                                                             .SingleOrDefault();
-
-            angMesNotPlnLng ??= CreaFaseNonPianificata(descrizioneFaseNonPianificata);
-
-            return _synergyJmesUoW.AngMesNotPln.Get(x => x.Uid == angMesNotPlnLng.RecUid).Single().NotPlnCod;
-        }
-
-        private AngMesNotPlnLng CreaFaseNonPianificata(string descrizioneFaseNonPianificata)
-        {
-            AngMesNotPln ultimaFaseRilavorazione = _synergyJmesUoW.AngMesNotPln.Get()
-                                                                  .OrderByDescending(x => x.NotPlnCod)
-                                                                  .First();
-
-            int codiceNumerico = Int32.Parse(ultimaFaseRilavorazione.NotPlnCod) + 1;
-
-            _synergyJmesUoW.AngMesNotPln.Insert(new AngMesNotPln
-            {
-                Uid = codiceNumerico,
-                NotPlnCod = codiceNumerico.ToString().PadLeft(4, '0'),
-                NotPlnIco = ultimaFaseRilavorazione.NotPlnIco,
-                LogDel = 0,
-                Tsi = DateTime.Now,
-                RecVer = 0
-            });
-
-            _synergyJmesUoW.Save();
-
-            AngMesNotPlnLng nuovaFaseNonPianificata = new AngMesNotPlnLng
-            {
-                RecUid = codiceNumerico,
-                LngUid = 1,
-                NotPlnDsc = descrizioneFaseNonPianificata,
-                Tsi = DateTime.Now,
-                RecVer = 0
-            };
-
-            _synergyJmesUoW.AngMesNotPlnLng.Insert(nuovaFaseNonPianificata);
-
-            _synergyJmesUoW.Save();
-
-            return nuovaFaseNonPianificata;
-        }
     }
 }

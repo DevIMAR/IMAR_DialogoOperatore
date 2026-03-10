@@ -38,10 +38,10 @@ namespace IMAR_DialogoOperatore.Helpers
             switch (operazioneInCorso)
             {
                 case Costanti.INIZIO_LAVORO:
-                    return await GestisciInizioLavoroAsync();
+                    return await GestisciInizioOperazioneAsync(isLavoro: true);
 
                 case Costanti.INIZIO_ATTREZZAGGIO:
-                    return GestisciInizioAttrezzaggio();
+                    return await GestisciInizioOperazioneAsync(isLavoro: false);
 
                 case Costanti.AVANZAMENTO:
                 case Costanti.FINE_LAVORO:
@@ -52,7 +52,7 @@ namespace IMAR_DialogoOperatore.Helpers
             }
         }
 
-        private async Task<string> GestisciInizioLavoroAsync()
+        private async Task<string> GestisciInizioOperazioneAsync(bool isLavoro)
         {
             // Se l'operatore ha già questa fase aperta con la stessa causale, blocca
             string? blocco = VerificaFaseGiaApertaDaMeStesso();
@@ -62,26 +62,13 @@ namespace IMAR_DialogoOperatore.Helpers
             string messaggioPopup = string.Empty;
 
             messaggioPopup += GestisciCambioDiFaseSelezionata(_cercaAttivitaObserver.FaseCercata);
-            messaggioPopup += await GestisciLavoroApertoDaAltriAsync();
-            messaggioPopup += GestisciAperturaConQtProdottaFasePrecedenteAZero();
-            messaggioPopup += GestisciCambioCausale();
 
-            if (messaggioPopup != string.Empty)
-                messaggioPopup += "Sei sicuro di voler iniziare questo lavoro?\n";
+            if (isLavoro)
+            {
+                messaggioPopup += await GestisciLavoroApertoDaAltriAsync();
+                messaggioPopup += GestisciAperturaConQtProdottaFasePrecedenteAZero();
+            }
 
-            return messaggioPopup;
-        }
-
-        private string GestisciInizioAttrezzaggio()
-        {
-            // Se l'operatore ha già questa fase aperta con la stessa causale, blocca
-            string? blocco = VerificaFaseGiaApertaDaMeStesso();
-            if (blocco != null)
-                return blocco;
-
-            string messaggioPopup = string.Empty;
-
-            messaggioPopup += GestisciCambioDiFaseSelezionata(_cercaAttivitaObserver.FaseCercata);
             messaggioPopup += GestisciCambioCausale();
 
             if (messaggioPopup != string.Empty)

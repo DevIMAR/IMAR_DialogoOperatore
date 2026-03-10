@@ -41,6 +41,7 @@ namespace IMAR_DialogoOperatore.Infrastructure
 		
 			services.AddScoped<As400Context>();
 
+			services.AddSingleton<CalFlOdpCacheService>();
 			services.AddSingleton<CaricamentoAttivitaInBackgroundService>();
 
 			services.AddScoped<ISynergyJmesUoW, SynergyJmesUoW>();
@@ -49,6 +50,7 @@ namespace IMAR_DialogoOperatore.Infrastructure
 			services.AddScoped<IImarSchedulatoreUoW, ImarSchedulatoreUoW>();
 
 			services.AddScoped<IAttivitaService, AttivitaService>();
+			services.AddScoped<IFaseNonPianificataService, FaseNonPianificataService>();
 			services.AddScoped<IForzaturaService, ForzaturaService>();
 			services.AddScoped<IMorpheusApiService, MorpheusApiService>();
 			services.AddScoped<IOperatoreService, OperatoreService>();
