@@ -38,10 +38,10 @@ namespace IMAR_DialogoOperatore.Helpers
             switch (operazioneInCorso)
             {
                 case Costanti.INIZIO_LAVORO:
-                    return await GestisciInizioLavoroAsync();
+                    return await GestisciInizioOperazioneAsync(isLavoro: true);
 
                 case Costanti.INIZIO_ATTREZZAGGIO:
-                    return GestisciInizioAttrezzaggio();
+                    return await GestisciInizioOperazioneAsync(isLavoro: false);
 
                 case Costanti.AVANZAMENTO:
                 case Costanti.FINE_LAVORO:
@@ -52,26 +52,23 @@ namespace IMAR_DialogoOperatore.Helpers
             }
         }
 
-        private async Task<string> GestisciInizioLavoroAsync()
+        private async Task<string> GestisciInizioOperazioneAsync(bool isLavoro)
         {
+            // Se l'operatore ha già questa fase aperta con la stessa causale, blocca
+            string? blocco = VerificaFaseGiaApertaDaMeStesso();
+            if (blocco != null)
+                return blocco;
+
             string messaggioPopup = string.Empty;
 
             messaggioPopup += GestisciCambioDiFaseSelezionata(_cercaAttivitaObserver.FaseCercata);
-            messaggioPopup += await GestisciLavoroApertoDaAltriAsync();
-            messaggioPopup += GestisciAperturaConQtProdottaFasePrecedenteAZero();
-            messaggioPopup += GestisciCambioCausale();
 
-            if (messaggioPopup != string.Empty)
-                messaggioPopup += "Sei sicuro di voler iniziare questo lavoro?\n";
+            if (isLavoro)
+            {
+                messaggioPopup += await GestisciLavoroApertoDaAltriAsync();
+                messaggioPopup += GestisciAperturaConQtProdottaFasePrecedenteAZero();
+            }
 
-            return messaggioPopup;
-        }
-
-        private string GestisciInizioAttrezzaggio()
-        {
-            string messaggioPopup = string.Empty;
-
-            messaggioPopup += GestisciCambioDiFaseSelezionata(_cercaAttivitaObserver.FaseCercata);
             messaggioPopup += GestisciCambioCausale();
 
             if (messaggioPopup != string.Empty)
@@ -151,16 +148,45 @@ namespace IMAR_DialogoOperatore.Helpers
             return -1;
         }
 
+        private string? VerificaFaseGiaApertaDaMeStesso()
+        {
+            string bollaSelezionata = _dialogoOperatoreObserver.AttivitaSelezionata.Bolla;
+            string operazioneInCorso = _dialogoOperatoreObserver.OperazioneInCorso;
+
+            // Mappa operazione → causale: "Inizio lavoro" → "IL", "Inizio attrezzaggio" → "IA"
+            string causaleDaAprire = operazioneInCorso == Costanti.INIZIO_LAVORO
+                ? Costanti.IN_LAVORO
+                : Costanti.IN_ATTREZZAGGIO;
+
+            Attivita? attivitaGiaAperta = _dialogoOperatoreObserver.OperatoreSelezionato.AttivitaAperte
+                .SingleOrDefault(x => x.Bolla == bollaSelezionata);
+
+            if (attivitaGiaAperta == null)
+                return null;
+
+            if (attivitaGiaAperta.Causale == causaleDaAprire)
+                return "Hai già questa fase aperta!\n";
+
+            return null;
+        }
+
         private async Task<string> GestisciLavoroApertoDaAltriAsync()
         {
             string messaggioAttivitaAperta = "Questa fase è già in lavorazione da:\n";
 
             IList<string>? idJmesOperatoriConStessaBollaAperta = await _attivitaService.GetIdOperatoriConBollaApertaAsync(_dialogoOperatoreObserver.AttivitaSelezionata.Bolla);
-            if (idJmesOperatoriConStessaBollaAperta.Count == 0)
+
+            // Filtra l'operatore corrente: mostra solo gli ALTRI operatori
+            string idJmesOperatoreCorrente = _dialogoOperatoreObserver.OperatoreSelezionato.IdJMes.ToString();
+            var altriOperatori = idJmesOperatoriConStessaBollaAperta
+                .Where(id => id != idJmesOperatoreCorrente)
+                .ToList();
+
+            if (altriOperatori.Count == 0)
                 return string.Empty;
 
             Operatore operatoreConAttivitaAperta;
-            foreach (string idJmesOperatore in idJmesOperatoriConStessaBollaAperta)
+            foreach (string idJmesOperatore in altriOperatori)
             {
                 operatoreConAttivitaAperta = _operatoreService.GetOperatoreDaIdJMes(idJmesOperatore);
 

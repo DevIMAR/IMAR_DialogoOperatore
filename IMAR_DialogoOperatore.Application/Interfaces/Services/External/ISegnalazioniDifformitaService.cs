@@ -7,5 +7,7 @@ namespace IMAR_DialogoOperatore.Application.Interfaces.Services.External
     {
         int InsertSegnalazione(SegnalazioneDifformita segnalazione);
         Task<CostiArticoloDTO> GetCostiArticolo(string codiceArticolo);
+        string? GetFlussoByOdpFase(string odp, string fase);
+        List<string> GetCategorie();
 	}
 }

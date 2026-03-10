@@ -10,5 +10,6 @@ namespace IMAR_DialogoOperatore.Interfaces.Mappers
         IEnumerable<IAttivitaViewModel> ListaAttivitaToListaAttivitaViewModel(IEnumerable<Attivita> attivitaList);
         TimbraturaAttivitaViewModel AttivitaToTimbraturaAttivitaViewModel(Attivita attivitaList);
         IList<TimbraturaAttivitaViewModel> ListAttivitaToListTimbraturaAttivitaViewModel(IList<Attivita>? attivitaList);
+        IList<EventoRaggrupatoViewModel> ListAttivitaToListEventiRaggruppati(IList<Attivita>? attivitaList);
     }
 }

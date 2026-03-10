@@ -1,9 +1,12 @@
-﻿using IMAR_DialogoOperatore.Application.DTOs;
+﻿using Dapper;
+using IMAR_DialogoOperatore.Application.DTOs;
 using IMAR_DialogoOperatore.Application.Interfaces.Clients;
 using IMAR_DialogoOperatore.Application.Interfaces.Services.External;
 using IMAR_DialogoOperatore.Application.Interfaces.UoW;
 using IMAR_DialogoOperatore.Application.Interfaces.Utilities;
 using IMAR_DialogoOperatore.Domain.Entities.Imar_Produzione;
+using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Configuration;
 
 namespace IMAR_DialogoOperatore.Infrastructure.Services
 {
@@ -12,16 +15,18 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
         private readonly IImarProduzioneUoW _imarProduzioneUoW;
         private readonly ILoggingService _loggingService;
 		private readonly IImarApiClient _imarApiClient;
+		private readonly string _connectionString;
 
 		public SegnalazioniDifformitaService(
             IImarProduzioneUoW imarProduzioneUoW,
             ILoggingService loggingService,
-			IImarApiClient imarApiClient)
+			IImarApiClient imarApiClient,
+			IConfiguration configuration)
         {
             _imarProduzioneUoW = imarProduzioneUoW;
             _loggingService = loggingService;
 			_imarApiClient = imarApiClient;
-
+			_connectionString = configuration.GetConnectionString("ImarProduzione")!;
 		}
 
         public int InsertSegnalazione(SegnalazioneDifformita segnalazione)
@@ -98,5 +103,36 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
 
         public async Task<CostiArticoloDTO> GetCostiArticolo(string codiceArticolo) => await _imarApiClient.GetCostiArticolo(codiceArticolo);
 
+		public string? GetFlussoByOdpFase(string odp, string fase)
+		{
+			try
+			{
+				using var connection = new SqlConnection(_connectionString);
+				return connection.QueryFirstOrDefault<string?>(
+					"SELECT TOP 1 Flusso FROM FasePerOdpConQtaDifformeInFase WHERE RTRIM(Odp) = @Odp AND RTRIM(Fase) = @Fase",
+					new { Odp = odp, Fase = fase });
+			}
+			catch (Exception ex)
+			{
+				_loggingService.LogError($"Errore nel recupero Flusso per ODP={odp}, Fase={fase}", ex);
+				return null;
+			}
+		}
+
+		public List<string> GetCategorie()
+		{
+			try
+			{
+				using var connection = new SqlConnection(_connectionString);
+				return connection.Query<string>(
+					"SELECT DISTINCT CategoriaDifformita FROM SegnalazioneDifformita WHERE CategoriaDifformita IS NOT NULL AND CategoriaDifformita <> '' AND CategoriaDifformita <> 'Test' ORDER BY CategoriaDifformita")
+					.ToList();
+			}
+			catch (Exception ex)
+			{
+				_loggingService.LogError("Errore nel recupero categorie difformità", ex);
+				return new List<string> { "Mt Materiale", "Tr Trattamenti", "Fn Finiture", "Rilevazione Ok", "Dm Dimensionale", "Quantitativo", "Lg Logistica", "St Strutturale" };
+			}
+		}
 	}
 }

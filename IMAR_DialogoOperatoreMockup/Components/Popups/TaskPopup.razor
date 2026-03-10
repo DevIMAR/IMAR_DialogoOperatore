@@ -1,4 +1,4 @@
-﻿@using IMAR_DialogoOperatore.Application
+@using IMAR_DialogoOperatore.Application
 @using IMAR_DialogoOperatore.Application.Interfaces.Utilities
 @using IMAR_DialogoOperatore.Components.SubComponents
 @using IMAR_DialogoOperatore.Interfaces.Observers
@@ -15,50 +15,13 @@
 		 CloseOnOutsideClick="false"
 		 ShowFooter="true"
 		 EnableAdaptivity="true"
-		 Width="60%"
+		 Width="70%"
 		 @onkeydown="RestartAutoLogoutTimer"
 		 @onclick="RestartAutoLogoutTimer"
 		 @onmousemove="RestartAutoLogoutTimer"
 		 @onmousedown="RestartAutoLogoutTimer">
 	<BodyContentTemplate>
-		<DxGridLayout>
-			<Rows>
-				<DxGridLayoutRow Height="auto" />
-				<DxGridLayoutRow Height="auto" />
-				<DxGridLayoutRow Height="auto" />
-			</Rows>
-
-			<Columns>
-				<DxGridLayoutColumn Width="5%" />
-				<DxGridLayoutColumn />
-				<DxGridLayoutColumn Width="5%" />
-			</Columns>
-
-			<Items>
-				<DxGridLayoutItem Row="0" Column="1">
-					<Template>
-						<div class="d-flex justify-content-center align-items-center h-100 testo-grande mt-2">
-							<label>CATEGORIA ERRORE</label>
-						</div>
-					</Template>
-				</DxGridLayoutItem>
-
-				<DxGridLayoutItem Row="1" Column="1">
-					<Template>
-						<DxComboBox Data="@TaskPopupViewModel.CategorieErrori"
-									@bind-Value="@TaskPopupViewModel.CategoriaErroreSelezionata"
-									NullText="Clicca qui per selezionare una causa"
-									CssClass="mt-2 combobox-categoria-errore" />
-					</Template>
-				</DxGridLayoutItem>
-
-				<DxGridLayoutItem Row="2" Column="1">
-					<Template>
-						<CompilatoreTask />
-					</Template>
-				</DxGridLayoutItem>
-			</Items>
-		</DxGridLayout>
+		<CompilatoreTask />
 	</BodyContentTemplate>
 
 	<FooterContentTemplate>

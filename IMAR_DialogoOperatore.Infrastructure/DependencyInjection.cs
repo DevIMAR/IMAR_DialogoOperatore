@@ -1,5 +1,6 @@
 ﻿using IMAR_DialogoOperatore.Application.Interfaces.Clients;
 using IMAR_DialogoOperatore.Application.Interfaces.Repositories;
+using IMAR_DialogoOperatore.Application.Interfaces.Services;
 using IMAR_DialogoOperatore.Application.Interfaces.Services.Activities;
 using IMAR_DialogoOperatore.Application.Interfaces.Services.External;
 using IMAR_DialogoOperatore.Application.Interfaces.UoW;
@@ -19,7 +20,9 @@ using log4net.Config;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System.Net.Http.Headers;
 using System.Reflection;
+using System.Text;
 
 namespace IMAR_DialogoOperatore.Infrastructure
 {
@@ -38,6 +41,7 @@ namespace IMAR_DialogoOperatore.Infrastructure
 		
 			services.AddScoped<As400Context>();
 
+			services.AddSingleton<CalFlOdpCacheService>();
 			services.AddSingleton<CaricamentoAttivitaInBackgroundService>();
 
 			services.AddScoped<ISynergyJmesUoW, SynergyJmesUoW>();
@@ -46,6 +50,7 @@ namespace IMAR_DialogoOperatore.Infrastructure
 			services.AddScoped<IImarSchedulatoreUoW, ImarSchedulatoreUoW>();
 
 			services.AddScoped<IAttivitaService, AttivitaService>();
+			services.AddScoped<IFaseNonPianificataService, FaseNonPianificataService>();
 			services.AddScoped<IForzaturaService, ForzaturaService>();
 			services.AddScoped<IMorpheusApiService, MorpheusApiService>();
 			services.AddScoped<IOperatoreService, OperatoreService>();
@@ -53,7 +58,17 @@ namespace IMAR_DialogoOperatore.Infrastructure
 			services.AddScoped<INotaService, NotaService>();
 			services.AddScoped<ISegnalazioniDifformitaService, SegnalazioniDifformitaService>();
 			services.AddScoped<ITimbratureService, TimbratureService>();
+			services.AddScoped<IUtenteService, UtenteService>();
 
+			// HttpClient per IMAR API con autenticazione Basic pre-configurata
+			services.AddHttpClient("ImarApi", (sp, client) =>
+			{
+				var config = sp.GetRequiredService<IConfiguration>();
+				client.BaseAddress = new Uri(config["ImarApi:BaseUrl"]!);
+				var credentials = Convert.ToBase64String(
+					Encoding.ASCII.GetBytes($"{config["ImarApi:Username"]}:{config["ImarApi:Password"]}"));
+				client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", credentials);
+			});
 			services.AddScoped<IImarApiClient, ImarApiClient>();
 			services.AddScoped<IJmesApiClient, JmesApiClient>();
 

@@ -22,6 +22,15 @@ namespace IMAR_DialogoOperatore.Infrastructure.As400
             }
         }
 
+        public IEnumerable<T> ExecuteQuery<T>(string query, object param)
+        {
+            using (var connection = (OdbcConnection)_as400Context.CreateConnection())
+            {
+                connection.Open();
+                return connection.Query<T>(query, param).ToList();
+            }
+        }
+
         public int ExecuteCommand(string sql, object? param = null)
         {
             using (var connection = (OdbcConnection)_as400Context.CreateConnection())

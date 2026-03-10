@@ -8,5 +8,6 @@ namespace IMAR_DialogoOperatore.Interfaces.ViewModels
         string? DescrizioneFase { get; }
         string? CodiceArticolo { get; }
         string? DescrizioneArticolo { get; }
+        string? Flusso { get; }
     }
 }

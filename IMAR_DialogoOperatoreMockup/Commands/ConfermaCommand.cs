@@ -89,11 +89,21 @@ namespace IMAR_DialogoOperatore.Commands
                 ? await _segnalazioniDifformitaService.GetCostiArticolo(attivita.CodiceArticolo)
                 : new CostiArticoloDTO();
 
+            // Flusso della fase di apertura NC (dai dati AS400 già in pancia)
+            string? flusso = attivita?.Flusso;
+
+            // Se "Errore fase attuale" non è spuntato, FaseDifformita vuota + nota nascosta
+            bool isErroreFaseAttuale = _segnalazioneObserver.IsErroreFaseAttuale;
+            string descrizione = _segnalazioneObserver.DescrizioneDifetto ?? "";
+            if (!isErroreFaseAttuale)
+                descrizione = (descrizione + " #Errore in fase precedente o materia prima#").Trim();
+
             _segnalazioniDifformitaService.InsertSegnalazione(new SegnalazioneDifformita
             {
                 OrigineSegnalazione = "I",
                 Richiedente = _dialogoOperatoreObserver.OperatoreSelezionato.Badge + " - " + _dialogoOperatoreObserver.OperatoreSelezionato.Cognome + " " + _dialogoOperatoreObserver.OperatoreSelezionato.Nome,
-                FaseDifformita = attivita?.CodiceFase,
+                Flusso = flusso,
+                FaseDifformita = isErroreFaseAttuale ? attivita?.CodiceFase : null,
                 DescrizioneFase = attivita?.DescrizioneFase,
                 Odp = attivita?.Odp,
                 Articolo = attivita?.CodiceArticolo,
@@ -103,7 +113,7 @@ namespace IMAR_DialogoOperatore.Commands
                 CostoGestioneDifformita = 5,
                 CostoUnitarioMateriale = Math.Round(costiArticoloDTO.CostoUnitarioMateriale, 2),
                 CostoLavorazione = Math.Round(costiArticoloDTO.CostoUnitarioLavorazione, 2),
-                DescrizioneDifformita = _segnalazioneObserver.DescrizioneDifetto,
+                DescrizioneDifformita = descrizione,
                 CategoriaDifformita = _segnalazioneObserver.Categoria,
                 QtaDifformiRecuperati = _segnalazioneObserver.QuantitaRecuperata,
                 Sorgente = "DialogoOperatore"

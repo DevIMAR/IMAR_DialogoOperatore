@@ -3,7 +3,9 @@ using IMAR_DialogoOperatore.Application.Interfaces.Clients;
 using IMAR_DialogoOperatore.Application.Interfaces.Services.Activities;
 using IMAR_DialogoOperatore.Application.Interfaces.UoW;
 using IMAR_DialogoOperatore.Domain.Entities.JMES;
+using IMAR_DialogoOperatore.Application.Interfaces.Utilities;
 using IMAR_DialogoOperatore.Domain.Models;
+using System.Diagnostics;
 using System.Globalization;
 
 namespace IMAR_DialogoOperatore.Infrastructure.Services
@@ -15,6 +17,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
 
 		private readonly IAttivitaService _attivitaService;
 		private readonly IMacchinaService _macchinaService;
+		private readonly ILoggingService _loggingService;
 
 		public Operatore Operatore { get; set; }
 
@@ -22,19 +25,23 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
 			ISynergyJmesUoW synergyJmesUoW,
 			IJmesApiClient jmesApiClient,
 			IAttivitaService attivitaService,
-			IMacchinaService macchinaService)
+			IMacchinaService macchinaService,
+			ILoggingService loggingService)
 		{
 			_synergyJmesUoW = synergyJmesUoW;
 			_jmesApiClient = jmesApiClient;
 
 			_attivitaService = attivitaService;
 			_macchinaService = macchinaService;
+			_loggingService = loggingService;
 		}
 
 		public async Task<Operatore?> OttieniOperatoreAsync(int? badge)
 		{
 			if (badge == null)
 				return null;
+
+			var swTotale = Stopwatch.StartNew();
 
 			string format = "yyyyMMddHHmmss";
 			CultureInfo provider = CultureInfo.InvariantCulture;
@@ -59,12 +66,18 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
 			Operatore.Uscita = ingressiUscite != null && ingressiUscite.Any(x => x.ResUid == risorsa.Uid) ? ingressiUscite.Where(x => x.ResUid == risorsa.Uid).Max(x => x.EdtOutTss ?? x.ClkOutTss) ?? fallback : fallback;
 			Operatore.InizioPausa = iniziFiniPause != null && iniziFiniPause.Any(x => x.ResUid == risorsa.Uid) ? iniziFiniPause.Where(x => x.ResUid == risorsa.Uid).Max(x => x.TssStr) ?? fallback : fallback;
 			Operatore.FinePausa = iniziFiniPause != null && iniziFiniPause.Any(x => x.ResUid == risorsa.Uid) ? iniziFiniPause.Where(x => x.ResUid == risorsa.Uid).Max(x => x.TssEnd) ?? fallback : fallback;
-			Operatore.AttivitaAperte = await _attivitaService.OttieniAttivitaOperatoreAsync(Operatore);
 
+			var swAttivita = Stopwatch.StartNew();
+			Operatore.AttivitaAperte = await _attivitaService.OttieniAttivitaOperatoreAsync(Operatore);
+			_loggingService.LogInfo($"[TIMING] OttieniOperatoreAsync.AttivitaAperte: {swAttivita.ElapsedMilliseconds}ms");
+
+			var swMacchina = Stopwatch.StartNew();
 			await AssegnaMacchinaAdOperatoreAsync();
+			_loggingService.LogInfo($"[TIMING] OttieniOperatoreAsync.AssegnaMacchina: {swMacchina.ElapsedMilliseconds}ms");
 
 			Operatore.Stato = GetStatus();
 
+			_loggingService.LogInfo($"[TIMING] OttieniOperatoreAsync totale: {swTotale.ElapsedMilliseconds}ms");
 			return Operatore;
 		}
 

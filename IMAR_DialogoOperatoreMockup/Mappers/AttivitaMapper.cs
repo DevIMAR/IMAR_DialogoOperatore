@@ -106,5 +106,33 @@ namespace IMAR_DialogoOperatore.Mappers
             timbratureAttivita.Add(timbraturaAttivitaTemp);
             return timbraturaAttivitaTemp;
         }
+
+        /// <summary>
+        /// Raggruppa le attività: ogni attività diventa una riga con Inizio + Fine.
+        /// </summary>
+        public IList<EventoRaggrupatoViewModel> ListAttivitaToListEventiRaggruppati(IList<Attivita>? attivitaList)
+        {
+            if (attivitaList == null)
+                return new List<EventoRaggrupatoViewModel>();
+
+            return attivitaList.Select(a => new EventoRaggrupatoViewModel
+            {
+                CodiceJMes = a.CodiceJMes,
+                Causale = a.Causale,
+                CausaleEstesa = a.CausaleEstesa,
+                Bolla = a.Bolla,
+                Odp = a.Odp,
+                CodiceFase = a.Fase,
+                DescrizioneFase = a.DescrizioneFase,
+                CodiceArticolo = a.Articolo,
+                DescrizioneArticolo = a.DescrizioneArticolo,
+                QuantitaProdotta = a.QuantitaProdotta,
+                QuantitaScartata = a.QuantitaScartata,
+                SaldoAcconto = a.SaldoAcconto,
+                Flusso = a.Flusso,
+                OraInizio = a.InizioAttivita,
+                OraFine = a.FineAttivita
+            }).ToList();
+        }
     }
 }

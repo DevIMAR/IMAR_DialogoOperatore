@@ -1,93 +1,173 @@
-﻿@using DevExpress.Blazor.Internal
+@using DevExpress.Blazor.Internal
+@using IMAR_DialogoOperatore.Application
 @using IMAR_DialogoOperatore.ViewModels
 
 @inject CompilatoreTaskViewModel CompilatoreTaskViewModel
+@inject TaskPopupViewModel TaskPopupViewModel
+@inject CronologiaAttivitaGridViewModel CronologiaAttivitaGridViewModel
 
-<DxGridLayout>
-	<Rows>
-		<DxGridLayoutRow Height="auto" />
-		<DxGridLayoutRow Height="auto" />
-		<DxGridLayoutRow Height="auto" />
-		<DxGridLayoutRow Height="auto" />
-	</Rows>
+<div>
+	@* Grid attività raggruppate (Inizio + Fine in una riga) *@
+	<DxGrid Data="@CronologiaAttivitaGridViewModel.EventiRaggruppati"
+			AllowSort="true"
+			SortMode="GridSortMode.Multiple"
+			AllowColumnReorder="false"
+			ShowAllRows="true"
+			AllowSelectRowByClick="true"
+			SelectionMode="GridSelectionMode.Single"
+			SelectedDataItem="@CompilatoreTaskViewModel.EventoRaggrupatoSelezionato"
+			SelectedDataItemChanged="OnEventoSelezionatoChanged"
+			CssClass="mt-2"
+			style="height: 25dvh;">
+		<Columns>
+			<DxGridDataColumn Caption="Causale"
+							  FieldName="@(nameof(EventoRaggrupatoViewModel.CausaleEstesa))" />
+			<DxGridDataColumn Caption="Bolla"
+							  FieldName="@(nameof(EventoRaggrupatoViewModel.Bolla))" />
+			<DxGridDataColumn Caption="Odp"
+							  FieldName="@(nameof(EventoRaggrupatoViewModel.Odp))" />
+			<DxGridDataColumn Caption="Fase"
+							  FieldName="@(nameof(EventoRaggrupatoViewModel.CodiceFase))" />
+			<DxGridDataColumn Caption="Inizio"
+							  FieldName="@(nameof(EventoRaggrupatoViewModel.OraInizio))"
+							  DisplayFormat="HH:mm"
+							  SortIndex="0" SortOrder="GridColumnSortOrder.Ascending" />
+			<DxGridDataColumn Caption="Fine"
+							  FieldName="@(nameof(EventoRaggrupatoViewModel.OraFine))"
+							  DisplayFormat="HH:mm" />
+			<DxGridDataColumn Caption="Prodotta"
+							  FieldName="@(nameof(EventoRaggrupatoViewModel.QuantitaProdotta))" />
+			<DxGridDataColumn Caption="Scartata"
+							  FieldName="@(nameof(EventoRaggrupatoViewModel.QuantitaScartata))" />
+			<DxGridDataColumn Caption="S/A"
+							  FieldName="@(nameof(EventoRaggrupatoViewModel.SaldoAcconto))"
+							  Width="50px" />
+		</Columns>
+	</DxGrid>
 
-	<Items>
-		<DxGridLayoutItem Row="0"
-						  CssClass="mt-2">
-			<Template>
-				<CronologiaAttivitaGrid ShowTimbrature="@CompilatoreTaskViewModel.ShowTimbratureInGriglia"
-										@bind-AttivitaSelezionata="@CompilatoreTaskViewModel.EventoSelezionato"/>
-			</Template>
-		</DxGridLayoutItem>
+	@* Checkbox correzioni *@
+	<div class="d-flex flex-wrap gap-4 mt-3 testo-piccolo">
+		<DxCheckBox @bind-Checked="@TaskPopupViewModel.IsRettificaQuantita"
+					Enabled="@IsRettificaQuantitaAbilitata"
+					Alignment="CheckBoxContentAlignment.Center">
+			Rettifica quantità
+		</DxCheckBox>
+		<DxCheckBox @bind-Checked="@TaskPopupViewModel.IsTogliSaldo"
+					Enabled="@IsTogliSaldoAbilitato"
+					Alignment="CheckBoxContentAlignment.Center">
+			Togli saldo
+		</DxCheckBox>
+		<DxCheckBox @bind-Checked="@TaskPopupViewModel.IsCorreggiOrarioInizio"
+					Alignment="CheckBoxContentAlignment.Center">
+			Correggi orario inizio
+		</DxCheckBox>
+		<DxCheckBox @bind-Checked="@TaskPopupViewModel.IsCorreggiOrarioFine"
+					Alignment="CheckBoxContentAlignment.Center">
+			Correggi orario fine
+		</DxCheckBox>
+	</div>
 
-		<DxGridLayoutItem Row="1">
-			<Template>
-				@if (!string.IsNullOrWhiteSpace(CompilatoreTaskViewModel.CategoriaErroreSelezionata) &&
-								CompilatoreTaskViewModel.CategoriaErroreSelezionata.ToLower().Contains("quantità"))
-				{
-					<AvanzamentoAttivitaView />
-				}
-			</Template>
-		</DxGridLayoutItem>
+	@* Rettifica quantità *@
+	@if (TaskPopupViewModel.IsRettificaQuantita)
+	{
+		<AvanzamentoAttivitaView />
+	}
 
-		<DxGridLayoutItem Row="1">
-			<Template>
-				@if (!string.IsNullOrWhiteSpace(CompilatoreTaskViewModel.CategoriaErroreSelezionata) &&
-								CompilatoreTaskViewModel.CategoriaErroreSelezionata.ToLower().Contains("operatore"))
-				{
-					<InfoTaskOperatore OrarioAggiunto="@HandleOrarioAggiunto"/>
-				}
-			</Template>
-		</DxGridLayoutItem>
-
-		<DxGridLayoutItem Row="2">
-			<Template>
-				<div class="d-flex justify-content-center align-items-center h-100 testo-piccolo mt-2">
-					<label>NOTE/DESCRIZIONE</label>
+	@* Correzione orari - compatto in una riga *@
+	@if (TaskPopupViewModel.IsCorreggiOrarioInizio || TaskPopupViewModel.IsCorreggiOrarioFine)
+	{
+		<div class="d-flex flex-wrap align-items-center gap-3 mt-2 testo-piccolo">
+			@if (TaskPopupViewModel.IsCorreggiOrarioInizio)
+			{
+				<div class="d-flex align-items-center gap-2">
+					<label>INIZIO:</label>
+					<DxSpinEdit @bind-Value="@CompilatoreTaskViewModel.OraInizio"
+								MinValue="0" MaxValue="24"
+								DisplayFormat="00"
+								ShowSpinButtons="false"
+								CssClass="dxbl-text-edit"
+								style="width: 60px;" />
+					<label>:</label>
+					<DxSpinEdit @bind-Value="@CompilatoreTaskViewModel.MinutoInizio"
+								MinValue="0" MaxValue="59"
+								DisplayFormat="00"
+								ShowSpinButtons="false"
+								CssClass="dxbl-text-edit"
+								style="width: 60px;" />
 				</div>
-			</Template>
-		</DxGridLayoutItem>
+			}
+			@if (TaskPopupViewModel.IsCorreggiOrarioFine)
+			{
+				<div class="d-flex align-items-center gap-2">
+					<label>FINE:</label>
+					<DxSpinEdit @bind-Value="@CompilatoreTaskViewModel.OraFine"
+								MinValue="0" MaxValue="24"
+								DisplayFormat="00"
+								ShowSpinButtons="false"
+								CssClass="dxbl-text-edit"
+								style="width: 60px;" />
+					<label>:</label>
+					<DxSpinEdit @bind-Value="@CompilatoreTaskViewModel.MinutoFine"
+								MinValue="0" MaxValue="59"
+								DisplayFormat="00"
+								ShowSpinButtons="false"
+								CssClass="dxbl-text-edit"
+								style="width: 60px;" />
+				</div>
+			}
+		</div>
+	}
 
-		<DxGridLayoutItem Row="3">
-			<Template>
-				<DxMemo @bind-Text="@CompilatoreTaskViewModel.Note"
-						NullText="Inserisci la descrizione dell'errore"
-						BindValueMode="BindValueMode.OnInput"
-						Rows="3"
-						Enabled="@CompilatoreTaskViewModel.IsDescrizioneErroreAttiva"
-						CssClass="mt-2"
-						@ref="Note"/>
-			</Template>
-		</DxGridLayoutItem>
-	</Items>
-</DxGridLayout>
+	@* Note *@
+	<div class="d-flex justify-content-center align-items-center h-100 testo-piccolo mt-3">
+		<label>NOTE/DESCRIZIONE</label>
+	</div>
+	<DxMemo @bind-Text="@CompilatoreTaskViewModel.Note"
+			NullText="Inserisci la descrizione dell'errore"
+			BindValueMode="BindValueMode.OnInput"
+			Rows="3"
+			CssClass="mt-2" />
+</div>
 
 @code {
-	private DxMemo Note;
-
 	protected override void OnInitialized()
 	{
 		CompilatoreTaskViewModel.NotifyStateChanged += CompilatoreTaskViewModel_NotifyStateChanged;
+		CronologiaAttivitaGridViewModel.NotifyStateChanged += CronologiaAttivitaGridViewModel_NotifyStateChanged;
+		TaskPopupViewModel.NotifyStateChanged += TaskPopupViewModel_NotifyStateChanged;
 		base.OnInitialized();
 	}
 
-	private async void CompilatoreTaskViewModel_NotifyStateChanged() => await InvokeAsync(StateHasChanged);
-
-	private async Task SetFocus(IFocusableEditor element)
+	protected override void OnAfterRender(bool firstRender)
 	{
-		try
-		{
-			await Task.Delay(10);
-			await element.FocusAsync();
-		}
-		catch
-		{
+		base.OnAfterRender(firstRender);
 
-		}
+		if (firstRender)
+			CronologiaAttivitaGridViewModel.GetEventiRaggruppati();
 	}
 
-	private async Task HandleOrarioAggiunto()
+	private async void CompilatoreTaskViewModel_NotifyStateChanged() => await InvokeAsync(StateHasChanged);
+	private async void CronologiaAttivitaGridViewModel_NotifyStateChanged() => await InvokeAsync(StateHasChanged);
+	private async void TaskPopupViewModel_NotifyStateChanged() => await InvokeAsync(StateHasChanged);
+
+	/// <summary>"Togli saldo" abilitato solo se la riga selezionata è a Saldo</summary>
+	private bool IsTogliSaldoAbilitato =>
+		CompilatoreTaskViewModel.EventoRaggrupatoSelezionato?.SaldoAcconto == Costanti.SALDO;
+
+	/// <summary>"Rettifica quantità" disabilitata sugli attrezzaggi (non hanno quantità)</summary>
+	private bool IsRettificaQuantitaAbilitata =>
+		CompilatoreTaskViewModel.EventoRaggrupatoSelezionato?.Causale != Costanti.IN_ATTREZZAGGIO;
+
+	private void OnEventoSelezionatoChanged(object nuovoEvento)
 	{
-		await SetFocus(Note);
+		CompilatoreTaskViewModel.EventoRaggrupatoSelezionato = (EventoRaggrupatoViewModel?)nuovoEvento;
+
+		// Se la riga selezionata è in Acconto, deseleziona "Togli saldo"
+		if (!IsTogliSaldoAbilitato && TaskPopupViewModel.IsTogliSaldo)
+			TaskPopupViewModel.IsTogliSaldo = false;
+
+		// Se la riga selezionata è un attrezzaggio, deseleziona "Rettifica quantità"
+		if (!IsRettificaQuantitaAbilitata && TaskPopupViewModel.IsRettificaQuantita)
+			TaskPopupViewModel.IsRettificaQuantita = false;
 	}
 }

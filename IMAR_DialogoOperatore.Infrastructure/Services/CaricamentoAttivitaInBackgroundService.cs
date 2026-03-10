@@ -1,6 +1,5 @@
 using IMAR_DialogoOperatore.Application.Interfaces.Clients;
 using IMAR_DialogoOperatore.Application.Interfaces.Repositories;
-using IMAR_DialogoOperatore.Application.Interfaces.UoW;
 using IMAR_DialogoOperatore.Application.Interfaces.Utilities;
 using IMAR_DialogoOperatore.Domain.Entities.As400;
 using IMAR_DialogoOperatore.Domain.Models;
@@ -13,27 +12,26 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
 	public class CaricamentoAttivitaInBackgroundService : IDisposable
 	{
 		private readonly IServiceProvider _serviceProvider;
+		private readonly CalFlOdpCacheService _calFlOdpCacheService;
 		private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
-		private readonly ReaderWriterLockSlim _lockCalFlOdp = new ReaderWriterLockSlim();
 
 		private readonly CancellationTokenSource _cts = new();
 		private readonly SemaphoreSlim _attivitaSemaphore = new(1, 1);
-		private readonly SemaphoreSlim _calFlOdpSemaphore = new(1, 1);
 
 		private List<string> _odpDatiMonitor;
 		private IList<Attivita>? _attivitaAperte;
 		private IList<stdMesIndTsk>? _attivitaIndirette;
-		private Dictionary<(string, string), DateTime> _calFlOdpCache;
-	public CaricamentoAttivitaInBackgroundService(
-			IServiceProvider serviceProvider)
+
+		public CaricamentoAttivitaInBackgroundService(
+			IServiceProvider serviceProvider,
+			CalFlOdpCacheService calFlOdpCacheService)
 		{
 			_serviceProvider = serviceProvider;
+			_calFlOdpCacheService = calFlOdpCacheService;
 			_attivitaAperte = new List<Attivita>();
 			_attivitaIndirette = new List<stdMesIndTsk>();
-			_calFlOdpCache = new Dictionary<(string, string), DateTime>();
 
 			_ = Task.Run(() => RunAttivitaLoopAsync(_cts.Token));
-			_ = Task.Run(() => RunCalFlOdpLoopAsync(_cts.Token));
 		}
 
 		private async Task RunAttivitaLoopAsync(CancellationToken cancellationToken)
@@ -45,18 +43,6 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
 			while (await timer.WaitForNextTickAsync(cancellationToken))
 			{
 				await UpdateAttivitaAsync();
-			}
-		}
-
-		private async Task RunCalFlOdpLoopAsync(CancellationToken cancellationToken)
-		{
-			// Prima esecuzione immediata
-			UpdateCalFlOdpCache();
-
-			using var timer = new PeriodicTimer(TimeSpan.FromSeconds(60));
-			while (await timer.WaitForNextTickAsync(cancellationToken))
-			{
-				UpdateCalFlOdpCache();
 			}
 		}
 
@@ -129,6 +115,8 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
 			return nuoveAttivita;
 		}
 
+		// NB: batchOdp è costruito da ODP provenienti da query AS400 interna, non da input utente.
+		// ODBC non supporta array parameters per IN(), quindi la concatenazione è accettabile qui.
 		private List<Attivita> EseguiQueryAttivitaAs400(IAs400Repository as400Repository, string batchOdp)
 		{
 			return as400Repository.ExecuteQuery<Attivita>(@"WITH
@@ -161,7 +149,8 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
 																				pf2.TIRECI AS TIPORICEVIMENTO,
 																				CASE WHEN ra.MAX_SAACCJM IS NULL THEN pf2.TIRECI ELSE ra.MAX_SAACCJM END AS SALDOACCONTO,
 																				ra.MAX_SAACCJM AS SALDOACCONTOJMES,
-																				pf2.FLSFCI AS ISNONPIANIFICATA
+																				pf2.FLSFCI AS ISNONPIANIFICATA,
+																			CASE WHEN TRIM(pf2.CDRICI) = '' THEN '09' ELSE TRIM(LEFT(pf2.CDRICI, 2)) END AS FLUSSO
 																			FROM IMA90DAT.PCIMP00F pf2
 																			JOIN IMA90DAT.MGART00F mf ON pf2.CDARCI = mf.CDARMA
 																			LEFT JOIN NONCONTABILIZZATE ra ON ra.NRTSKJM = pf2.NRBLCI
@@ -170,18 +159,11 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
 
 		private void ArricchisciConDateSchedulate(List<Attivita> attivita)
 		{
-			_lockCalFlOdp.EnterReadLock();
-			try
+			foreach (var a in attivita)
 			{
-				foreach (var a in attivita)
-				{
-					if (_calFlOdpCache.TryGetValue((a.Odp, a.Fase), out var dataSchedulata))
-						a.DataSchedulata = dataSchedulata;
-				}
-			}
-			finally
-			{
-				_lockCalFlOdp.ExitReadLock();
+				var dataSchedulata = _calFlOdpCacheService.GetDataSchedulata(a.Odp, a.Fase);
+				if (dataSchedulata.HasValue)
+					a.DataSchedulata = dataSchedulata.Value;
 			}
 		}
 
@@ -207,7 +189,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
 			}
 		}
 
-private void UpdateDatiDaMonitor(IAs400Repository as400Repository)
+		private void UpdateDatiDaMonitor(IAs400Repository as400Repository)
 		{
 			_lock.EnterWriteLock();
 			try
@@ -220,54 +202,6 @@ private void UpdateDatiDaMonitor(IAs400Repository as400Repository)
 			finally
 			{
 				_lock.ExitWriteLock();
-			}
-		}
-
-		private void UpdateCalFlOdpCache()
-		{
-			if (!_calFlOdpSemaphore.Wait(0))
-				return;
-
-			try
-			{
-				using var scope = _serviceProvider.CreateScope();
-				var imarSchedulatoreUoW = scope.ServiceProvider.GetRequiredService<IImarSchedulatoreUoW>();
-				var loggingService = scope.ServiceProvider.GetRequiredService<ILoggingService>();
-
-				var sw = Stopwatch.StartNew();
-
-				var calFlOdpData = imarSchedulatoreUoW.CalFlOdpRepository
-					.Get()
-					.GroupBy(c => new { c.ODP, c.FASE })
-					.Select(g => new { g.Key.ODP, g.Key.FASE, MinGiorno = g.Min(x => x.GIORNO) })
-					.AsEnumerable()
-					.ToDictionary(x => (x.ODP, x.FASE.ToString().PadLeft(3, '0')), x => x.MinGiorno);
-
-				_lockCalFlOdp.EnterWriteLock();
-				try
-				{
-					_calFlOdpCache = calFlOdpData;
-				}
-				finally
-				{
-					_lockCalFlOdp.ExitWriteLock();
-				}
-
-				loggingService.LogInfo($"CaricamentoAttivitaInBackgroundService.UpdateCalFlOdpCache completato in {sw.ElapsedMilliseconds}ms");
-			}
-			catch (Exception ex)
-			{
-				try
-				{
-					using var scope = _serviceProvider.CreateScope();
-					var loggingService = scope.ServiceProvider.GetRequiredService<ILoggingService>();
-					loggingService.LogError("Errore nell'aggiornamento cache CalFlOdp", ex);
-				}
-				catch { }
-			}
-			finally
-			{
-				_calFlOdpSemaphore.Release();
 			}
 		}
 
@@ -302,9 +236,7 @@ private void UpdateDatiDaMonitor(IAs400Repository as400Repository)
 			_cts.Cancel();
 			_cts.Dispose();
 			_lock.Dispose();
-			_lockCalFlOdp.Dispose();
 			_attivitaSemaphore.Dispose();
-			_calFlOdpSemaphore.Dispose();
 		}
 	}
 }
