@@ -1,5 +1,31 @@
-﻿@using IMAR_DialogoOperatore.Components.Pages
+@using IMAR_DialogoOperatore.Components.Pages
+@using IMAR_DialogoOperatore.Interfaces.Services
+@using Microsoft.AspNetCore.WebUtilities
 
 @page "/"
 
+@inject NavigationManager NavigationManager
+@inject IDeepLinkParameters DeepLinkParameters
+
 <DialogoOperatoreView />
+
+@code {
+    protected override void OnInitialized()
+    {
+        var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
+
+        if (string.IsNullOrEmpty(uri.Query))
+            return;
+
+        var query = QueryHelpers.ParseQuery(uri.Query);
+
+        if (query.TryGetValue("badge", out var badgeStr) && int.TryParse(badgeStr, out var badge))
+            DeepLinkParameters.Badge = badge;
+
+        if (query.TryGetValue("odp", out var odp) && !string.IsNullOrEmpty(odp))
+            DeepLinkParameters.Odp = odp.ToString().PadLeft(8, '0');
+
+        if (query.TryGetValue("fase", out var fase) && !string.IsNullOrEmpty(fase))
+            DeepLinkParameters.Fase = fase;
+    }
+}
