@@ -27,8 +27,10 @@ namespace IMAR_DialogoOperatore.ViewModels
 
         public string? CodiceDescrizioneArticolo => _attivitaSelezionata != null ? _attivitaSelezionata.CodiceDescrizioneArticolo : string.Empty;
         public string? DataSchedulata => _attivitaSelezionata != null ? _attivitaSelezionata.DataSchedulata?.ToString("dd/MM/yyyy") : string.Empty;
-        public bool IsAttivitaSelezionata => _dialogoOperatoreObserver.AttivitaSelezionata?.Bolla == Bolla &&
-                                             _dialogoOperatoreObserver.AttivitaSelezionata?.Odp == Odp;
+        public bool IsAttivitaSelezionata => _attivitaSelezionata != null &&
+                                             (_attivitaSelezionata.IsIndiretta ||
+                                             (_dialogoOperatoreObserver.AttivitaSelezionata?.Bolla == Bolla &&
+                                              _dialogoOperatoreObserver.AttivitaSelezionata?.Odp == Odp));
         public bool IsDataSchedulataLontana => _attivitaSelezionata?.DataSchedulata > DateTime.Today.AddDays(Costanti.LIMITE_GIORNO_VICINO);
         public bool IsAttivitaSaldata => _attivitaSelezionata != null && _attivitaSelezionata.SaldoAcconto == Costanti.SALDO;
         public bool IsAttivitaNonSchedulata => _attivitaSelezionata != null && !IsAttivitaSaldata &&
@@ -142,8 +144,19 @@ namespace IMAR_DialogoOperatore.ViewModels
                 _fasiPerAttivita = new List<string> { _attivitaSelezionata.CodiceDescrizioneFase };
 
             _faseSelezionata = _attivitaSelezionata.CodiceDescrizioneFase;
-            _odp = _attivitaSelezionata.Odp ?? string.Empty;
-            _bolla = _attivitaSelezionata.Bolla ?? string.Empty;
+
+            if (_attivitaSelezionata.IsIndiretta)
+            {
+                // Per le indirette non mostriamo bolla/odp (sono progressivi JMes inutili per l'operatore)
+                _odp = string.Empty;
+                _bolla = string.Empty;
+            }
+            else
+            {
+                _odp = _attivitaSelezionata.Odp ?? string.Empty;
+                _bolla = _attivitaSelezionata.Bolla ?? string.Empty;
+            }
+
             GetNoteAttivita();
 
             OnNotifyStateChanged();

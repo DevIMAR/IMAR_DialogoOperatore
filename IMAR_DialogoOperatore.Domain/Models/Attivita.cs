@@ -31,5 +31,6 @@
         public DateTime? InizioAttivita { get; set; }
         public DateTime? FineAttivita { get; set; }
         public IEnumerable<Nota> Note { get; set; }
+        public bool IsIndiretta { get; set; }
     }
 }

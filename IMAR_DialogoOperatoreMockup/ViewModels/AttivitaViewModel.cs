@@ -37,6 +37,7 @@ namespace IMAR_DialogoOperatore.ViewModels
         public DateTime? DataSchedulata => _attivita?.DataSchedulata;
         public DateTime? InizioAttivita => _attivita?.InizioAttivita;
 		public DateTime? FineAttivita => _attivita?.FineAttivita;
+		public bool IsIndiretta => _attivita?.IsIndiretta ?? false;
 
         public string Causale
 		{

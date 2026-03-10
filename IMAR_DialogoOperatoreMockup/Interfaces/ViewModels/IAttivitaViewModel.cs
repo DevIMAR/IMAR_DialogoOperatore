@@ -32,5 +32,6 @@ namespace IMAR_DialogoOperatore.Interfaces.ViewModels
         DateTime? InizioAttivita { get; }
         DateTime? FineAttivita { get; }
         IEnumerable<Nota> Note { get; set; }
+        bool IsIndiretta { get; }
     }
 }

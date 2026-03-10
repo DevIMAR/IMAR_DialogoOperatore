@@ -317,7 +317,8 @@ namespace IMAR_DialogoOperatore.Services
                                                                 CodiceJMes = aa.ID_Det3348,
                                                                 CausaleEstesa = aa.ID_Sts3130,
                                                                 Causale = StatoAttivitaMapper.FromJMesStatus(aa.ID_Sts3130),
-                                                                SaldoAcconto = "A"
+                                                                SaldoAcconto = "A",
+                                                                IsIndiretta = true
                                                             })
                                                     .Where(x => x.Causale == Costanti.IN_LAVORO ||
                                                                 x.Causale == Costanti.IN_ATTREZZAGGIO ||
@@ -339,7 +340,8 @@ namespace IMAR_DialogoOperatore.Services
                 {
                     Bolla = stdMesIndTsk.ID_Ind3463,
                     DescrizioneArticolo = Costanti.FASE_INDIRETTA,
-                    DescrizioneFase = stdMesIndTsk.ID_Ind3464
+                    DescrizioneFase = stdMesIndTsk.ID_Ind3464,
+                    IsIndiretta = true
                 });
             }
 
