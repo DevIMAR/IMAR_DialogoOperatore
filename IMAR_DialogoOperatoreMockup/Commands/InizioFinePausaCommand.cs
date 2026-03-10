@@ -125,7 +125,7 @@ namespace IMAR_DialogoOperatore.Commands
             {
                 attivita = new AttivitaViewModel(operatore.AttivitaAperte[i]);
 
-                if (attivita.Causale == Costanti.IN_ATTREZZAGGIO)
+                if (attivita.Causale == Costanti.IN_ATTREZZAGGIO || attivita.IsIndiretta)
                     continue;
 
                 await _interruzioneAttivitaHelper.GestisciInterruzioneAttivita(attivita, false);

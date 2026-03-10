@@ -150,6 +150,10 @@ namespace IMAR_DialogoOperatore.Commands
                 {
                     attivita = new AttivitaViewModel(operatore.AttivitaAperte[i]);
 
+                    // Le indirette non hanno avanzamento: JMes le chiude con il clock-out
+                    if (attivita.IsIndiretta)
+                        continue;
+
                     await _interruzioneAttivitaHelper.GestisciInterruzioneAttivita(attivita, true);
 
                     if (_dialogoOperatoreObserver.IsOperazioneAnnullata)
