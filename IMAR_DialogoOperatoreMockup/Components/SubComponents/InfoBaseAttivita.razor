@@ -1,9 +1,12 @@
 ﻿@using DevExpress.Blazor.Internal
+@using IMAR_DialogoOperatore.Application
 @using IMAR_DialogoOperatore.Interfaces.Observers
+@using IMAR_DialogoOperatore.Interfaces.Services
 @using IMAR_DialogoOperatore.ViewModels
 
 @inject InfoBaseAttivitaViewModel InfoBaseAttivitaViewModel
 @inject IDialogoOperatoreObserver DialogoOperatoreObserver
+@inject IDeepLinkParameters DeepLinkParameters
 @inject IJSRuntime JS
 @inject ILogger<InfoBaseAttivita> Logger
 
@@ -189,6 +192,7 @@
 	{
 		InfoBaseAttivitaViewModel.NotifyStateChanged += InfoBaseAttivitaViewModel_NotifyStateChanged;
 		DialogoOperatoreObserver.OnIsDettaglioAttivitaOpenChanged += DialogoOperatoreObserver_OnIsDettaglioAttivitaOpenChanged;
+		DialogoOperatoreObserver.OnOperatoreSelezionatoChanged += DialogoOperatoreObserver_OnOperatoreSelezionatoDeepLink;
 
 		return base.OnInitializedAsync();
 	}
@@ -256,6 +260,47 @@
 		await SetFocus(BollaRef);
 	}
 
+	private async void DialogoOperatoreObserver_OnOperatoreSelezionatoDeepLink()
+	{
+		if (!DeepLinkParameters.HasDeepLink || string.IsNullOrEmpty(DeepLinkParameters.Odp))
+			return;
+
+		if (DialogoOperatoreObserver.OperatoreSelezionato == null)
+			return;
+
+		Logger.LogInformation("[DEEP LINK] Operatore selezionato, avvio ricerca ODP: {Odp}, Fase: {Fase}",
+			DeepLinkParameters.Odp, DeepLinkParameters.Fase);
+
+		// Apre il drawer impostando l'operazione "Inizio lavoro"
+		DialogoOperatoreObserver.OperazioneInCorso = Costanti.INIZIO_LAVORO;
+
+		// Aspetta che il drawer si apra e i campi vengano puliti dal ViewModel
+		await Task.Delay(100);
+
+		// Cerca l'ODP
+		var odp = DeepLinkParameters.Odp;
+		var fase = DeepLinkParameters.Fase;
+		DeepLinkParameters.Consume();
+
+		InfoBaseAttivitaViewModel.Odp = odp;
+		InfoBaseAttivitaViewModel.CercaAttivitaDaOdp(odp);
+
+		// Se specificata una fase, la seleziona
+		if (!string.IsNullOrEmpty(fase) && InfoBaseAttivitaViewModel.FasiPerAttivita?.Any() == true)
+		{
+			var faseTarget = InfoBaseAttivitaViewModel.FasiPerAttivita
+				.FirstOrDefault(f => f.StartsWith(fase));
+
+			if (faseTarget != null)
+			{
+				InfoBaseAttivitaViewModel.FaseSelezionata = faseTarget;
+				Logger.LogInformation("[DEEP LINK] Fase selezionata: {Fase}", faseTarget);
+			}
+		}
+
+		await InvokeAsync(StateHasChanged);
+	}
+
 	private async Task SetFocus(IFocusableEditor element)
 	{
 		try
@@ -312,6 +357,7 @@
 	{
 		InfoBaseAttivitaViewModel.NotifyStateChanged -= InfoBaseAttivitaViewModel_NotifyStateChanged;
 		DialogoOperatoreObserver.OnIsDettaglioAttivitaOpenChanged -= DialogoOperatoreObserver_OnIsDettaglioAttivitaOpenChanged;
+		DialogoOperatoreObserver.OnOperatoreSelezionatoChanged -= DialogoOperatoreObserver_OnOperatoreSelezionatoDeepLink;
 		_dotNetRef?.Dispose();
 	}
 }

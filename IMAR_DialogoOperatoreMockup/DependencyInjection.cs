@@ -17,6 +17,8 @@ namespace IMAR_DialogoOperatore
 	{
 		public static IServiceCollection AddDialogoOperatoreServices(this IServiceCollection services)
 		{
+			services.AddScoped<IDeepLinkParameters, DeepLinkParameters>();
+
 			services.AddScoped<IAttivitaIndirettaObserver, AttivitaIndirettaObserver>();
 			services.AddScoped<IAvanzamentoObserver, AvanzamentoObserver>();
 			services.AddScoped<ICercaAttivitaObserver, CercaAttivitaObserver>();
