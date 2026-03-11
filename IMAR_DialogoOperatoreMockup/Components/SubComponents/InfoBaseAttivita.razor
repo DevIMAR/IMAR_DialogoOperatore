@@ -54,7 +54,7 @@
 							   @ref="@BollaRef"
 							   inputmode="text"
 							   enterkeyhint="enter"
-							   Enabled="@(!InfoBaseAttivitaViewModel.IsIndirettaSelezionata)">
+							   Enabled="@(!InfoBaseAttivitaViewModel.IsIndirettaSelezionata && !IsOperazioneDiFine)">
 						<Buttons>
 							<DxEditorButton Text="Ind"
 											Tooltip="Apri indiretta"
@@ -76,7 +76,7 @@
 							   @ref="@OdpRef"
 							   inputmode="text"
 							   enterkeyhint="enter"
-							   Enabled="@(!InfoBaseAttivitaViewModel.IsIndirettaSelezionata)">
+							   Enabled="@(!InfoBaseAttivitaViewModel.IsIndirettaSelezionata && !IsOperazioneDiFine)">
 				</DxMaskedInput>
 			</Template>
 		</DxGridLayoutItem>
@@ -95,7 +95,7 @@
 			<Template>
 				<DxComboBox Data="@InfoBaseAttivitaViewModel.FasiPerAttivita"
 							@bind-Value="@(InfoBaseAttivitaViewModel.FaseSelezionata)"
-							Enabled="@(InfoBaseAttivitaViewModel.FasiPerAttivita != null && InfoBaseAttivitaViewModel.FasiPerAttivita.Count() != 0)"
+							Enabled="@(InfoBaseAttivitaViewModel.FasiPerAttivita != null && InfoBaseAttivitaViewModel.FasiPerAttivita.Count() != 0 && !IsOperazioneDiFine)"
 							CssClass="dxbl-text-edit mt-2"
 							@ref="@FasiRef"
 							@onkeydown="HandleFaseKeyPress" />
@@ -184,6 +184,11 @@
 	[Parameter] public bool ShowDescrizioni { get; set; } = false;
 	[Parameter] public bool ShowDataSchedulata { get; set; } = false;
 	[Parameter] public bool ShowBottoneIndirette { get; set; } = false;
+
+	// In Fine Lavoro/Fine Attrezzaggio i campi Bolla, ODP e Fase devono essere readonly
+	private bool IsOperazioneDiFine =>
+		DialogoOperatoreObserver.OperazioneInCorso == Costanti.FINE_LAVORO ||
+		DialogoOperatoreObserver.OperazioneInCorso == Costanti.FINE_ATTREZZAGGIO;
 
 	private DxMaskedInput<string?> BollaRef = null!;
 	private DxMaskedInput<string?> OdpRef = null!;
