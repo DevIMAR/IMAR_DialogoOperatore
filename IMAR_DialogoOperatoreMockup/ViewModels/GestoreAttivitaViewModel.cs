@@ -13,6 +13,7 @@ namespace IMAR_DialogoOperatore.ViewModels
 
 		public bool IsOpen => IsOpenCondition();
 		public string? OperazioneInCorso => _dialogoOperatoreObserver.OperazioneInCorso;
+		public IAttivitaViewModel? AttivitaSelezionata => _dialogoOperatoreObserver.AttivitaSelezionata;
 		public string CounterNote => _dialogoOperatoreObserver.AttivitaSelezionata?.Note?.Count() > 0 ? "Sì" : "No" ?? "No";
 
 		public ICommand ConfermaCommand { get; set; }

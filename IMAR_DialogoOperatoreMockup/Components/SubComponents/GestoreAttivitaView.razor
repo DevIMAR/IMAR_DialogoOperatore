@@ -43,18 +43,20 @@
 		}
 		else
 		{
-			@if (GestoreAttivitaViewModel.FineLavoroCommand.CanExecute(null))
+			@if (GestoreAttivitaViewModel.AttivitaSelezionata?.Causale == "IL")
 			{
 				<DxButton Text="Fine Lavoro (Z)"
 						  style="margin-right: 3%; background-color: dodgerblue; border-color: dodgerblue; color: white;"
 						  Click="@GestoreAttivitaViewModel.FineLavoroCommand.Execute"
+						  Enabled="@GestoreAttivitaViewModel.FineLavoroCommand.CanExecute(null)"
 						  CssClass="d-flex justify-content-center align-items-center conferma-dettagli" />
 			}
-			@if (GestoreAttivitaViewModel.FineAttrezzaggioCommand.CanExecute(null))
+			@if (GestoreAttivitaViewModel.AttivitaSelezionata?.Causale == "IA")
 			{
 				<DxButton Text="Fine Attrezzaggio (M)"
 						  style="margin-right: 3%; background-color: dodgerblue; border-color: dodgerblue; color: white;"
 						  Click="@GestoreAttivitaViewModel.FineAttrezzaggioCommand.Execute"
+						  Enabled="@GestoreAttivitaViewModel.FineAttrezzaggioCommand.CanExecute(null)"
 						  CssClass="d-flex justify-content-center align-items-center conferma-dettagli" />
 			}
 
