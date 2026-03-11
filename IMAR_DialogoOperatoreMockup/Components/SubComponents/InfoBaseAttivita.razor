@@ -54,7 +54,7 @@
 							   @ref="@BollaRef"
 							   inputmode="text"
 							   enterkeyhint="enter"
-							   Enabled="@(!InfoBaseAttivitaViewModel.IsIndirettaSelezionata && !IsOperazioneDiFine)">
+							   Enabled="@(!InfoBaseAttivitaViewModel.IsIndirettaSelezionata && IsCampiEditabili)">
 						<Buttons>
 							<DxEditorButton Text="Ind"
 											Tooltip="Apri indiretta"
@@ -76,7 +76,7 @@
 							   @ref="@OdpRef"
 							   inputmode="text"
 							   enterkeyhint="enter"
-							   Enabled="@(!InfoBaseAttivitaViewModel.IsIndirettaSelezionata && !IsOperazioneDiFine)">
+							   Enabled="@(!InfoBaseAttivitaViewModel.IsIndirettaSelezionata && IsCampiEditabili)">
 				</DxMaskedInput>
 			</Template>
 		</DxGridLayoutItem>
@@ -95,7 +95,7 @@
 			<Template>
 				<DxComboBox Data="@InfoBaseAttivitaViewModel.FasiPerAttivita"
 							@bind-Value="@(InfoBaseAttivitaViewModel.FaseSelezionata)"
-							Enabled="@(InfoBaseAttivitaViewModel.FasiPerAttivita != null && InfoBaseAttivitaViewModel.FasiPerAttivita.Count() != 0 && !IsOperazioneDiFine)"
+							Enabled="@(InfoBaseAttivitaViewModel.FasiPerAttivita != null && InfoBaseAttivitaViewModel.FasiPerAttivita.Count() != 0 && IsCampiEditabili)"
 							CssClass="dxbl-text-edit mt-2"
 							@ref="@FasiRef"
 							@onkeydown="HandleFaseKeyPress" />
@@ -185,10 +185,11 @@
 	[Parameter] public bool ShowDataSchedulata { get; set; } = false;
 	[Parameter] public bool ShowBottoneIndirette { get; set; } = false;
 
-	// In Fine Lavoro/Fine Attrezzaggio i campi Bolla, ODP e Fase devono essere readonly
-	private bool IsOperazioneDiFine =>
-		DialogoOperatoreObserver.OperazioneInCorso == Costanti.FINE_LAVORO ||
-		DialogoOperatoreObserver.OperazioneInCorso == Costanti.FINE_ATTREZZAGGIO;
+	// Bolla, ODP e Fase sono modificabili solo durante ricerca nuova attività
+	private bool IsCampiEditabili =>
+		DialogoOperatoreObserver.OperazioneInCorso == Costanti.INIZIO_LAVORO ||
+		DialogoOperatoreObserver.OperazioneInCorso == Costanti.INIZIO_ATTREZZAGGIO ||
+		DialogoOperatoreObserver.OperazioneInCorso == Costanti.AVANZAMENTO;
 
 	private DxMaskedInput<string?> BollaRef = null!;
 	private DxMaskedInput<string?> OdpRef = null!;
