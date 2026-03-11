@@ -18,7 +18,7 @@ namespace IMAR_DialogoOperatore.Commands
 		/// Wrappa un'operazione async con try/catch + logging.
 		/// Da usare nei metodi async void (Execute, event handler) per evitare crash silenziosi del circuito Blazor.
 		/// </summary>
-		protected static async Task SafeExecuteAsync(Func<Task> operation, ILoggingService loggingService, string contesto)
+		protected static async Task SafeExecuteAsync(Func<Task> operation, ILoggingService loggingService, string contesto, string? badge = null)
 		{
 			try
 			{
@@ -26,7 +26,8 @@ namespace IMAR_DialogoOperatore.Commands
 			}
 			catch (Exception ex)
 			{
-				loggingService.LogError($"Errore non gestito in {contesto}", ex);
+				string contestoConBadge = badge != null ? $"{contesto} [badge={badge}]" : contesto;
+				loggingService.LogError($"Errore non gestito in {contestoConBadge}", ex);
 			}
 		}
 

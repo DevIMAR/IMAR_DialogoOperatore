@@ -78,7 +78,8 @@ namespace IMAR_DialogoOperatore.Commands
                 }
 
                 await MostraLoaderEGestisciOperazione();
-            }, _loggingService, "ConfermaCommand.PopupStore_OnIsConfermatoChanged");
+            }, _loggingService, "ConfermaCommand.PopupStore_OnIsConfermatoChanged",
+               _dialogoOperatoreObserver.OperatoreSelezionato?.Badge?.ToString());
         }
 
         private async Task CreaEdInviaSegnalazioneDifformita()
@@ -134,7 +135,8 @@ namespace IMAR_DialogoOperatore.Commands
                     await MostraLoaderEGestisciOperazione();
                 else
                     MostraPopupConTesto(testoPopup);
-            }, _loggingService, "ConfermaCommand.Execute");
+            }, _loggingService, "ConfermaCommand.Execute",
+               _dialogoOperatoreObserver.OperatoreSelezionato?.Badge?.ToString());
         }
 
         private async Task MostraLoaderEGestisciOperazione()
@@ -180,9 +182,10 @@ namespace IMAR_DialogoOperatore.Commands
 
         private bool CanAssegnareMacchinaFittiziaAdOperatore()
         {
-            return (_dialogoOperatoreObserver.OperazioneInCorso == Costanti.INIZIO_ATTREZZAGGIO ||
-                    _dialogoOperatoreObserver.OperazioneInCorso == Costanti.INIZIO_LAVORO) &&
-                    !_dialogoOperatoreObserver.OperatoreSelezionato.MacchineAssegnate.Any();
+            return !_dialogoOperatoreObserver.OperatoreSelezionato.MacchineAssegnate.Any() &&
+                    (_dialogoOperatoreObserver.OperazioneInCorso == Costanti.INIZIO_ATTREZZAGGIO ||
+                     _dialogoOperatoreObserver.OperazioneInCorso == Costanti.INIZIO_LAVORO ||
+                     _dialogoOperatoreObserver.OperazioneInCorso == Costanti.AVANZAMENTO);
         }
 
         private async Task EseguiOperazioneOMostraMessaggioAsync()

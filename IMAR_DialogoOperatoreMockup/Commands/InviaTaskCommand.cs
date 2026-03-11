@@ -82,7 +82,8 @@ namespace IMAR_DialogoOperatore.Commands
                 {
                     await CompilaEdInviaTask();
                 }
-            }, _loggingService, "InviaTaskCommand.Execute");
+            }, _loggingService, "InviaTaskCommand.Execute",
+               _dialogoOperatoreObserver.OperatoreSelezionato?.Badge?.ToString());
         }
 
         private async void PopupObserver_OnIsConfermatoChanged()
@@ -99,7 +100,8 @@ namespace IMAR_DialogoOperatore.Commands
 
                 await CreaEdInviaSegnalazioneDifformita();
                 await CompilaEdInviaTask();
-            }, _loggingService, "InviaTaskCommand.PopupObserver_OnIsConfermatoChanged");
+            }, _loggingService, "InviaTaskCommand.PopupObserver_OnIsConfermatoChanged",
+               _dialogoOperatoreObserver.OperatoreSelezionato?.Badge?.ToString());
         }
 
         private async Task CompilaEdInviaTask()

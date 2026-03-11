@@ -73,7 +73,8 @@ namespace IMAR_DialogoOperatore.Commands
                     await EffettuaIngressoOperatore();
                 else
                     await EffettuaUscitaOperatore();
-            }, _loggingService, "IngressoUscitaCommand.Execute");
+            }, _loggingService, "IngressoUscitaCommand.Execute",
+               _dialogoOperatoreObserver.OperatoreSelezionato?.Badge?.ToString());
         }
 
         private async Task EffettuaIngressoOperatore()

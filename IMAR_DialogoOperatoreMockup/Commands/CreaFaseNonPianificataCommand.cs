@@ -56,7 +56,8 @@ namespace IMAR_DialogoOperatore.Commands
 
                 _dialogoOperatoreObserver.IsOperazioneGestita = true;
                 _dialogoOperatoreObserver.IsLoaderVisibile = false;
-            }, _loggingService, "CreaFaseNonPianificataCommand.Execute");
+            }, _loggingService, "CreaFaseNonPianificataCommand.Execute",
+               _dialogoOperatoreObserver.OperatoreSelezionato?.Badge?.ToString());
         }
 
         private async Task AssegnaMacchinaFittiziaAdOperatoreAsync()

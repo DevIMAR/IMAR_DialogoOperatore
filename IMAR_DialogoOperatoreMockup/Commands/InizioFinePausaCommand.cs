@@ -74,7 +74,8 @@ namespace IMAR_DialogoOperatore.Commands
                     await FinePausa();
                 else
                     await InizioPausa();
-            }, _loggingService, "InizioFinePausaCommand.Execute");
+            }, _loggingService, "InizioFinePausaCommand.Execute",
+               _dialogoOperatoreObserver.OperatoreSelezionato?.Badge?.ToString());
         }
 
         private async Task FinePausa()
