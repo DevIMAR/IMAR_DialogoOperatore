@@ -21,6 +21,7 @@ namespace IMAR_DialogoOperatore.Commands
 					&& _dialogoOperatoreObserver.OperatoreSelezionato.Stato != Costanti.IN_PAUSA
 					&& _dialogoOperatoreObserver.AttivitaSelezionata != null
 					&& _dialogoOperatoreObserver.AttivitaSelezionata.Causale == Costanti.IN_ATTREZZAGGIO
+					&& _dialogoOperatoreObserver.OperazioneInCorso != Costanti.FINE_ATTREZZAGGIO
 					&& base.CanExecute(parameter);
 		}
 

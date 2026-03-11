@@ -93,18 +93,29 @@ function setupSearchInputs(dotNetRef) {
 
 // --- Speech-to-Text (Web Speech API) ---
 var _speechRecognition = null;
+var _speechAccumulatedText = '';
+var _speechOriginalText = '';
 
-function startSpeechRecognition(dotNetRef) {
+function startSpeechRecognition(dotNetRef, existingText) {
 	var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 	if (!SpeechRecognition) {
+		console.error('[Speech] API non supportata in questo browser');
 		dotNetRef.invokeMethodAsync('OnSpeechError', 'Speech recognition non supportato in questo browser');
 		return;
 	}
+
+	_speechOriginalText = existingText || '';
+	_speechAccumulatedText = _speechOriginalText;
+	console.log('[Speech] Avvio riconoscimento vocale...');
 
 	_speechRecognition = new SpeechRecognition();
 	_speechRecognition.lang = 'it-IT';
 	_speechRecognition.continuous = true;
 	_speechRecognition.interimResults = false;
+
+	_speechRecognition.onstart = function () {
+		console.log('[Speech] Registrazione avviata - parla ora');
+	};
 
 	_speechRecognition.onresult = function (event) {
 		var transcript = '';
@@ -114,16 +125,24 @@ function startSpeechRecognition(dotNetRef) {
 			}
 		}
 		if (transcript) {
-			dotNetRef.invokeMethodAsync('OnSpeechResult', transcript);
+			_speechAccumulatedText = _speechAccumulatedText
+				? _speechAccumulatedText + ' ' + transcript
+				: transcript;
+			console.log('[Speech] Risultato:', transcript, '| Totale:', _speechAccumulatedText);
+			// Scrivi direttamente nel textarea del DxMemo
+			updateSpeechTextarea(_speechAccumulatedText);
 		}
 	};
 
 	_speechRecognition.onerror = function (event) {
+		console.error('[Speech] Errore:', event.error, event.message || '');
 		dotNetRef.invokeMethodAsync('OnSpeechError', event.error);
 	};
 
 	_speechRecognition.onend = function () {
-		dotNetRef.invokeMethodAsync('OnSpeechEnded');
+		console.log('[Speech] Registrazione terminata | Testo finale:', _speechAccumulatedText);
+		// Sincronizza il testo accumulato col model C#
+		dotNetRef.invokeMethodAsync('OnSpeechEnded', _speechAccumulatedText);
 	};
 
 	_speechRecognition.start();
@@ -134,4 +153,15 @@ function stopSpeechRecognition() {
 		_speechRecognition.stop();
 		_speechRecognition = null;
 	}
+}
+
+function updateSpeechTextarea(text) {
+	var textarea = document.querySelector('textarea.speech-memo');
+	if (!textarea) {
+		console.warn('[Speech] textarea.speech-memo non trovato');
+		return;
+	}
+	var setter = Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, 'value').set;
+	setter.call(textarea, text);
+	textarea.dispatchEvent(new Event('input', { bubbles: true }));
 }
