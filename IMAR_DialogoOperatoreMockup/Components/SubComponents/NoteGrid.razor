@@ -39,9 +39,9 @@
         <DxFormLayout CssClass="w-100">
             <DxFormLayoutItem Caption="Testo:" ColSpanMd="12">
                 <div class="d-flex align-items-start gap-2">
-                    <DxMemo @bind-Text="@nota.Testo"
-                            Rows="3"
-                            CssClass="flex-grow-1" />
+                    <textarea @bind="nota.Testo" @bind:event="oninput"
+                              rows="3"
+                              class="form-control flex-grow-1 speech-memo"></textarea>
                     <DxButton Text="@(_isRecording ? "Stop" : "Registra")"
                               RenderStyle="@(_isRecording ? ButtonRenderStyle.Danger : ButtonRenderStyle.Info)"
                               Click="@(() => ToggleRecording(nota))"
@@ -132,7 +132,7 @@
         {
             _currentEditModel = nota;
             _isRecording = true;
-            await JS.InvokeVoidAsync("startSpeechRecognition", _speechDotNetRef);
+            await JS.InvokeVoidAsync("startSpeechRecognition", _speechDotNetRef, nota.Testo ?? "");
         }
     }
 
@@ -144,21 +144,12 @@
     }
 
     [JSInvokable]
-    public async Task OnSpeechResult(string text)
+    public async Task OnSpeechEnded(string finalText)
     {
-        if (_currentEditModel == null)
-            return;
+        // Sincronizza il testo accumulato dal JS col model C#
+        if (_currentEditModel != null)
+            _currentEditModel.Testo = finalText;
 
-        _currentEditModel.Testo = string.IsNullOrEmpty(_currentEditModel.Testo)
-            ? text
-            : _currentEditModel.Testo + " " + text;
-
-        await InvokeAsync(StateHasChanged);
-    }
-
-    [JSInvokable]
-    public async Task OnSpeechEnded()
-    {
         _isRecording = false;
         _currentEditModel = null;
         await InvokeAsync(StateHasChanged);
