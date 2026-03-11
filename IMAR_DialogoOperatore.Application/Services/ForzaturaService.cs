@@ -138,7 +138,6 @@ namespace IMAR_DialogoOperatore.Application.Services
         private async Task AggiungiNuoveFasiDaForzare(string oridneRiga)
         {
             List<PCIMP00F> pCIMP00Fs;
-            FASI fasePrecedente;
             bool faseAggiunta = false;
 
 			List<ODC_ODP> odcOdp = _imarSchedulatoreUoW.OdcOdpRepository.Get(x => x.ORDINE_RIGA == oridneRiga).ToList();
@@ -179,8 +178,6 @@ namespace IMAR_DialogoOperatore.Application.Services
 				Utente = "DialogoOperatore",
 				Attiva = true
 			};
-
-            OrdineProduzioneForzato odpForzatoIn;
 
 			ICollection<OrdineProduzioneForzato> OrdiniProduzioneForzati = new List<OrdineProduzioneForzato>();
 			foreach (var odp in _schedulazioneAttuale)

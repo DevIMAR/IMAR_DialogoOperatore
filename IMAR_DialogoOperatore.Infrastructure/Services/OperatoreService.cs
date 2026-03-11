@@ -43,7 +43,6 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
 
 			var swTotale = Stopwatch.StartNew();
 
-			string format = "yyyyMMddHHmmss";
 			CultureInfo provider = CultureInfo.InvariantCulture;
 
 			IQueryable<TblResClk>? ingressiUscite = null;
