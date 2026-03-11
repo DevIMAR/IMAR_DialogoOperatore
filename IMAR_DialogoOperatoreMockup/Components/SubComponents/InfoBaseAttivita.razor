@@ -200,6 +200,7 @@
 		InfoBaseAttivitaViewModel.NotifyStateChanged += InfoBaseAttivitaViewModel_NotifyStateChanged;
 		DialogoOperatoreObserver.OnIsDettaglioAttivitaOpenChanged += DialogoOperatoreObserver_OnIsDettaglioAttivitaOpenChanged;
 		DialogoOperatoreObserver.OnOperatoreSelezionatoChanged += DialogoOperatoreObserver_OnOperatoreSelezionatoDeepLink;
+		DialogoOperatoreObserver.OnOperazioneInCorsoChanged += async () => await InvokeAsync(StateHasChanged);
 
 		return base.OnInitializedAsync();
 	}

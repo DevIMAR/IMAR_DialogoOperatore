@@ -22,6 +22,12 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
 		private IList<Attivita>? _attivitaAperte;
 		private IList<stdMesIndTsk>? _attivitaIndirette;
 
+		/// <summary>
+		/// Indica se il primo caricamento dati è completato.
+		/// Finché è false, la UI deve mostrare il loader.
+		/// </summary>
+		public bool IsReady { get; private set; }
+
 		public CaricamentoAttivitaInBackgroundService(
 			IServiceProvider serviceProvider,
 			CalFlOdpCacheService calFlOdpCacheService)
@@ -38,6 +44,7 @@ namespace IMAR_DialogoOperatore.Infrastructure.Services
 		{
 			// Prima esecuzione immediata
 			await UpdateAttivitaAsync();
+			IsReady = true;
 
 			using var timer = new PeriodicTimer(TimeSpan.FromSeconds(20));
 			while (await timer.WaitForNextTickAsync(cancellationToken))

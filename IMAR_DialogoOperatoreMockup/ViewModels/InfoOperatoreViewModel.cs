@@ -2,6 +2,7 @@
 using IMAR_DialogoOperatore.Application.Interfaces.Services.Activities;
 using IMAR_DialogoOperatore.Application.Interfaces.Utilities;
 using IMAR_DialogoOperatore.Domain.Models;
+using IMAR_DialogoOperatore.Infrastructure.Services;
 using IMAR_DialogoOperatore.Interfaces.Observers;
 using IMAR_DialogoOperatore.Interfaces.ViewModels;
 
@@ -12,6 +13,7 @@ namespace IMAR_DialogoOperatore.ViewModels
         private readonly IDialogoOperatoreObserver _dialogoOperatoreObserver;
         private readonly IOperatoreService _operatoriService;
         private readonly IAutoLogoutUtility _autoLogoutUtility;
+        private readonly CaricamentoAttivitaInBackgroundService _backgroundService;
 
         private int? _badge;
         private IOperatoreViewModel? _operatoreSelezionato;
@@ -51,11 +53,13 @@ namespace IMAR_DialogoOperatore.ViewModels
         public InfoOperatoreViewModel(
             IDialogoOperatoreObserver dialogoOperatoreStore,
             IOperatoreService operatoriService,
-            IAutoLogoutUtility autoLogoutUtility)
+            IAutoLogoutUtility autoLogoutUtility,
+            CaricamentoAttivitaInBackgroundService backgroundService)
         {
             _dialogoOperatoreObserver = dialogoOperatoreStore;
             _operatoriService = operatoriService;
             _autoLogoutUtility = autoLogoutUtility;
+            _backgroundService = backgroundService;
 
             _autoLogoutUtility.OnLogoutTriggered += AutoLogoutUtility_OnLogoutTriggered;
             _dialogoOperatoreObserver.OnIsDettaglioAttivitaOpenChanged += DialogoOperatoreObserver_OnIsDettaglioAttivitaOpenChanged;
@@ -90,6 +94,12 @@ namespace IMAR_DialogoOperatore.ViewModels
         {
             _dialogoOperatoreObserver.IsLoaderVisibile = true;
             await Task.Delay(1);
+
+            // Aspetta che il primo caricamento dati in background sia completato
+            // (evita di mostrare attività vuote subito dopo un deploy/riavvio)
+            while (!_backgroundService.IsReady)
+                await Task.Delay(200);
+
             Operatore? operatore = await _operatoriService.OttieniOperatoreAsync(Badge);
             _dialogoOperatoreObserver.IsLoaderVisibile = false;
 
